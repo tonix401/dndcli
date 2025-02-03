@@ -4,7 +4,7 @@ import { select } from "@inquirer/prompts";
 
 const menuOptions = {
   option1: {
-    name: "Option 1",
+    name: "Dance",
     value: "1",
   },
   option2: {
@@ -49,7 +49,7 @@ async function main() {
           log("Option 3 selected");
           break;
         default:
-          console.log("Invalid option");
+          log("test", LogTypes.ERROR);
       }
       break;
     }
