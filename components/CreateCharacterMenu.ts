@@ -1,7 +1,7 @@
 import ICharacterData from "../types/ICharacterData";
 import { saveCharacterData } from "../utilities/CharacterService.js";
 import { input, select } from "@inquirer/prompts";
-import { classChoices } from "../types/ClassChoices.js";
+import { getClassChoices } from "../types/ClassChoices.js";
 import { getTerm, Language } from "../utilities/LanguageService.js";
 
 let charData: ICharacterData = {
@@ -36,7 +36,7 @@ export async function createCharacterMenu(lang: Language) {
   charData.class = await select(
     {
       message: getTerm("classPrompt", lang),
-      choices: classChoices,
+      choices: getClassChoices(lang),
     },
     { clearPromptOnDone: true }
   );
@@ -44,5 +44,5 @@ export async function createCharacterMenu(lang: Language) {
   saveCharacterData(charData);
 
   console.log(getTerm("characterSuccess", lang));
-  await input({message: getTerm("backToMenu", lang)});
+  await input({ message: getTerm("pressEnter", lang) });
 }

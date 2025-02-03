@@ -1,24 +1,28 @@
 import { input } from "@inquirer/prompts";
 import { getTerm, Language } from "../utilities/LanguageService.js";
 import chalk from "chalk";
-import { totalClear } from "../utilities/ConsoleService.js";
+import { pause, slowWrite, totalClear } from "../utilities/ConsoleService.js";
 
-export async function welcomeScreen(lang: Language){
-    totalClear();
-
-    console.log(chalk.bold(chalk.blueBright(getTerm("welcome", lang))));
-    await pause(2500);
-    console.log(getTerm("goodName", lang));
-    await pause(3000);
-    console.log(getTerm("right", lang));
-    await pause(2000);
-    console.log(getTerm("adventure", lang));
-    await pause(2500);
-    console.log(getTerm("authors", lang));
-    await pause(2000);
-    await input({message: getTerm("backToMenu", lang)});
-}
-
-async function pause(time:number) {
-   return new Promise((resolve) => setTimeout(resolve, time));
+/**
+ * Initiates the title sequence / welcome screen of the app
+ * @param lang The current language code, to show the sequence in
+ * @example
+ *   Welcome to DnD-CLI
+ *   That must be the best name you have ever heard!
+ *   Right?
+ *   Nevermind that! Adventure awaits!
+ *   by Julian Thaesler and Tom Weise
+ * ? Press [Enter] to go to the menu
+ */
+export async function welcomeScreen(lang: Language) {
+  totalClear();
+  await slowWrite(
+    getTerm("welcome", lang),
+    undefined,
+    undefined,
+    false,
+    (char) => chalk.bold(chalk.cyan(char))
+  );
+  await slowWrite(getTerm("welcomeText", lang));
+  await input({ message: getTerm("pressEnter", lang) });
 }

@@ -14,15 +14,16 @@ export async function inspectCharacter(lang: Language = "de") {
   if (!charData) {
     console.log(getTerm("noCharacter", lang));
     await input({
-      message: getTerm("backToMenu", lang),
+      message: getTerm("pressEnter", lang),
     });
   }
 
   const charLog = `
     ${chalk.bold(
-      `${charData.name} - ${getTerm("level", lang)} ${charData.level} ${
-        charData.class
-      }`
+      `${charData.name} - ${getTerm("level", lang)} ${charData.level} ${getTerm(
+        charData.class,
+        lang
+      )}`
     )}
 
     ${getTerm("hp", lang)}: ${charData.hp} of ${charData.abilities.maxhp}
@@ -45,6 +46,6 @@ export async function inspectCharacter(lang: Language = "de") {
     `;
   console.log(charLog);
   await input({
-    message: getTerm("backToMenu", lang),
+    message: getTerm("pressEnter", lang),
   });
 }

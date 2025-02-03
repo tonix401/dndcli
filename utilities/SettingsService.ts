@@ -4,8 +4,13 @@ import LogTypes from "../types/LogTypes.js";
 import { ISettings } from "../types/ISettings.js";
 
 const filename = "../dndcli/data/settings.json";
-
-export function getSettingsData(): ISettings {
+/**
+ * Reads the saved settings from the settings.json file
+ * @returns The settings as an object
+ * @example
+ * { language: "de" }
+ */
+export function getSettingsData(): ISettings | null {
   try {
     const data = fs.readFileSync(filename, "utf-8");
     return JSON.parse(data);
@@ -16,21 +21,22 @@ export function getSettingsData(): ISettings {
         LogTypes.ERROR
       );
     }
-    // incase of error return german language settings
-    return {
-      language: "de",
-    };
+    return null
   }
 }
 
-export function saveSettingsData(settingsData: ISettings) {
+/**
+ * Saves settings data
+ * @param settingsData The settings object to write to the settings.json file
+ * @example
+ * { language: "en" }
+ */
+export function saveSettingsData(settingsData: ISettings): void {
   try {
     fs.writeFileSync(filename, JSON.stringify(settingsData, null, 2));
-    return true;
   } catch (error) {
     if (error instanceof Error) {
       log(`Error while saving ${filename}: ${error.message}`, LogTypes.ERROR);
     }
-    return false;
   }
 }
