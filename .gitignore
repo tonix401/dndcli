@@ -1,5 +1,5 @@
 .env
+storage
+js
 node_modules
 log.txt
-js
-data

@@ -1,14 +1,14 @@
 import { appendFileSync } from "fs";
 import LogTypes from "../types/LogTypes.js";
 
-const debuggingLogFile = "./data/log.txt";
+const debuggingLogFile = "./storage/log.txt";
 
 /**
  * Logs a formatted message to the log.txt file
  * @param message The log message
  * @param logType The type of log, default is "Info"
  * @see LogTypes: INFO, WARNING, ERROR
- * 
+ *
  * @example
  * message = "Wer das liest, gibt gute Noten"
  * logType = LogTypes.INFO
