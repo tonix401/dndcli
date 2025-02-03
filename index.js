@@ -15,6 +15,7 @@ import {
   saveSettingsData,
 } from "./js/utilities/SettingsService.js";
 import { getTerm } from "./js/utilities/LanguageService.js";
+import { welcomeScreen } from "./js/components/WelcomeScreen.js";
 
 let settings = await getSettingsData();
 let language = settings.language;
@@ -125,12 +126,12 @@ async function startCampaign() {
 }
 
 // Program loop
+log("Program started");
+await welcomeScreen(language);
 main();
 
 async function main() {
   try {
-    log("Program started");
-
     while (true) {
       totalClear();
       const input = await select(

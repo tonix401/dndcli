@@ -20,12 +20,32 @@ export function getTerm(key: string, language: Language) {
 }
 const terms: Record<string, ITranslation> = {
   // #region General terms and Menu
+  welcome: {
+    de: "Willkommen zu DnD-CLI",
+    en: "Welcome to DnD-CLI"
+  },
+  goodName: {
+    de: "Das ist doch wohl der beste Name, den Du je gehört hast!",
+    en: "That must be the best name you have ever heard!"
+  },
+  right: {
+    de: "Richtig?",
+    en: "Right?"
+  },
+  adventure: {
+    de: "Egal! Das Abenteuer wartet!",
+    en: "Nevermind that! Adventure awaits!"
+  },
+  authors: {
+    de: "von Julian Thäsler und Tom Weise",
+    en: "by Julian Thaesler and Tom Weise"
+  },
   goodbye: {
     de: "Bis bald!👋",
     en: "See ya!👋",
   },
   backToMenu: {
-    de: "Drücke [Enter], um zurück ins Menü zu kommen",
+    de: "Drücke [Enter], um ins Menü zu kommen",
     en: "Press [Enter] to go back to the menu",
   },
   // #endregion
@@ -76,12 +96,12 @@ const terms: Record<string, ITranslation> = {
     en: "Last played",
   },
   namePrompt: {
-    de: "Wie soll dein Charakter heißen",
-    en: "What should your character be named",
+    de: "Wie soll dein Charakter heißen?",
+    en: "What should your character be named?",
   },
   classPrompt: {
-    de: "Welche Klasse soll dein Charakter haben",
-    en: "Which class should your character be",
+    de: "Welche Klasse soll dein Charakter haben?",
+    en: "Which class should your character be?",
   },
   characterSuccess: {
     de: "Charakter erfolgreich erstellt",
