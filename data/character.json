@@ -1,6 +1,7 @@
 {
-  "name": "peter",
-  "class": "Mage",
+  "name": "Kaito Sena",
+  "class": "Swordsman",
+  "origin": "He wants to travel the world to find his bride. He will have to go through trials and tribulations in order to protect the one he loves",
   "level": "1",
   "xp": "0",
   "hp": "10",
@@ -12,12 +13,31 @@
     "charisma": "1",
     "luck": "1"
   },
-  "inventory": {
-    "item1": "",
-    "item2": "",
-    "item3": "",
-    "item4": "",
-    "item5": ""
-  },
-  "lastPlayed": "3.2.2025"
+  "inventory": [
+    {
+      "id": "item1",
+      "name": "Basic Sword",
+      "description": "A rusty sword that still cuts.",
+      "effect": "",
+      "rarity": "Common",
+      "quantity": 1
+    },
+    {
+      "id": "item2",
+      "name": "Leather Armor",
+      "description": "Provides minimal protection.",
+      "effect": "",
+      "rarity": "Common",
+      "quantity": 1
+    },
+    {
+      "id": "item3",
+      "name": "Healing Potion",
+      "description": "Restores 10 HP.",
+      "effect": "restoreHP",
+      "rarity": "Common",
+      "quantity": 2
+    }
+  ],
+  "lastPlayed": "03/02/2025"
 }

@@ -8,7 +8,10 @@ interface ITranslation {
 
 export type Language = "de" | "en";
 
-export function getTerm(key: string, language: Language) {
+// Define valid term keys for type safety
+export type TermKey = keyof typeof terms;
+
+export function getTerm(key: TermKey, language: Language): string {
   const term = terms[key][language];
 
   if (!term) {
@@ -18,7 +21,8 @@ export function getTerm(key: string, language: Language) {
 
   return term;
 }
-const terms: Record<string, ITranslation> = {
+
+const terms = {
   // #region General terms and Menu
   goodbye: {
     de: "Bis bald!👋",
@@ -31,6 +35,32 @@ const terms: Record<string, ITranslation> = {
   // #endregion
 
   // #region Character Data
+  namePrompt: {
+    de: "Wie soll dein Charakter heißen",
+    en: "What should your character be named",
+  },
+  classPrompt: {
+    de: "Welche Klasse soll dein Charakter haben",
+    en: "Which class should your character be",
+  },
+  originPrompt: {
+    de: "Beschreibe die Herkunft deines Charakters",
+    en: "Describe your character's origin",
+  },
+  originClarification: {
+    de: "Bitte präzisiere die Herkunft deines Charakters",
+    en: "Please clarify your character's origin",
+  },
+  characterSuccess: {
+    de: "Charakter erfolgreich erstellt",
+    en: "Character successfully created",
+  },
+  noCharacter: {
+    de: "Es wurde noch kein Charakter gespeichert",
+    en: "There is no character saved yet",
+  },
+
+  // Character Stats
   hp: {
     de: "HP",
     en: "HP",
@@ -74,22 +104,6 @@ const terms: Record<string, ITranslation> = {
   lastPlayed: {
     de: "Zuletzt gespielt",
     en: "Last played",
-  },
-  namePrompt: {
-    de: "Wie soll dein Charakter heißen",
-    en: "What should your character be named",
-  },
-  classPrompt: {
-    de: "Welche Klasse soll dein Charakter haben",
-    en: "Which class should your character be",
-  },
-  characterSuccess: {
-    de: "Charakter erfolgreich erstellt",
-    en: "Character successfuly created"
-  },
-  noCharacter: {
-    de: "Es wurde noch kein Charakter gespeichert",
-    en: "There is no character saved yet",
   },
   // #endregion
 
@@ -146,4 +160,4 @@ const terms: Record<string, ITranslation> = {
     en: "Exit",
   },
   // #endregion
-};
+} as const;

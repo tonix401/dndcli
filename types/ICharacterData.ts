@@ -1,9 +1,10 @@
-/**
- * Defines the structure for the character data
- */
-export default interface CharacterData {
+// types/ICharacterData.ts
+import { IItem } from "./IITem.js";
+
+export default interface ICharacterData {
   name: string;
   class: string;
+  origin: string;
   level: string;
   xp: string;
   hp: string;
@@ -15,12 +16,6 @@ export default interface CharacterData {
     charisma: string;
     luck: string;
   };
-  inventory: {
-    item1: string;
-    item2: string;
-    item3: string;
-    item4: string;
-    item5: string;
-  };
+  inventory: IItem[];
   lastPlayed: string;
 }
