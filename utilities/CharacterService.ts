@@ -8,7 +8,9 @@ export function getCharacterData() {
     const data = fs.readFileSync(filename, "utf-8");
     return JSON.parse(data);
   } catch (error) {
-    console.error(`Error loading ${filename}:`, error.message);
+    if (error instanceof Error) {
+      console.error(`Error loading ${filename}:`, error.message);
+    }
     return false;
   }
 }
@@ -18,7 +20,9 @@ export function saveCharacterData(characterData: ICharacterData) {
     fs.writeFileSync(filename, JSON.stringify(characterData, null, 2));
     return true;
   } catch (error) {
-    console.error(`Error saving ${filename}:`, error.message);
+    if (error instanceof Error) {
+      console.error(`Error saving ${filename}:`, error.message);
+    }
     return false;
   }
 }

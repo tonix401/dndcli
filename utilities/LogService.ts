@@ -1,7 +1,7 @@
 import { appendFileSync } from "fs";
-import { LogTypes } from "../types/logTypes";
+import { LogTypes } from "../types/LogTypes";
 
-const debuggingLogFile = "../data/log.txt";
+const debuggingLogFile = "./data/log.txt";
 
 export function log(message: string, logType = LogTypes.INFO) {
   let log = `${new Date().toLocaleTimeString()} | ${logType} | ${message}\n`;

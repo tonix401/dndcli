@@ -1,5 +1,5 @@
-import { LogTypes } from "types/LogTypes";
-import { log } from "utilities/LogService";
+import { LogTypes } from "./js/types/LogTypes.js";
+import { log } from "./js/utilities/LogService.js";
 import { select } from "@inquirer/prompts";
 
 const menuOptions = {
