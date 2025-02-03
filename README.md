@@ -1,20 +1,25 @@
-# DNDCLI
+## DNDCLI
 
 Programmieren Projekt
 
-## Description
+### Description
 
 Programmieren Projekt von Julian Thaesler und Tom Weise, TIF24B
 
-## Installation
+### Installation
 
+```batch
 npm install
+
 tsc --build
+```
 
-## Usage
+### Usage
 
+```batch
 node index
+```
 
-## License
+### License
 
 [MIT](https://choosealicense.com/licenses/mit/)
