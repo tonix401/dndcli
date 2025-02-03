@@ -1,7 +1,7 @@
 import { appendFileSync } from "fs";
 import logTypes from "../types/logTypes.js";
 
-const debuggingLogFile = "./utilities/log.txt";
+const debuggingLogFile = "./data/log.txt";
 
 class LogService {
   static
