@@ -1,7 +1,7 @@
 import fs from "fs";
 import ICharacterData from "../types/ICharacterData";
 
-const filename = "../data/context.json";
+const filename = "../dndcli/data/character.json";
 
 export function getCharacterData() {
   try {
