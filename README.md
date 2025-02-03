@@ -11,7 +11,7 @@ Programmieren Projekt von Julian Thaesler und Tom Weise, TIF24B
 ```batch
 npm install
 
-tsc --build
+tsc --build -w
 ```
 
 ### Usage

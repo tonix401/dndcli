@@ -1,6 +1,7 @@
 import ICharacterData from "../types/ICharacterData";
 import { saveCharacterData } from "../utilities/CharacterService.js";
 import { input, select } from "@inquirer/prompts";
+import { classChoices } from "../types/ClassChoices.js";
 
 let charData: ICharacterData = {
   name: "",
@@ -9,7 +10,7 @@ let charData: ICharacterData = {
   xp: "0",
   hp: "10",
   abilities: {
-    maxhp: "1",
+    maxhp: "10",
     strength: "1",
     mana: "1",
     dexterity: "1",
@@ -26,27 +27,18 @@ let charData: ICharacterData = {
   lastPlayed: "",
 };
 
-const classChoices = [
-  {
-    name: "Swordsman",
-    value: "swordsman",
-  },
-  {
-    name: "Mage",
-    value: "mage",
-  },
-  {
-    name: "Archer",
-    value: "archer",
-  },
-];
-
 export async function createCharacterMenu() {
-  charData.name = await input({ message: "Wie soll dein Charakter heißen" });
-  charData.class = await select({
-    message: "Welche Klasse soll dein Charakter haben",
-    choices: classChoices,
-  });
+  charData.name = await input(
+    { message: "Wie soll dein Charakter heißen" },
+    { clearPromptOnDone: true }
+  );
+  charData.class = await select(
+    {
+      message: "Welche Klasse soll dein Charakter haben",
+      choices: classChoices,
+    },
+    { clearPromptOnDone: true }
+  );
   charData.lastPlayed = new Date().toLocaleDateString();
   saveCharacterData(charData);
 }

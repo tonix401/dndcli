@@ -1,5 +1,7 @@
 import fs from "fs";
 import ICharacterData from "../types/ICharacterData";
+import { log } from "./LogService";
+import LogTypes from "../types/LogTypes";
 
 const filename = "../dndcli/data/character.json";
 
@@ -9,7 +11,7 @@ export function getCharacterData() {
     return JSON.parse(data);
   } catch (error) {
     if (error instanceof Error) {
-      console.error(`Error loading ${filename}:`, error.message);
+      log(`Error while loading ${filename}: No Character yet saved`, LogTypes.ERROR);
     }
     return false;
   }
@@ -21,7 +23,7 @@ export function saveCharacterData(characterData: ICharacterData) {
     return true;
   } catch (error) {
     if (error instanceof Error) {
-      console.error(`Error saving ${filename}:`, error.message);
+      log(`Error while saving ${filename}: ${error.message}`, LogTypes.ERROR);
     }
     return false;
   }
