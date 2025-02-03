@@ -1,11 +1,11 @@
 {
-  "name": "de",
-  "class": "swordsman",
+  "name": "Günter",
+  "class": "Archer",
   "level": "1",
   "xp": "0",
   "hp": "10",
   "abilities": {
-    "maxhp": "1",
+    "maxhp": "10",
     "strength": "1",
     "mana": "1",
     "dexterity": "1",

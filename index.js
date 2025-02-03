@@ -2,22 +2,24 @@ import { createCharacterMenu } from "./js/components/CreateCharacterMenu.js";
 import LogTypes from "./js/types/LogTypes.js";
 import { log } from "./js/utilities/LogService.js";
 import { select } from "@inquirer/prompts";
+import { totalClear } from "./js/utilities/ConsoleService.js";
+import { inspectCharacter } from "./js/components/InspectCharacter.js";
 
 const menuOptions = [
   {
-    name: "Einen neuen Charakter erstellen",
+    name: "Create your Character",
     value: "1",
   },
   {
-    name: "Option 2",
+    name: "Inspect your Character",
     value: "2",
   },
   {
-    name: "Option 3",
+    name: "Start Campaign",
     value: "3",
   },
   {
-    name: "Exit",
+    name: "End Game",
     value: "9",
   },
 ];
@@ -30,10 +32,14 @@ async function main() {
     log("Program started");
 
     while (true) {
-      const input = await select({
-        message: "Bitte wählen:",
-        choices: menuOptions,
-      });
+      totalClear();
+      const input = await select(
+        {
+          message: "Please choose:",
+          choices: menuOptions,
+        },
+        { clearPromptOnDone: true }
+      );
 
       switch (input) {
         case "1":
@@ -42,13 +48,14 @@ async function main() {
           break;
         case "2":
           log("Option 2 selected");
+          await inspectCharacter();
           break;
         case "3":
           log("Option 3 selected");
           break;
         case "9":
           log("Program ended");
-          console.log("Bis bald!👋");
+          console.log("See ya!👋");
           process.exit();
       }
     }
