@@ -1,10 +1,10 @@
 # DNDCLI
 
-
+Programmieren Projekt
 
 ## Description
 
-Julian Thaesler Programmieren Projekt, Semester 1
+Programmieren Projekt von Julian Thaesler und Tom Weise, TIF24B
 
 ## Installation
 

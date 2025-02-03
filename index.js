@@ -2,24 +2,24 @@ import { LogTypes } from "./js/types/LogTypes.js";
 import { log } from "./js/utilities/LogService.js";
 import { select } from "@inquirer/prompts";
 
-const menuOptions = {
-  option1: {
+const menuOptions = [
+  {
     name: "Dance",
     value: "1",
   },
-  option2: {
+  {
     name: "Option 2",
     value: "2",
   },
-  option3: {
+  {
     name: "Option 3",
     value: "3",
   },
-  option9: {
+  {
     name: "Exit",
     value: "9",
   },
-};
+];
 
 // program loop
 main();
@@ -32,24 +32,24 @@ async function main() {
       clear();
 
       const input = await select({
-        message: "Select an option",
-        choices: Object.values(menuOptions).map((o) => o.name),
+        message: "Bitte wählen:",
+        choices: menuOptions,
       });
 
       clear();
 
       switch (input) {
-        case menuOptions.option1.value:
+        case "1":
           log("Option 1 selected");
           break;
-        case menuOptions.option2.value:
+        case "2":
           log("Option 2 selected");
           break;
-        case menuOptions.option3.value:
+        case "3":
           log("Option 3 selected");
           break;
         default:
-          log("test", LogTypes.ERROR);
+          console.log(`${input} ist keine valide Eingabe`);
       }
       break;
     }
