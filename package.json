@@ -1,0 +1,11 @@
+{
+  "type": "module",
+  "dependencies": {
+    "@inquirer/prompts": "^7.3.1",
+    "chalk": "^5.4.1",
+    "fs": "^0.0.1-security"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.0"
+  }
+}

@@ -1,5 +1,5 @@
 import { appendFileSync } from "fs";
-import { LogTypes } from "../types/LogTypes";
+import LogTypes from "../types/LogTypes.js";
 
 const debuggingLogFile = "./data/log.txt";
 

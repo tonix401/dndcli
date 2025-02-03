@@ -1,9 +1,9 @@
 import fs from "fs";
 import ICharacterData from "../types/ICharacterData";
 
-const filename = "../data/context.json";
+const filename = "../dndcli/data/context.json";
 
-export function getCharacterData() {
+export function getContextData() {
   try {
     const data = fs.readFileSync(filename, "utf-8");
     return JSON.parse(data);
@@ -15,7 +15,7 @@ export function getCharacterData() {
   }
 }
 
-export function saveCharacterData(characterData: ICharacterData) {
+export function saveContextData(characterData: ICharacterData) {
   try {
     fs.writeFileSync(filename, JSON.stringify(characterData, null, 2));
     return true;

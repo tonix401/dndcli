@@ -1,27 +1,28 @@
-import { LogTypes } from "./js/types/LogTypes.js";
+import { createCharacterMenu } from "./js/components/CreateCharacterMenu.js";
+import LogTypes from "./js/types/LogTypes.js";
 import { log } from "./js/utilities/LogService.js";
 import { select } from "@inquirer/prompts";
 
-const menuOptions = {
-  option1: {
-    name: "Option 1",
+const menuOptions = [
+  {
+    name: "Einen neuen Charakter erstellen",
     value: "1",
   },
-  option2: {
+  {
     name: "Option 2",
     value: "2",
   },
-  option3: {
+  {
     name: "Option 3",
     value: "3",
   },
-  option9: {
+  {
     name: "Exit",
     value: "9",
   },
-};
+];
 
-// program loop
+// Program loop
 main();
 
 async function main() {
@@ -29,37 +30,29 @@ async function main() {
     log("Program started");
 
     while (true) {
-      clear();
-
       const input = await select({
-        message: "Select an option",
-        choices: Object.values(menuOptions).map((o) => o.name),
+        message: "Bitte wählen:",
+        choices: menuOptions,
       });
 
-      clear();
-
       switch (input) {
-        case menuOptions.option1.value:
+        case "1":
           log("Option 1 selected");
+          await createCharacterMenu();
           break;
-        case menuOptions.option2.value:
+        case "2":
           log("Option 2 selected");
           break;
-        case menuOptions.option3.value:
+        case "3":
           log("Option 3 selected");
           break;
-        default:
-          console.log("Invalid option");
+        case "9":
+          log("Program ended");
+          console.log("Bis bald!👋");
+          process.exit();
       }
-      break;
     }
-    log("Program ended");
   } catch (error) {
     log(error, LogTypes.ERROR);
   }
-}
-
-function clear() {
-  // Clears the console completely, without leaving any annoying scroll-up buffer behind
-  process.stdout.write("\x1Bc\x1B[3J\x1B[H\x1B[2J");
 }

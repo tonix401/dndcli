@@ -1,3 +1,6 @@
+/**
+ * Defines the structure for the character data
+ */
 export default interface CharacterData {
   name: string;
   class: string;
