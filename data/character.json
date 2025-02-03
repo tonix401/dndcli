@@ -1,0 +1,23 @@
+{
+    "name":"unnamed",
+    "class":"classless",
+    "level":"1",
+    "xp":"0",
+    "hp":"10",
+    "abilities": {
+        "max-hp":"10",
+        "strength":"1",
+        "mana":"1",
+        "dexterity":"1",
+        "charisma":"1",
+        "luck":"1"
+    },
+    "inventory": {
+      "item1": "",
+      "item2": "",
+      "item3": "",
+      "item4": "",
+      "item5": ""
+    },
+    "lastPlayed":""
+}
