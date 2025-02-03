@@ -6,7 +6,7 @@
     "dotenv": "^16.4.7",
     "fs": "^0.0.1-security",
     "inquirer": "^12.4.1",
-    "openai": "^3.3.0"
+    "openai": "3.3.0"
   },
   "devDependencies": {
     "@types/node": "^22.13.0"

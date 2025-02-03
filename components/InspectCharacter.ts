@@ -3,43 +3,48 @@ import { getCharacterData } from "../utilities/CharacterService.js";
 import { totalClear } from "../utilities/ConsoleService.js";
 import chalk from "chalk";
 import { confirm } from "@inquirer/prompts";
-import { log } from "../utilities/LogService";
-import LogTypes from "../types/LogTypes";
+import { getTerm } from "../utilities/LanguageService.js";
 
-export async function inspectCharacter() {
+type Language = "de" | "en";
+
+export async function inspectCharacter(lang: Language = "de") {
   totalClear();
   const charData: ICharacterData = await getCharacterData();
 
   if (!charData) {
-    console.log("There is no character saved yet");
+    console.log(getTerm("noCharacter", lang));
     await confirm({
-      message: "Do you want to go back to the menu?",
+      message: getTerm("backToMenu", lang),
     });
   }
 
   const charLog = `
-  ${chalk.bold(`${charData.name} - Level ${charData.level} ${charData.class}`)}
-  
-  HP: ${charData.hp} of ${charData.abilities.maxhp}
-  XP: ${charData.xp}
+    ${chalk.bold(
+      `${charData.name} - ${getTerm("level", lang)} ${charData.level} ${
+        charData.class
+      }`
+    )}
 
-  Strength: ${charData.abilities.strength}
-  Mana: ${charData.abilities.mana}
-  Dexterity: ${charData.abilities.dexterity}
-  Charisma: ${charData.abilities.charisma}
-  Luck: ${charData.abilities.luck}
+    ${getTerm("hp", lang)}: ${charData.hp} of ${charData.abilities.maxhp}
+    ${getTerm("xp", lang)}: ${charData.xp}
 
-  Inventory:
-  | ${charData.inventory.item1 || "empty"} | ${
-    charData.inventory.item2 || "empty"
-  } | ${charData.inventory.item3 || "empty"} | ${
-    charData.inventory.item4 || "empty"
-  } | ${charData.inventory.item5 || "empty"} |
+    ${getTerm("strength", lang)}: ${charData.abilities.strength}
+    ${getTerm("mana", lang)}: ${charData.abilities.mana}
+    ${getTerm("dexterity", lang)}: ${charData.abilities.dexterity}
+    ${getTerm("charisma", lang)}: ${charData.abilities.charisma}
+    ${getTerm("luck", lang)}: ${charData.abilities.luck}
 
-  Last played: ${charData.lastPlayed}
-  `;
+    ${getTerm("inventory", lang)}:
+    | ${charData.inventory.item1 || getTerm("empty", lang)} | ${
+    charData.inventory.item2 || getTerm("empty", lang)
+  } | ${charData.inventory.item3 || getTerm("empty", lang)} | ${
+    charData.inventory.item4 || getTerm("empty", lang)
+  } | ${charData.inventory.item5 || getTerm("empty", lang)} |
+
+    ${getTerm("lastPlayed", lang)}: ${charData.lastPlayed}
+    `;
   console.log(charLog);
   await confirm({
-    message: "Do you want to go back to the menu?",
+    message: getTerm("backToMenu", lang),
   });
 }
