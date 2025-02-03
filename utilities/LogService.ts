@@ -11,4 +11,7 @@ export function log(message: string, logType = LogTypes.INFO) {
   } catch (error) {
     console.error(`Error writing to log file: ${error}`);
   }
+
+  if(logType === LogTypes.ERROR)
+    console.error("An Error occured, please check the logs");
 }

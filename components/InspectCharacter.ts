@@ -2,7 +2,7 @@ import ICharacterData from "../types/ICharacterData";
 import { getCharacterData } from "../utilities/CharacterService.js";
 import { totalClear } from "../utilities/ConsoleService.js";
 import chalk from "chalk";
-import { confirm } from "@inquirer/prompts";
+import { input } from "@inquirer/prompts";
 import { getTerm } from "../utilities/LanguageService.js";
 
 type Language = "de" | "en";
@@ -13,7 +13,7 @@ export async function inspectCharacter(lang: Language = "de") {
 
   if (!charData) {
     console.log(getTerm("noCharacter", lang));
-    await confirm({
+    await input({
       message: getTerm("backToMenu", lang),
     });
   }
@@ -44,7 +44,7 @@ export async function inspectCharacter(lang: Language = "de") {
     ${getTerm("lastPlayed", lang)}: ${charData.lastPlayed}
     `;
   console.log(charLog);
-  await confirm({
+  await input({
     message: getTerm("backToMenu", lang),
   });
 }

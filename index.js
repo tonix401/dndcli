@@ -9,22 +9,35 @@ import { promptForChoice } from "./js/src/gameMaster.js";
 import { GameState } from "./js/src/gameState.js";
 import { generateChatNarrative } from "./js/src/aiAssistant.js";
 import { ChatCompletionRequestMessageRoleEnum } from "openai";
+import { changeLanguage } from "./js/components/SettingsMenu.js";
+import {
+  getSettingsData,
+  saveSettingsData,
+} from "./js/utilities/SettingsService.js";
+import { getTerm } from "./js/utilities/LanguageService.js";
 
-const menuOptions = [
+let settings = await getSettingsData();
+let language = settings.language;
+
+const menuOptions = () => [
   {
-    name: "Create your Character",
+    name: getTerm("createCharacter", language),
     value: "1",
   },
   {
-    name: "Inspect your Character",
+    name: getTerm("inspectCharacter", language),
     value: "2",
   },
   {
-    name: "Start Campaign",
+    name: getTerm("startCampaign", language),
     value: "3",
   },
   {
-    name: "End Game",
+    name: getTerm("changeLang", language),
+    value: "4",
+  },
+  {
+    name: getTerm("exit", language),
     value: "9",
   },
 ];
@@ -122,8 +135,8 @@ async function main() {
       totalClear();
       const input = await select(
         {
-          message: "Please choose:",
-          choices: menuOptions,
+          message: getTerm("chooseOption", language),
+          choices: menuOptions(),
         },
         { clearPromptOnDone: true }
       );
@@ -131,23 +144,28 @@ async function main() {
       switch (input) {
         case "1":
           try {
-            log("Option 1 selected");
-            await createCharacterMenu();
+            log("Creating new Character");
+            await createCharacterMenu(language);
           } catch (error) {
             log("Error creating character: " + error.message, LogTypes.ERROR);
           }
           break;
         case "2":
-          log("Option 2 selected");
-          await inspectCharacter();
+          log("Inspecting Character");
+          await inspectCharacter(language);
           break;
         case "3":
           log("Campaign Start");
-          await startCampaign();
+          await startCampaign(language);
+          break;
+        case "4":
+          language = await changeLanguage(language);
+          log("Changed Language to " + language);
           break;
         case "9":
           log("Program ended");
-          console.log("See ya!👋");
+          saveSettingsData({ language: language });
+          console.log(getTerm("goodbye", language));
           process.exit();
       }
     }
