@@ -2,6 +2,7 @@ import ICharacterData from "../types/ICharacterData";
 import { saveCharacterData } from "../utilities/CharacterService.js";
 import { input, select } from "@inquirer/prompts";
 import { classChoices } from "../types/ClassChoices.js";
+import { getTerm, Language } from "../utilities/LanguageService.js";
 
 let charData: ICharacterData = {
   name: "",
@@ -27,18 +28,21 @@ let charData: ICharacterData = {
   lastPlayed: "",
 };
 
-export async function createCharacterMenu() {
+export async function createCharacterMenu(lang: Language) {
   charData.name = await input(
-    { message: "Wie soll dein Charakter heißen" },
+    { message: getTerm("namePrompt", lang) },
     { clearPromptOnDone: true }
   );
   charData.class = await select(
     {
-      message: "Welche Klasse soll dein Charakter haben",
+      message: getTerm("classPrompt", lang),
       choices: classChoices,
     },
     { clearPromptOnDone: true }
   );
   charData.lastPlayed = new Date().toLocaleDateString();
   saveCharacterData(charData);
+
+  console.log(getTerm("characterSuccess", lang));
+  await input({message: getTerm("backToMenu", lang)});
 }
