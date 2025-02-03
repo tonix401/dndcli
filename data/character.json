@@ -1,6 +1,6 @@
 {
-  "name": "Günter",
-  "class": "Archer",
+  "name": "n+",
+  "class": "Mage",
   "level": "1",
   "xp": "0",
   "hp": "10",
@@ -19,5 +19,5 @@
     "item4": "",
     "item5": ""
   },
-  "lastPlayed": "3.2.2025"
+  "lastPlayed": "03/02/2025"
 }
