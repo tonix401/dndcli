@@ -3,7 +3,18 @@ import LogTypes from "../types/LogTypes.js";
 
 const debuggingLogFile = "./data/log.txt";
 
-export function log(message: string, logType = LogTypes.INFO) {
+/**
+ * Logs a formatted message to the log.txt file
+ * @param message The log message
+ * @param logType The type of log, default is "Info"
+ * @see LogTypes: INFO, WARNING, ERROR
+ * 
+ * @example
+ * message = "Wer das liest, gibt gute Noten"
+ * logType = LogTypes.INFO
+ * -> "12:34:56 | Info  | Wer das liest, gibt gute Noten"
+ */
+export function log(message: string, logType = LogTypes.INFO): void {
   let log = `${new Date().toLocaleTimeString()} | ${logType} | ${message}\n`;
 
   try {
@@ -11,7 +22,4 @@ export function log(message: string, logType = LogTypes.INFO) {
   } catch (error) {
     console.error(`Error writing to log file: ${error}`);
   }
-
-  if(logType === LogTypes.ERROR)
-    console.error("An Error occured, please check the logs");
 }

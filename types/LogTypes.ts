@@ -1,5 +1,6 @@
 /**
- * These have nothing to do with wood, but instead define the different types of debugging logs
+ * These have nothing to do with wood
+ * @options INFO, WARNING, ERROR
  */
 enum LogTypes {
   INFO = "Info ",

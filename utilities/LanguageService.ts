@@ -8,7 +8,24 @@ interface ITranslation {
 
 export type Language = "de" | "en";
 
-export function getTerm(key: string, language: Language) {
+/**
+ * Takes a term key and returns the term translated and formatted depending on parameters
+ * @param key Defines the key of the term
+ * @param language Defines the language to translate the term into
+ * @param indented Defines whether or not two spaces get added at the front of the returned term, to align normal output with inquirer prompts
+ * @returns The term in the given language and format as a string
+ *
+ * @example
+ * key = "pressEnter",
+ * language = "de",
+ * indented = true,
+ * returns "  Drücke [Enter], um ins Menü zu kommen",
+ */
+export function getTerm(
+  key: string,
+  language: Language,
+  indented: boolean = false
+): string {
   const term = terms[key][language];
 
   if (!term) {
@@ -16,17 +33,48 @@ export function getTerm(key: string, language: Language) {
     return "";
   }
 
-  return term;
+  return (indented ? "  " : "") + term;
 }
 const terms: Record<string, ITranslation> = {
-  // #region General terms and Menu
-  goodbye: {
-    de: "Bis bald!👋",
-    en: "See ya!👋",
+  // #region Welcome Sequence and Menu
+  welcome: {
+    de: "Willkommen zu DnD-CLI",
+    en: "Welcome to DnD-CLI",
   },
-  backToMenu: {
-    de: "Drücke [Enter], um zurück ins Menü zu kommen",
-    en: "Press [Enter] to go back to the menu",
+  welcomeText: {
+    de: "Das ist doch wohl der beste Name, den Du je gehört hast!\nRichtig?\nEgal! Das Abenteuer wartet!\nVon Julian Thäsler und Tom Weise",
+    en: "That must be the best name you have ever heard!\nRight?\nNevermind that! Adventure awaits!\nBy Julian Thaesler and Tom Weise",
+  },
+  goodbye: {
+    de: "Wir werden uns wiedersehen!👋",
+    en: "We shall meet again!👋",
+  },
+  pressEnter: {
+    de: "Drücke [Enter]",
+    en: "Press [Enter]",
+  },
+  helloNewPlayer: {
+    de: "Es sieht aus, als wärst Du zum ersten Mal hier.\nWir haben Dir schon einmal einen Charakter vorbereitet, damit Du gleich loslegen kannst.\nErstelle Dir aber gerne auch einen eigenen.\nGenieß die Show!",
+    en: "It looks like it's your first time around here.\nWe've prepared a character for you, so you can get right into the game.\nFeel free to make yourself a custom one though.\nEnjoy the show!",
+  },
+  // #endregion
+
+  // #region Character Classes
+  swordFighter: {
+    de: "Schwertkämpfer",
+    en: "Sword fighter",
+  },
+  archer: {
+    de: "Bogenschütze",
+    en: "Archer",
+  },
+  mage: {
+    de: "Magier",
+    en: "Mage",
+  },
+  thief: {
+    de: "Dieb",
+    en: "Thief",
   },
   // #endregion
 
@@ -75,17 +123,20 @@ const terms: Record<string, ITranslation> = {
     de: "Zuletzt gespielt",
     en: "Last played",
   },
+  // #endregion
+
+  // #region Character Creation
   namePrompt: {
-    de: "Wie soll dein Charakter heißen",
-    en: "What should your character be named",
+    de: "Wie soll dein Charakter heißen?",
+    en: "What should your character be named?",
   },
   classPrompt: {
-    de: "Welche Klasse soll dein Charakter haben",
-    en: "Which class should your character be",
+    de: "Welche Klasse soll dein Charakter haben?",
+    en: "Which class should your character be?",
   },
   characterSuccess: {
     de: "Charakter erfolgreich erstellt",
-    en: "Character successfuly created"
+    en: "Character successfuly created",
   },
   noCharacter: {
     de: "Es wurde noch kein Charakter gespeichert",
@@ -120,7 +171,7 @@ const terms: Record<string, ITranslation> = {
   },
   // #endregion
 
-  // #region menu options
+  // #region Menu options
   chooseOption: {
     de: "Bitte wähle:",
     en: "Please choose:",

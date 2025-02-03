@@ -1,24 +1,35 @@
-import { getCharacterData } from "./js/utilities/CharacterService.js";
-import { createCharacterMenu } from "./js/components/CreateCharacterMenu.js";
-import LogTypes from "./js/types/LogTypes.js";
-import { log } from "./js/utilities/LogService.js";
-import { select } from "@inquirer/prompts";
-import { totalClear } from "./js/utilities/ConsoleService.js";
-import { inspectCharacter } from "./js/components/InspectCharacter.js";
-import { promptForChoice } from "./js/src/gameMaster.js";
-import { GameState } from "./js/src/gameState.js";
-import { generateChatNarrative } from "./js/src/aiAssistant.js";
+// #region Imports
+// Modules
 import { ChatCompletionRequestMessageRoleEnum } from "openai";
-import { changeLanguage } from "./js/components/SettingsMenu.js";
+import { select } from "@inquirer/prompts";
+
+// Services
+import { totalClear } from "./js/utilities/ConsoleService.js";
+import { getTerm } from "./js/utilities/LanguageService.js";
+import { log } from "./js/utilities/LogService.js";
+import LogTypes from "./js/types/LogTypes.js";
+import { getCharacterData } from "./js/utilities/CharacterService.js";
 import {
   getSettingsData,
   saveSettingsData,
 } from "./js/utilities/SettingsService.js";
-import { getTerm } from "./js/utilities/LanguageService.js";
 
-let settings = await getSettingsData();
-let language = settings.language;
+// AI
+import { generateChatNarrative } from "./js/src/aiAssistant.js";
+import { promptForChoice } from "./js/src/gameMaster.js";
+import { GameState } from "./js/src/gameState.js";
 
+// Components
+import { createCharacterMenu } from "./js/components/CreateCharacterMenu.js";
+import { inspectCharacter } from "./js/components/InspectCharacter.js";
+import { changeLanguage } from "./js/components/SettingsMenu.js";
+import { welcomeScreen } from "./js/components/WelcomeScreen.js";
+import { newPlayerScreen } from "./js/components/NewPlayerScreen.js";
+// #endregion
+
+/**
+ *  The menu options for the main menu
+ */
 const menuOptions = () => [
   {
     name: getTerm("createCharacter", language),
@@ -124,13 +135,23 @@ async function startCampaign() {
   await campaignLoop(gameState, characterData);
 }
 
-// Program loop
-main();
+///////////////////////////////////////////// MAIN PROGRAM /////////////////////////////////////////////////
+await newPlayerScreen();
 
+let settings = await getSettingsData();
+let language = settings?.language || "de";
+
+log("Program started");
+await welcomeScreen(language);
+
+main();
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * The main menu and game loop of the app
+ */
 async function main() {
   try {
-    log("Program started");
-
     while (true) {
       totalClear();
       const input = await select(
