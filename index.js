@@ -1,28 +1,17 @@
 import fs from "fs-extra";
 import path from "path";
 import inquirer from "inquirer";
-import { totalClear } from "./js/utilities/ConsoleService.js";
-import LogTypes from "./js/types/LogTypes.js";
-import { log } from "./js/utilities/LogService.js";
 import { createCharacterMenu } from "./js/components/CreateCharacterMenu.js";
 import { inspectCharacter } from "./js/components/InspectCharacter.js";
 import { startCampaign } from "./js/src/campaign.js";
-// #region Imports
-// Modules
-import { ChatCompletionRequestMessageRoleEnum } from "openai";
-import { select } from "@inquirer/prompts";
-
-// Services
 import { totalClear } from "./js/utilities/ConsoleService.js";
-import { getTerm } from "./js/utilities/LanguageService.js";
 import { log } from "./js/utilities/LogService.js";
 import LogTypes from "./js/types/LogTypes.js";
-import { getCharacterData } from "./js/utilities/CharacterService.js";
-import {
-  getSettingsData,
-  saveSettingsData,
-} from "./js/utilities/SettingsService.js";
+import { getSettingsData } from "./js/utilities/SettingsService.js";
 import { changeLanguage } from "./js/components/SettingsMenu.js";
+import { newPlayerScreen } from "./js/components/NewPlayerScreen.js";
+import { welcomeScreen } from "./js/components/WelcomeScreen.js";
+import { saveSettingsData } from "./js/utilities/SettingsService.js";
 import { getTerm } from "./js/utilities/LanguageService.js";
 
 const dataDir = path.join(process.cwd(), "data");
@@ -67,7 +56,8 @@ async function handleMenuChoice(choice, currentLanguage) {
         log("Changed Language to " + newLanguage);
         return newLanguage;
       case "9":
-        await cleanup(currentLanguage);
+        saveSettingsData(currentLanguage);
+        console.log(getTerm("goodbye", currentLanguage));
         process.exit(0);
       default:
         log("Invalid option selected", LogTypes.ERROR);
@@ -78,33 +68,6 @@ async function handleMenuChoice(choice, currentLanguage) {
     return currentLanguage;
   }
 }
-
-async function startCampaign() {
-  const gameState = new GameState();
-  const characterData = getCharacterData();
-
-  if (!characterData) {
-    log(
-      "No character data found. Please create a character first.",
-      LogTypes.ERROR
-    );
-    return;
-  }
-
-  await campaignLoop(gameState, characterData);
-}
-
-///////////////////////////////////////////// MAIN PROGRAM /////////////////////////////////////////////////
-log("Program started");
-
-let settings = await getSettingsData();
-let language = settings?.language || "de";
-
-await newPlayerScreen(language);
-await welcomeScreen(language);
-
-main();
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * The main menu and game loop of the app
@@ -118,7 +81,7 @@ async function main() {
       const { choice } = await inquirer.prompt({
         type: "list",
         name: "choice",
-        message: "Please choose:",
+        message: getTerm("chooseOption", language),
         choices: menuOptions,
       });
 
@@ -126,14 +89,32 @@ async function main() {
     }
   } catch (error) {
     log("Fatal error: " + error.message, LogTypes.ERROR);
-    await cleanup(language);
+    saveSettingsData(language);
     process.exit(1);
   }
 }
 
 process.on("SIGINT", async () => {
-  await cleanup(language);
+  saveSettingsData(language);
   process.exit(0);
 });
 
+process.stdin.on('data', (key) => {
+  if (key.toString() === 'x') {
+    console.log("\n" + getTerm("goodbye", language));
+    saveSettingsData(language);
+    process.exit(0);
+  }
+});
+
+///////////////////////////////////////////// MAIN PROGRAM /////////////////////////////////////////////////
+log("Program started");
+
+let settings = await getSettingsData();
+let language = settings?.language || "de";
+
+await newPlayerScreen(language);
+await welcomeScreen(language);
+
 main();
+////////////////////////////////////////////////////////////////////////////////////////////////////////////

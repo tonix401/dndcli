@@ -1,5 +1,3 @@
-import { getTerm } from "./LanguageService";
-
 /**
  * Clears the console completely, without leaving any annoying scroll-up buffer behind
  */
