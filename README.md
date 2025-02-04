@@ -9,15 +9,13 @@ Programmieren Projekt von Julian Thaesler und Tom Weise, TIF24B
 ### Installation
 
 ```batch
-npm install
-
-tsc --build -w
+npm run setup
 ```
 
 ### Usage
 
 ```batch
-node index
+npm run start
 ```
 
 ### License

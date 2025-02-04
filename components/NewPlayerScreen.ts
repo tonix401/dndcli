@@ -29,7 +29,7 @@ const newPlayerChar = {
     item4: "",
     item5: "",
   },
-  lastPlayed: "1.1.1970",
+  lastPlayed: new Date().toLocaleDateString(),
 };
 
 /**

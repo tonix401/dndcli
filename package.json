@@ -1,5 +1,9 @@
 {
   "type": "module",
+  "scripts": {
+  "setup": "npm install && tsc --build && echo OPENAI_API_KEY= > .env",
+  "start": "powershell -Command \"if (!(Test-Path .env)) { npm run setup }; if (Select-String -Path .env -Pattern '^OPENAI_API_KEY= *$' -Quiet) { Write-Host '\u001b[31mBitte füge den OPENAI_API_KEY in das .env file ein\u001b[0m'; exit 1 }; node index\""
+  },
   "dependencies": {
     "@inquirer/prompts": "^7.3.1",
     "chalk": "^5.4.1",
@@ -10,5 +14,8 @@
   },
   "devDependencies": {
     "@types/node": "^22.13.0"
+  },
+  "config": {
+    "checkEnv": "node -e \"if(!require('fs').readFileSync('.env','utf8').match(/OPENAI_API_KEY=.+/)){console.error('\\u001b[31mError: OPENAI_API_KEY not set in .env file\\u001b[0m');process.exit(1)}\""
   }
 }
