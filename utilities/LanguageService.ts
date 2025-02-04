@@ -7,6 +7,7 @@ interface ITranslation {
 }
 
 export type Language = "de" | "en";
+export type TermKey = keyof typeof terms;
 
 /**
  * Takes a term key and returns the term translated and formatted depending on parameters
@@ -21,11 +22,7 @@ export type Language = "de" | "en";
  * indented = true,
  * returns "  Drücke [Enter], um ins Menü zu kommen",
  */
-export function getTerm(
-  key: string,
-  language: Language,
-  indented: boolean = false
-): string {
+export function getTerm(key: TermKey, language: Language, indented: boolean = false): string {
   const term = terms[key][language];
 
   if (!term) {
@@ -42,12 +39,12 @@ const terms: Record<string, ITranslation> = {
     en: "Welcome to DnD-CLI",
   },
   welcomeText: {
-    de: "Das ist doch wohl der beste Name, den Du je gehört hast!\nRichtig?\nEgal! Das Abenteuer wartet!\nVon Julian Thäsler und Tom Weise",
-    en: "That must be the best name you have ever heard!\nRight?\nNevermind that! Adventure awaits!\nBy Julian Thaesler and Tom Weise",
+    de: "Von Julian Thäsler und Tom Weise",
+    en: "By Julian Thaesler and Tom Weise",
   },
   goodbye: {
-    de: "Wir werden uns wiedersehen!👋",
-    en: "We shall meet again!👋",
+    de: "Wir werden uns wiedersehen!",
+    en: "We shall meet again!",
   },
   pressEnter: {
     de: "Drücke [Enter]",
@@ -79,6 +76,32 @@ const terms: Record<string, ITranslation> = {
   // #endregion
 
   // #region Character Data
+  namePrompt: {
+    de: "Wie soll dein Charakter heißen",
+    en: "What should your character be named",
+  },
+  classPrompt: {
+    de: "Welche Klasse soll dein Charakter haben",
+    en: "Which class should your character be",
+  },
+  originPrompt: {
+    de: "Beschreibe die Herkunft deines Charakters",
+    en: "Describe your character's origin",
+  },
+  originClarification: {
+    de: "Bitte präzisiere die Herkunft deines Charakters",
+    en: "Please clarify your character's origin",
+  },
+  characterSuccess: {
+    de: "Charakter erfolgreich erstellt",
+    en: "Character successfully created",
+  },
+  noCharacter: {
+    de: "Es wurde noch kein Charakter gespeichert",
+    en: "There is no character saved yet",
+  },
+
+  // Character Stats
   hp: {
     de: "HP",
     en: "HP",
@@ -122,25 +145,6 @@ const terms: Record<string, ITranslation> = {
   lastPlayed: {
     de: "Zuletzt gespielt",
     en: "Last played",
-  },
-  // #endregion
-
-  // #region Character Creation
-  namePrompt: {
-    de: "Wie soll dein Charakter heißen?",
-    en: "What should your character be named?",
-  },
-  classPrompt: {
-    de: "Welche Klasse soll dein Charakter haben?",
-    en: "Which class should your character be?",
-  },
-  characterSuccess: {
-    de: "Charakter erfolgreich erstellt",
-    en: "Character successfuly created",
-  },
-  noCharacter: {
-    de: "Es wurde noch kein Charakter gespeichert",
-    en: "There is no character saved yet",
   },
   // #endregion
 
