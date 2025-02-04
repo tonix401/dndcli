@@ -11,6 +11,7 @@ Programmieren Projekt von Julian Thaesler und Tom Weise, TIF24B
 ```batch
 npm run setup
 ```
+add your OPENAI_API_KEY into the .env file
 
 ### Usage
 

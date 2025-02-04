@@ -1,10 +1,9 @@
 import fs from "fs-extra";
 import path from "path";
-import inquirer from "inquirer";
 import { createCharacterMenu } from "./js/components/CreateCharacterMenu.js";
 import { inspectCharacter } from "./js/components/InspectCharacter.js";
 import { startCampaign } from "./js/src/campaign.js";
-import { totalClear } from "./js/utilities/ConsoleService.js";
+import { slowWrite, totalClear } from "./js/utilities/ConsoleService.js";
 import { log } from "./js/utilities/LogService.js";
 import LogTypes from "./js/types/LogTypes.js";
 import { getSettingsData } from "./js/utilities/SettingsService.js";
@@ -13,98 +12,79 @@ import { newPlayerScreen } from "./js/components/NewPlayerScreen.js";
 import { welcomeScreen } from "./js/components/WelcomeScreen.js";
 import { saveSettingsData } from "./js/utilities/SettingsService.js";
 import { getTerm } from "./js/utilities/LanguageService.js";
+import { select } from "@inquirer/prompts";
 
-const dataDir = path.join(process.cwd(), "data");
+const dataDir = path.join(process.cwd(), "storage");
 fs.ensureDirSync(dataDir);
 
-// Initialize settings
-const initializeSettings = () => {
-  try {
-    const settings = getSettingsData();
-    return settings?.language || "en";
-  } catch (error) {
-    log("Could not load language settings, using default", LogTypes.ERROR);
-    return "en";
-  }
-};
-
-const menuOptions = [
-  { name: "Create your Character", value: "1", group: "Character" },
-  { name: "Inspect your Character", value: "2", group: "Character" },
-  { name: "Start Campaign", value: "3", group: "Game" },
-  { name: "Change Language", value: "4", group: "Settings" },
-  { name: "End Game", value: "9", group: "System" },
+const getMenuOptions = (lang) => [
+  { name: getTerm("createCharacter", lang), value: "1" },
+  { name: getTerm("inspectCharacter", lang), value: "2" },
+  { name: getTerm("startCampaign", lang), value: "3" },
+  { name: getTerm("changeLang", lang), value: "4" },
+  { name: getTerm("exit", lang), value: "9" },
 ];
 
-async function handleMenuChoice(choice, currentLanguage) {
+async function handleMenuChoice(choice, language) {
   try {
     switch (choice) {
       case "1":
         log("Creating new Character");
-        await createCharacterMenu(currentLanguage);
+        await createCharacterMenu(language);
         break;
       case "2":
         log("Inspecting Character");
-        await inspectCharacter(currentLanguage);
+        await inspectCharacter(language);
         break;
       case "3":
         log("Campaign Start");
-        await startCampaign(currentLanguage);
+        await startCampaign(language);
         break;
       case "4":
-        const newLanguage = await changeLanguage(currentLanguage);
+        const newLanguage = await changeLanguage(language);
         log("Changed Language to " + newLanguage);
         return newLanguage;
       case "9":
-        saveSettingsData(currentLanguage);
-        console.log(getTerm("goodbye", currentLanguage));
+        saveSettingsData({ language: language });
+        await slowWrite(getTerm("goodbye", language));
         process.exit(0);
       default:
         log("Invalid option selected", LogTypes.ERROR);
     }
-    return currentLanguage;
+    return language;
   } catch (error) {
     log(`Error in menu operation: ${error.message}`, LogTypes.ERROR);
-    return currentLanguage;
+    return language;
   }
 }
 
 /**
  * The main menu and game loop of the app
  */
-async function main() {
-  let language = initializeSettings();
-
+async function main(language) {
   try {
     while (true) {
       totalClear();
-      const { choice } = await inquirer.prompt({
-        type: "list",
-        name: "choice",
-        message: getTerm("chooseOption", language),
-        choices: menuOptions,
-      });
+      const choice = await select(
+        {
+          message: getTerm("chooseOption", language),
+          choices: getMenuOptions(language),
+        },
+        { clearPromptOnDone: true }
+      );
 
       language = await handleMenuChoice(choice, language);
     }
   } catch (error) {
     log("Fatal error: " + error.message, LogTypes.ERROR);
-    saveSettingsData(language);
+    saveSettingsData({ language: language });
     process.exit(1);
   }
 }
 
 process.on("SIGINT", async () => {
-  saveSettingsData(language);
+  saveSettingsData({ language: language });
   process.exit(0);
-});
-
-process.stdin.on('data', (key) => {
-  if (key.toString() === 'x') {
-    console.log("\n" + getTerm("goodbye", language));
-    saveSettingsData(language);
-    process.exit(0);
-  }
 });
 
 ///////////////////////////////////////////// MAIN PROGRAM /////////////////////////////////////////////////
@@ -116,5 +96,5 @@ let language = settings?.language || "de";
 await newPlayerScreen(language);
 await welcomeScreen(language);
 
-main();
+main(language);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////

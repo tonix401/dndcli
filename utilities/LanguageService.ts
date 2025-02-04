@@ -39,12 +39,12 @@ const terms: Record<string, ITranslation> = {
     en: "Welcome to DnD-CLI",
   },
   welcomeText: {
-    de: "Das ist doch wohl der beste Name, den Du je gehört hast!\nRichtig?\nEgal! Das Abenteuer wartet!\nVon Julian Thäsler und Tom Weise",
-    en: "That must be the best name you have ever heard!\nRight?\nNevermind that! Adventure awaits!\nBy Julian Thaesler and Tom Weise",
+    de: "Von Julian Thäsler und Tom Weise",
+    en: "By Julian Thaesler and Tom Weise",
   },
   goodbye: {
-    de: "Wir werden uns wiedersehen!👋",
-    en: "We shall meet again!👋",
+    de: "Wir werden uns wiedersehen!",
+    en: "We shall meet again!",
   },
   pressEnter: {
     de: "Drücke [Enter]",
@@ -201,4 +201,4 @@ const terms: Record<string, ITranslation> = {
     en: "Exit",
   },
   // #endregion
-} as const;
+};

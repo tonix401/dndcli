@@ -1,7 +1,8 @@
 {
   "type": "module",
   "scripts": {
-    "setup": "npm install --silent && tsc --build && echo OPENAI_API_KEY= > .env && mkdir storage && echo LOG START > storage/log.txt",
+    "dev": "tsc && node index",
+    "setup": "npm install --silent && tsc --build && powershell -Command \"if (!(Test-Path .env)) { echo OPENAI_API_KEY= > .env } && mkdir storage && echo LOG START > storage/log.txt",
     "start": "powershell -Command \"if (!(Test-Path .env)) { npm run setup }; if (Select-String -Path .env -Pattern '^OPENAI_API_KEY= *$' -Quiet) { Write-Host '\u001b[31mBitte füge den OPENAI_API_KEY in das .env file ein\u001b[0m'; exit 1 }; node index\""
   },
   "dependencies": {

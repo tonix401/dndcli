@@ -9,7 +9,8 @@
     "Player choice: 1. Introduce himself and request their assistance in navigating the forest to uncover the source of the dark power?",
     "With a determined look in his eyes, Kaito Sena approaches the group of mercenaries gathered around the campfire at the abandoned watchtower. The mercenaries size him up, their expressions guarded as Kaito introduces himself and requests their assistance in navigating the forest to uncover the source of the dark power rumored to be lurking within.\n\nThe leader of the mercenaries, a burly warrior with a scar across his cheek, regards Kaito with a steely gaze. After a tense moment of silence, he nods gruffly. \"We'll help you, but be warned, the path ahead is treacherous. We don't take kindly to burdens slowing us down.\"\n\nKaito nods gratefully, understanding the gravity of the situation as he prepares to embark on this perilous journey with the mercenaries by his side.\n\nAs the group readies themselves for the task ahead, the forest looms dark and foreboding in the distance, its secrets waiting to be uncovered.\n\nCongratulations! You have successfully enlisted the aid of the mercenaries to navigate the treacherous forest and uncover the source of the dark power. Your journey is about to take a dangerous turn. Beware, for not all may be as it seems in the shadows of Lysoria.\n\nReturn to main menu.",
     "You have successfully navigated through the first chapter of our adventure in Eldoria with Kaito Sena. Your choices have set the stage for an exciting and perilous journey ahead. When you're ready to continue Kaito's quest, just let me know. May your sword stay sharp and your heart brave in the face of darkness.",
-    "As the sun sets on another day in Lysoria, Kaito Sena finds himself standing at a crossroads, ready to continue his quest to become the best adventurer in the world. The path ahead is fraught with danger and mystery, but with his newfound companions and steadfast determination, he is ready to face whatever challenges come his way.\n\nReturn to the main menu to embark on the next chapter of your adventure in Eldoria."
+    "As the sun sets on another day in Lysoria, Kaito Sena finds himself standing at a crossroads, ready to continue his quest to become the best adventurer in the world. The path ahead is fraught with danger and mystery, but with his newfound companions and steadfast determination, he is ready to face whatever challenges come his way.\n\nReturn to the main menu to embark on the next chapter of your adventure in Eldoria.",
+    "You have successfully navigated through the first chapter of our adventure in Eldoria with Kaito Sena. Your choices have set the stage for an exciting and perilous journey ahead. When you're ready to continue Kaito's quest, just let me know. May your sword stay sharp and your heart brave in the face of darkness."
   ],
   "conversationHistory": [
     {
@@ -55,6 +56,10 @@
     {
       "role": "assistant",
       "content": "As the sun sets on another day in Lysoria, Kaito Sena finds himself standing at a crossroads, ready to continue his quest to become the best adventurer in the world. The path ahead is fraught with danger and mystery, but with his newfound companions and steadfast determination, he is ready to face whatever challenges come his way.\n\nReturn to the main menu to embark on the next chapter of your adventure in Eldoria."
+    },
+    {
+      "role": "assistant",
+      "content": "You have successfully navigated through the first chapter of our adventure in Eldoria with Kaito Sena. Your choices have set the stage for an exciting and perilous journey ahead. When you're ready to continue Kaito's quest, just let me know. May your sword stay sharp and your heart brave in the face of darkness."
     }
   ],
   "choices": [],

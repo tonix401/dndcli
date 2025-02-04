@@ -6,6 +6,8 @@ import { ChatCompletionRequestMessage } from "openai";
 import { getStartingItems } from "../utilities/InventoryService.js";
 import { getTerm, Language } from "../utilities/LanguageService.js";
 import { getClassChoices } from "../types/ClassChoices.js";
+import { log } from "../utilities/LogService.js";
+import LogTypes from "../types/LogTypes.js";
 
 async function validateOrigin(origin: string): Promise<string> {
   const systemMessage =
@@ -98,7 +100,8 @@ export async function createCharacterMenu(lang: Language): Promise<void> {
     console.log(getTerm("characterSuccess", lang));
     await input({ message: getTerm("backToMenu", lang) });
   } catch (error) {
-    console.error("Error creating character:", error);
-    await input({ message: getTerm("errorMessage", lang) });
+    if (error instanceof Error) {
+      log("Fatal error: " + error.message, LogTypes.ERROR);
+    }
   }
 }
