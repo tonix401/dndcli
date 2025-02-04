@@ -14,6 +14,7 @@ const newPlayerChar = {
   level: "4",
   xp: "21",
   hp: "3",
+  origin: "unknown",
   abilities: {
     maxhp: "10",
     strength: "0",
@@ -22,13 +23,7 @@ const newPlayerChar = {
     charisma: "10",
     luck: "7",
   },
-  inventory: {
-    item1: "Holzschwert",
-    item2: "",
-    item3: "",
-    item4: "",
-    item5: "",
-  },
+  inventory: [],
   lastPlayed: new Date().toLocaleDateString(),
 };
 

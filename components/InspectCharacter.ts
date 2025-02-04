@@ -37,11 +37,7 @@ export async function inspectCharacter(lang: Language = "de") {
   ${getTerm("luck", lang)}: ${charData.abilities.luck}
 
   ${getTerm("inventory", lang)}:
-  [ ${charData.inventory.item1 || getTerm("empty", lang)} ][ ${
-    charData.inventory.item2 || getTerm("empty", lang)
-  } ][ ${charData.inventory.item3 || getTerm("empty", lang)} ][ ${
-    charData.inventory.item4 || getTerm("empty", lang)
-  } ][ ${charData.inventory.item5 || getTerm("empty", lang)} ]
+  [ ${charData.inventory.join(" ][ ")} ]
 
   ${getTerm("lastPlayed", lang)}: ${charData.lastPlayed}
   `;

@@ -6,11 +6,13 @@
   },
   "dependencies": {
     "@inquirer/prompts": "^7.3.1",
+    "@types/fs-extra": "^11.0.4",
     "chalk": "^5.4.1",
     "dotenv": "^16.4.7",
     "fs": "^0.0.1-security",
+    "fs-extra": "^11.3.0",
     "inquirer": "^12.4.1",
-    "openai": "3.3.0"
+    "openai": "^3.3.0"
   },
   "devDependencies": {
     "@types/node": "^22.13.0"
