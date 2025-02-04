@@ -3,7 +3,7 @@ import ICharacterData from "../types/ICharacterData";
 import { log } from "./LogService.js";
 import LogTypes from "../types/LogTypes.js";
 
-const filename = "../dndcli/data/character.json";
+const filename = "../dndcli/storage/character.json";
 
 /**
  * Reads the saved character data from the character.json file

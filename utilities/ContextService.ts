@@ -3,7 +3,7 @@ import { log } from "./LogService.js";
 import LogTypes from "../types/LogTypes.js";
 import { IContextData } from "../types/IContextData.js";
 
-const filename = "../dndcli/data/context.json";
+const filename = "../dndcli/storage/context.json";
 
 /**
  * Get the current Story context from the context.json file

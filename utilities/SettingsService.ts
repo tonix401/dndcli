@@ -3,7 +3,7 @@ import { log } from "./LogService.js";
 import LogTypes from "../types/LogTypes.js";
 import { ISettings } from "../types/ISettings.js";
 
-const filename = "../dndcli/data/settings.json";
+const filename = "../dndcli/storage/settings.json";
 /**
  * Reads the saved settings from the settings.json file
  * @returns The settings as an object
@@ -21,7 +21,7 @@ export function getSettingsData(): ISettings | null {
         LogTypes.ERROR
       );
     }
-    return null
+    return null;
   }
 }
 

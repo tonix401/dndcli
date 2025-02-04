@@ -136,12 +136,12 @@ async function startCampaign() {
 }
 
 ///////////////////////////////////////////// MAIN PROGRAM /////////////////////////////////////////////////
-await newPlayerScreen();
+log("Program started");
 
 let settings = await getSettingsData();
 let language = settings?.language || "de";
 
-log("Program started");
+await newPlayerScreen(language);
 await welcomeScreen(language);
 
 main();
