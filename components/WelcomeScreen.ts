@@ -1,7 +1,7 @@
 import { input } from "@inquirer/prompts";
 import { getTerm, Language } from "../utilities/LanguageService.js";
 import chalk from "chalk";
-import { pause, slowWrite, totalClear } from "../utilities/ConsoleService.js";
+import { skippableSlowWrite, totalClear } from "../utilities/ConsoleService.js";
 
 /**
  * Initiates the title sequence / welcome screen of the app
@@ -16,13 +16,18 @@ import { pause, slowWrite, totalClear } from "../utilities/ConsoleService.js";
  */
 export async function welcomeScreen(lang: Language) {
   totalClear();
-  await slowWrite(
+
+  /**
+   * If the user skips during the "welcome" line, the "welcomeText" line is also written out instantly,
+   * so the user doesnt have to skip twice in the same screen. I hope that makes sense ¯\_(ツ)_/¯
+   */
+  const isSkipping = await skippableSlowWrite(
     getTerm("welcome", lang),
-    undefined,
-    undefined,
     false,
+    undefined,
+    undefined,
     (char) => chalk.bold(chalk.cyan(char))
   );
-  await slowWrite(getTerm("welcomeText", lang));
+  await skippableSlowWrite(getTerm("welcomeText", lang), isSkipping);
   await input({ message: getTerm("pressEnter", lang) });
 }

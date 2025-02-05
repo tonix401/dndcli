@@ -4,7 +4,11 @@ import {
   saveCharacterData,
 } from "../utilities/CharacterService.js";
 import { getTerm, Language } from "../utilities/LanguageService.js";
-import { pause, slowWrite, totalClear } from "../utilities/ConsoleService.js";
+import {
+  pause,
+  skippableSlowWrite,
+  totalClear,
+} from "../utilities/ConsoleService.js";
 import { log } from "../utilities/LogService.js";
 
 // The standard character for new players
@@ -33,18 +37,17 @@ const newPlayerChar = {
  */
 export async function newPlayerScreen(lang: Language): Promise<boolean> {
   totalClear();
-  
+
   let isNew = false;
   const charData = getCharacterData();
   isNew = !charData;
 
   log(`IsNew: ${isNew}`);
-  log(`Character data: ${charData}`)
-
+  log(`Character data: ${charData}`);
 
   if (isNew) {
     saveCharacterData(newPlayerChar);
-    await slowWrite(getTerm("helloNewPlayer", lang));
+    await skippableSlowWrite(getTerm("helloNewPlayer", lang));
     await pause(500);
     await input({ message: getTerm("pressEnter", lang) });
   }
