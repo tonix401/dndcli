@@ -21,13 +21,12 @@ export async function welcomeScreen(lang: Language) {
    * If the user skips during the "welcome" line, the "welcomeText" line is also written out instantly,
    * so the user doesnt have to skip twice in the same screen. I hope that makes sense ¯\_(ツ)_/¯
    */
-  const isSkipping = await skippableSlowWrite(
+  await skippableSlowWrite(
     getTerm("welcome", lang),
-    false,
     undefined,
     undefined,
     (char) => chalk.bold(chalk.cyan(char))
   );
-  await skippableSlowWrite(getTerm("welcomeText", lang), isSkipping);
+  await skippableSlowWrite(getTerm("welcomeText", lang));
   await input({ message: getTerm("pressEnter", lang) });
 }
