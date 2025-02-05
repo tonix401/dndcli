@@ -1,5 +1,7 @@
 import fs from "fs-extra";
 import path from "path";
+import fs from "fs-extra";
+import path from "path";
 import { createCharacterMenu } from "./js/components/CreateCharacterMenu.js";
 import { inspectCharacter } from "./js/components/InspectCharacter.js";
 import { startCampaign } from "./js/src/campaign.js";
@@ -101,5 +103,6 @@ let language = settings?.language || "de";
 await newPlayerScreen(language);
 await welcomeScreen(language);
 
+main(language);
 main(language);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
