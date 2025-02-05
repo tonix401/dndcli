@@ -44,6 +44,16 @@ export async function slowWrite(
   }
 }
 
+type formattingFunction = (char: string) => string;
+
+type slowWriteConfig = {
+  charDelay?: number;
+  lineDelay?: number;
+  formattings?: formattingFunction[];
+  forceSkip?: boolean;
+  hasSafetyBuffer?: boolean;
+};
+
 /**
  * The coolest console writing ever
  * @param message The message to print
@@ -55,17 +65,23 @@ export async function slowWrite(
  */
 export async function skippableSlowWrite(
   message: string,
-  charDelay: number = 40,
-  lineDelay: number = 500,
-  formatting = (char: string) => char
+  config: slowWriteConfig = {}
 ) {
-  let isSkipping = false;
-  let typedText = "";
+  const {
+    charDelay = 40,
+    lineDelay = 500,
+    forceSkip = false,
+    hasSafetyBuffer = true,
+    formattings = [(char) => char],
+  } = config;
+
+  let isSkipping: boolean = forceSkip;
 
   // Enable raw mode to capture key presses
   readline.emitKeypressEvents(process.stdin);
   process.stdin.setRawMode(true);
 
+  // DO NOT REMOVE "str", OTHERWISE STUFF BREAKS
   process.stdin.on("keypress", (str, key) => {
     if (key.name === "return") {
       log("Skipping text...");
@@ -75,10 +91,13 @@ export async function skippableSlowWrite(
 
   const lines = message.split("\n");
   for (let i in lines) {
+    log(`i: ${i}, lines[i]: ${lines[i]}`);
     const line = lines[i].split("");
     for (let j in line) {
-      process.stdout.write(formatting(line[j]));
-      typedText += line[j];
+      // for some weird reason: i is a string here, so i need to parse it into a number
+      process.stdout.write(
+        getFormattingFunction(parseInt(i), formattings)(line[j])
+      );
       if (!isSkipping) {
         await pause(charDelay);
       }
@@ -90,7 +109,7 @@ export async function skippableSlowWrite(
   }
 
   // Prevent accidental input from affecting the next part of the CLI
-  if (isSkipping) {
+  if (isSkipping && hasSafetyBuffer) {
     await pause(500);
   }
 
@@ -99,4 +118,14 @@ export async function skippableSlowWrite(
   process.stdin.removeAllListeners("keypress");
 
   return;
+}
+
+function getFormattingFunction(
+  index: number,
+  formattings: formattingFunction[]
+): formattingFunction {
+  if (formattings[index]) {
+    return formattings[index];
+  }
+  return formattings[formattings.length - 1];
 }
