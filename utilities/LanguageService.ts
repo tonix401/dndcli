@@ -22,7 +22,11 @@ export type TermKey = keyof typeof terms;
  * indented = true,
  * returns "  Drücke [Enter], um ins Menü zu kommen",
  */
-export function getTerm(key: TermKey, language: Language, indented: boolean = false): string {
+export function getTerm(
+  key: TermKey,
+  language: Language,
+  indented: boolean = false
+): string {
   const term = terms[key][language];
 
   if (!term) {
@@ -35,12 +39,8 @@ export function getTerm(key: TermKey, language: Language, indented: boolean = fa
 const terms: Record<string, ITranslation> = {
   // #region Welcome Sequence and Menu
   welcome: {
-    de: "Willkommen zu DnD-CLI",
-    en: "Welcome to DnD-CLI",
-  },
-  welcomeText: {
-    de: "Von Julian Thäsler und Tom Weise",
-    en: "By Julian Thaesler and Tom Weise",
+    de: "Willkommen zu DnD-CLI\nVon Julian Thäsler und Tom Weise",
+    en: "Welcome to DnD-CLI\nBy Julian Thaesler and Tom Weise",
   },
   goodbye: {
     de: "Wir werden uns wiedersehen!",

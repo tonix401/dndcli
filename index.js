@@ -3,7 +3,10 @@ import path from "path";
 import { createCharacterMenu } from "./js/components/CreateCharacterMenu.js";
 import { inspectCharacter } from "./js/components/InspectCharacter.js";
 import { startCampaign } from "./js/src/campaign.js";
-import { slowWrite, totalClear } from "./js/utilities/ConsoleService.js";
+import {
+  skippableSlowWrite,
+  totalClear,
+} from "./js/utilities/ConsoleService.js";
 import { log } from "./js/utilities/LogService.js";
 import LogTypes from "./js/types/LogTypes.js";
 import { getSettingsData } from "./js/utilities/SettingsService.js";
@@ -13,9 +16,6 @@ import { welcomeScreen } from "./js/components/WelcomeScreen.js";
 import { saveSettingsData } from "./js/utilities/SettingsService.js";
 import { getTerm } from "./js/utilities/LanguageService.js";
 import { select } from "@inquirer/prompts";
-
-const dataDir = path.join(process.cwd(), "storage");
-fs.ensureDirSync(dataDir);
 
 const getMenuOptions = (lang) => [
   { name: getTerm("createCharacter", lang), value: "1" },
@@ -45,9 +45,7 @@ async function handleMenuChoice(choice, language) {
         log("Changed Language to " + newLanguage);
         return newLanguage;
       case "9":
-        saveSettingsData({ language: language });
-        await slowWrite(getTerm("goodbye", language));
-        process.exit(0);
+        await exitProgram(language);
       default:
         log("Invalid option selected", LogTypes.ERROR);
     }
@@ -76,18 +74,25 @@ async function main(language) {
       language = await handleMenuChoice(choice, language);
     }
   } catch (error) {
-    log("Fatal error: " + error.message, LogTypes.ERROR);
-    saveSettingsData({ language: language });
-    process.exit(1);
+    log("Error: " + error, LogTypes.ERROR);
+    main();
   }
 }
 
 process.on("SIGINT", async () => {
-  saveSettingsData({ language: language });
-  process.exit(0);
+  exitProgram(language);
 });
 
+async function exitProgram(language) {
+  saveSettingsData({ language: language });
+  await skippableSlowWrite(getTerm("goodbye", language));
+  process.exit(0);
+}
+
 ///////////////////////////////////////////// MAIN PROGRAM /////////////////////////////////////////////////
+const dataDir = path.join(process.cwd(), "storage");
+fs.ensureDirSync(dataDir);
+
 log("Program started");
 
 let settings = await getSettingsData();
@@ -96,5 +101,6 @@ let language = settings?.language || "de";
 await newPlayerScreen(language);
 await welcomeScreen(language);
 
+main(language);
 main(language);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
