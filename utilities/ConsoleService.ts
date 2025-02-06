@@ -64,6 +64,7 @@ type slowWriteConfig = {
   formattings?: formattingFunction[];
   forceSkip?: boolean;
   hasSafetyBuffer?: boolean;
+  indented?: boolean;
 };
 
 /**
@@ -84,7 +85,8 @@ export async function skippableSlowWrite(
     lineDelay = 500,
     forceSkip = false,
     hasSafetyBuffer = true,
-    formattings = [(char) => char],
+    formattings = [(char) => chalk.hex(getSecondaryColor())(char)],
+    indented = true,
   } = config;
 
   let isSkipping: boolean = forceSkip;
@@ -103,7 +105,7 @@ export async function skippableSlowWrite(
 
   const lines = message.split("\n");
   for (let i in lines) {
-    const line = lines[i].split("");
+    const line = ((indented ? " " : "") + lines[i]).split("");
     for (let j in line) {
       // for some weird reason i is a string here, so it has to be parsed into a number
       process.stdout.write(
@@ -189,7 +191,7 @@ export async function themedSelect(config: selectConfig): Promise<string> {
     },
     style: {
       message: (text: string) => chalk.hex(getPrimaryColor())(chalk.bold(text)),
-      answer: (text: string) => chalk.hex(getSecondaryColor())(text),
+      description: (text: string) => chalk.hex(getSecondaryColor())(text),
       highlight: (text: string) => chalk.bold(text),
     },
     helpMode: "never",

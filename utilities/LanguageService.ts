@@ -2,13 +2,9 @@ import LogTypes from "../types/LogTypes.js";
 import { getLanguage } from "./CacheService.js";
 import { log } from "./LogService.js";
 
-interface ITranslation {
-  de: string;
-  en: string;
-}
-
+export type ITerm = Record<Language, string>
+export type IColorTerm = Record<Language | "hex", string>
 export type Language = "de" | "en";
-export type TermKey = keyof typeof terms;
 
 /**
  * Takes a term key and returns the term translated and formatted depending on parameters
@@ -23,24 +19,23 @@ export type TermKey = keyof typeof terms;
  * indented = true,
  * returns "  Drücke [Enter], um ins Menü zu kommen",
  */
-export function getTerm(
-  key: TermKey,
-  indented: boolean = false
-): string {
-  const term = terms[key][getLanguage()];
+export function getTerm(key: string, indented: boolean = false): string {
+  const term = terms[key];
 
   if (!term) {
-    log(`Term not found: ${key}`, LogTypes.ERROR);
+    log(`Language Service: Term not found: ${key}`, LogTypes.ERROR);
     return "";
   }
 
-  return (indented ? "  " : "") + term;
+  const translation = term[getLanguage()];
+
+  return (indented ? "  " : "") + translation;
 }
-const terms: Record<string, ITranslation> = {
+const terms: Record<string, ITerm> = {
   // #region Welcome Sequence and Menu
   welcome: {
-    de: "Willkommen zu DnD-CLI\nVon Julian Thäsler und Tom Weise",
-    en: "Welcome to DnD-CLI\nBy Julian Thaesler and Tom Weise",
+    de: "Willkommen zu DnD-CLI\n\nDas ist doch wohl der beste Name, den Du je gehört hast\nRichtig?\nEgal! Das Abenteuer wartet! Lass uns loslegen!\n\nVon Julian Thäsler und Tom Weise",
+    en: "Welcome to DnD-CLI\n\nThat must be the best name you've ever heard\nRight?\nNevermind! Adventures are awaiting us! Let's go!\n\nBy Julian Thaesler and Tom Weise",
   },
   goodbye: {
     de: "Wir werden uns wiedersehen!",
@@ -157,6 +152,14 @@ const terms: Record<string, ITranslation> = {
     de: "Sprache",
     en: "Language",
   },
+  primaryColor: {
+    de: "Hauptfarbe",
+    en: "Primary color",
+  },
+  secondaryColor: {
+    de: "Nebenfarbe",
+    en: "Secondary color",
+  },
   en: {
     de: "Englisch",
     en: "English",
@@ -172,6 +175,14 @@ const terms: Record<string, ITranslation> = {
   currentLang: {
     de: "Deine aktuelle Sprache ist",
     en: "Your current language is",
+  },
+  invalid: {
+    de: "Invalide!",
+    en: "Invalid!",
+  },
+  goBack: {
+    de: "Zurück",
+    en: "Go back"
   },
   // #endregion
 
@@ -201,4 +212,69 @@ const terms: Record<string, ITranslation> = {
     en: "Exit",
   },
   // #endregion
+};
+
+export function getColorTerm(key: string) {
+  const color = colors[key];
+  if (!color) {
+    log(`Language Service: Color not found: ${key}`, LogTypes.ERROR);
+    return "";
+  }
+  return color[getLanguage()];
+}
+
+export function getColorHex(key: string) {
+  const color = colors[key];
+  if (!color) {
+    log(`Language Service: Color not found: ${key}`, LogTypes.ERROR);
+    return "";
+  }
+  return color.hex;
+}
+
+export function getAllColors(): Record<string, IColorTerm> {
+  return colors;
+}
+
+const colors: Record<string, IColorTerm> = {
+  red: {
+    de: "rot",
+    en: "red",
+    hex: "#E04500",
+  },
+  purple: {
+    de: "lila",
+    en: "purple",
+    hex: "#b00edc",
+  },
+  blue: {
+    de: "blau",
+    en: "blue",
+    hex: "#00AAFF",
+  },
+  turquoise: {
+    de: "türkis",
+    en: "turquoise",
+    hex: "#00CEBD",
+  },
+  green: {
+    de: "grün",
+    en: "green",
+    hex: "#0ad135",
+  },
+  yellow: {
+    de: "gelb",
+    en: "yellow",
+    hex: "#FFCC00",
+  },
+  orange: {
+    de: "orange",
+    en: "orange",
+    hex: "#FFA500",
+  },
+  white: {
+    de: "weiß",
+    en: "white",
+    hex: "#FFFFFF",
+  },
 };

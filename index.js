@@ -4,25 +4,32 @@ import { createCharacterMenu } from "./js/components/CreateCharacterMenu.js";
 import { inspectCharacter } from "./js/components/InspectCharacter.js";
 import { startCampaign } from "./js/src/campaign.js";
 import {
-  slowWrite,
+  skippableSlowWrite,
   themedSelect,
   totalClear,
 } from "./js/utilities/ConsoleService.js";
 import { log } from "./js/utilities/LogService.js";
 import LogTypes from "./js/types/LogTypes.js";
 import { getSettingsData } from "./js/utilities/SettingsService.js";
-import { changeLanguage } from "./js/components/SettingsMenu.js";
+import { settingsMenu } from "./js/components/SettingsMenu.js";
 import { newPlayerScreen } from "./js/components/NewPlayerScreen.js";
 import { welcomeScreen } from "./js/components/WelcomeScreen.js";
 import { saveSettingsData } from "./js/utilities/SettingsService.js";
 import { getTerm } from "./js/utilities/LanguageService.js";
-import { getLanguage, getPrimaryColor, getSecondaryColor, setLanguage, setPrimaryColor, setSecondaryColor } from "./js/utilities/CacheService.js";
+import {
+  getLanguage,
+  getPrimaryColor,
+  getSecondaryColor,
+  setLanguage,
+  setPrimaryColor,
+  setSecondaryColor,
+} from "./js/utilities/CacheService.js";
 
 const getMenuOptions = () => [
   { name: getTerm("createCharacter"), value: "1" },
   { name: getTerm("inspectCharacter"), value: "2" },
   { name: getTerm("startCampaign"), value: "3" },
-  { name: getTerm("changeLang"), value: "4" },
+  { name: getTerm("settings"), value: "4" },
   { name: getTerm("exit"), value: "9" },
 ];
 
@@ -42,7 +49,8 @@ async function handleMenuChoice(choice) {
         await startCampaign();
         break;
       case "4":
-        await changeLanguage();
+        log("Opening Settings")
+        await settingsMenu();
         break;
       case "9":
         await exitProgram();
@@ -86,7 +94,7 @@ async function exitProgram() {
     primaryColor: getPrimaryColor(),
     secondaryColor: getSecondaryColor(),
   });
-  await slowWrite(getTerm("goodbye"));
+  await skippableSlowWrite(getTerm("goodbye"));
   process.exit(0);
 }
 
@@ -102,7 +110,7 @@ log("Program started");
 let settings = await getSettingsData();
 setLanguage(settings?.language || "de");
 setPrimaryColor(settings?.primaryColor || "#E04500");
-setSecondaryColor(settings?.secondaryColor || "#FFFFFF")
+setSecondaryColor(settings?.secondaryColor || "#FFFFFF");
 
 await newPlayerScreen();
 await welcomeScreen();

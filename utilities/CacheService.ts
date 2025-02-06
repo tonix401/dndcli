@@ -27,7 +27,7 @@ export function setLanguage(lang: Language) {
 export function setPrimaryColor(color: string) {
   if (hexColorRegex.test(color)) {
     primaryColor = color;
-    log("Primary color set to " + color);
+    log("CacheService: Primary color set to " + color);
   } else {
     log(
       "CacheService: Invalid Color Format, while trying to set primary color " +
@@ -40,7 +40,7 @@ export function setPrimaryColor(color: string) {
 export function setSecondaryColor(color: string) {
   if (hexColorRegex.test(color)) {
     secondaryColor = color;
-    log("Secondary color set to " + color);
+    log("CacheService: Secondary color set to " + color);
   } else {
     log(
       "CacheService: Invalid Color Format, while trying to set secondary color: " +
