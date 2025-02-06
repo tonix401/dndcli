@@ -8,6 +8,7 @@ import { getTerm, Language } from "../utilities/LanguageService.js";
 import { getClassChoices } from "../types/ClassChoices.js";
 import { log } from "../utilities/LogService.js";
 import LogTypes from "../types/LogTypes.js";
+import { pressEnter, themedSelect } from "../utilities/ConsoleService.js";
 
 async function validateOrigin(origin: string): Promise<string> {
   const systemMessage =
@@ -31,7 +32,7 @@ async function validateOrigin(origin: string): Promise<string> {
   }
 }
 
-export async function createCharacterMenu(lang: Language): Promise<void> {
+export async function createCharacterMenu(): Promise<void> {
   try {
     const charData: ICharacterData = {
       name: "",
@@ -54,23 +55,22 @@ export async function createCharacterMenu(lang: Language): Promise<void> {
 
     // Get character name
     charData.name = await input(
-      { message: getTerm("namePrompt", lang) },
+      { message: getTerm("namePrompt") },
       { clearPromptOnDone: true }
     );
     if (charData.name.toLowerCase() === "exit") return;
 
     // Get character class
-    charData.class = await select(
+    charData.class = await themedSelect(
       {
-        message: getTerm("classPrompt", lang),
-        choices: getClassChoices(lang),
-      },
-      { clearPromptOnDone: true }
+        message: getTerm("classPrompt"),
+        choices: getClassChoices(),
+      }
     );
 
     // Get character origin
     let originInput = await input(
-      { message: getTerm("originPrompt", lang) },
+      { message: getTerm("originPrompt") },
       { clearPromptOnDone: true }
     );
     if (originInput.toLowerCase() === "exit") return;
@@ -81,7 +81,7 @@ export async function createCharacterMenu(lang: Language): Promise<void> {
       console.log(validationResponse);
       originInput = await input(
         {
-          message: getTerm("originClarification", lang),
+          message: getTerm("originClarification"),
         },
         { clearPromptOnDone: true }
       );
@@ -97,8 +97,8 @@ export async function createCharacterMenu(lang: Language): Promise<void> {
     // Save character
     saveCharacterData(charData);
 
-    console.log(getTerm("characterSuccess", lang));
-    await input({ message: getTerm("backToMenu", lang) });
+    console.log(getTerm("characterSuccess"));
+    await pressEnter();
   } catch (error) {
     if (error instanceof Error) {
       log("Fatal error: " + error.message, LogTypes.ERROR);

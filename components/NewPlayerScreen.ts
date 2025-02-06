@@ -3,13 +3,16 @@ import {
   getCharacterData,
   saveCharacterData,
 } from "../utilities/CharacterService.js";
-import { getTerm, Language } from "../utilities/LanguageService.js";
+import { getTerm } from "../utilities/LanguageService.js";
 import {
   pause,
+  pressEnter,
   skippableSlowWrite,
   totalClear,
 } from "../utilities/ConsoleService.js";
 import { log } from "../utilities/LogService.js";
+import { getSecondaryColor } from "../utilities/CacheService.js";
+import chalk from "chalk";
 
 // The standard character for new players
 const newPlayerChar = {
@@ -35,21 +38,21 @@ const newPlayerChar = {
  * Initializes the settings and a character in case there is none yet
  * @returns Whether the player is new
  */
-export async function newPlayerScreen(lang: Language): Promise<boolean> {
+export async function newPlayerScreen(): Promise<boolean> {
   totalClear();
 
   let isNew = false;
   const charData = getCharacterData();
   isNew = !charData;
 
-  log(`IsNew: ${isNew}`);
-  log(`Character data: ${charData}`);
-
   if (isNew) {
+    log("New Player detected, showing new player screen...");
     saveCharacterData(newPlayerChar);
-    await skippableSlowWrite(getTerm("helloNewPlayer", lang));
+    await skippableSlowWrite(getTerm("helloNewPlayer"), {
+      formattings: [(char) => chalk.hex(getSecondaryColor())(char)],
+    });
     await pause(500);
-    await input({ message: getTerm("pressEnter", lang) });
+    await pressEnter();
   }
   return isNew;
 }

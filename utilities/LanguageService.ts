@@ -1,4 +1,5 @@
 import LogTypes from "../types/LogTypes.js";
+import { getLanguage } from "./CacheService.js";
 import { log } from "./LogService.js";
 
 interface ITranslation {
@@ -24,10 +25,9 @@ export type TermKey = keyof typeof terms;
  */
 export function getTerm(
   key: TermKey,
-  language: Language,
   indented: boolean = false
 ): string {
-  const term = terms[key][language];
+  const term = terms[key][getLanguage()];
 
   if (!term) {
     log(`Term not found: ${key}`, LogTypes.ERROR);

@@ -1,48 +1,47 @@
 import ICharacterData from "../types/ICharacterData";
 import { getCharacterData } from "../utilities/CharacterService.js";
-import { totalClear } from "../utilities/ConsoleService.js";
+import { pressEnter, totalClear } from "../utilities/ConsoleService.js";
 import chalk from "chalk";
 import { input } from "@inquirer/prompts";
 import { getTerm } from "../utilities/LanguageService.js";
+import {
+  getPrimaryColor,
+  getSecondaryColor,
+} from "../utilities/CacheService.js";
 
-type Language = "de" | "en";
-
-export async function inspectCharacter(lang: Language = "de") {
+export async function inspectCharacter() {
   totalClear();
   const charData: ICharacterData | null = getCharacterData();
 
   if (!charData) {
-    console.log(getTerm("noCharacter", lang));
-    await input({
-      message: getTerm("pressEnter", lang),
-    });
+    console.log(getTerm("noCharacter"));
+    await pressEnter();
     return;
   }
-
-  const charLog = `
-  ${chalk.bold(
-    `${charData.name} - ${getTerm("level", lang)} ${charData.level} ${getTerm(
-      charData.class,
-      lang
+  const charLogTitle = chalk.bold(
+    `${charData.name} - ${getTerm("level")} ${charData.level} ${getTerm(
+      charData.class
     )}`
-  )}
+  );
 
-  ${getTerm("hp", lang)}: ${charData.hp} / ${charData.abilities.maxhp}
-  ${getTerm("xp", lang)}: ${charData.xp}
+  const charLogBody = `
+  ${getTerm("hp")}: ${charData.hp} / ${charData.abilities.maxhp}
+  ${getTerm("xp")}: ${charData.xp}
 
-  ${getTerm("strength", lang)}: ${charData.abilities.strength}
-  ${getTerm("mana", lang)}: ${charData.abilities.mana}
-  ${getTerm("dexterity", lang)}: ${charData.abilities.dexterity}
-  ${getTerm("charisma", lang)}: ${charData.abilities.charisma}
-  ${getTerm("luck", lang)}: ${charData.abilities.luck}
+  ${getTerm("strength")}: ${charData.abilities.strength}
+  ${getTerm("mana")}: ${charData.abilities.mana}
+  ${getTerm("dexterity")}: ${charData.abilities.dexterity}
+  ${getTerm("charisma")}: ${charData.abilities.charisma}
+  ${getTerm("luck")}: ${charData.abilities.luck}
 
-  ${getTerm("inventory", lang)}:
+  ${getTerm("inventory")}:
   [ ${charData.inventory.join(" ][ ")} ]
 
-  ${getTerm("lastPlayed", lang)}: ${charData.lastPlayed}
+  ${getTerm("lastPlayed")}: ${charData.lastPlayed}
   `;
-  console.log(charLog);
-  await input({
-    message: getTerm("pressEnter", lang),
-  });
+
+  console.log(chalk.hex(getPrimaryColor())(charLogTitle));
+  console.log(chalk.hex(getSecondaryColor())(charLogBody));
+
+  await pressEnter();
 }
