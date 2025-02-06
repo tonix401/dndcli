@@ -3,4 +3,5 @@
  */
 export interface ISettings {
   language: "de" | "en";
+  color: string
 };

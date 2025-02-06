@@ -4,7 +4,8 @@ import { createCharacterMenu } from "./js/components/CreateCharacterMenu.js";
 import { inspectCharacter } from "./js/components/InspectCharacter.js";
 import { startCampaign } from "./js/src/campaign.js";
 import {
-  skippableSlowWrite,
+  slowWrite,
+  themedSelect,
   totalClear,
 } from "./js/utilities/ConsoleService.js";
 import { log } from "./js/utilities/LogService.js";
@@ -15,63 +16,57 @@ import { newPlayerScreen } from "./js/components/NewPlayerScreen.js";
 import { welcomeScreen } from "./js/components/WelcomeScreen.js";
 import { saveSettingsData } from "./js/utilities/SettingsService.js";
 import { getTerm } from "./js/utilities/LanguageService.js";
-import { select } from "@inquirer/prompts";
+import { getLanguage, getPrimaryColor, getSecondaryColor, setLanguage, setPrimaryColor, setSecondaryColor } from "./js/utilities/CacheService.js";
 
-const getMenuOptions = (lang) => [
-  { name: getTerm("createCharacter", lang), value: "1" },
-  { name: getTerm("inspectCharacter", lang), value: "2" },
-  { name: getTerm("startCampaign", lang), value: "3" },
-  { name: getTerm("changeLang", lang), value: "4" },
-  { name: getTerm("exit", lang), value: "9" },
+const getMenuOptions = () => [
+  { name: getTerm("createCharacter"), value: "1" },
+  { name: getTerm("inspectCharacter"), value: "2" },
+  { name: getTerm("startCampaign"), value: "3" },
+  { name: getTerm("changeLang"), value: "4" },
+  { name: getTerm("exit"), value: "9" },
 ];
 
-async function handleMenuChoice(choice, language) {
+async function handleMenuChoice(choice) {
   try {
     switch (choice) {
       case "1":
         log("Creating new Character");
-        await createCharacterMenu(language);
+        await createCharacterMenu();
         break;
       case "2":
         log("Inspecting Character");
-        await inspectCharacter(language);
+        await inspectCharacter();
         break;
       case "3":
         log("Campaign Start");
-        await startCampaign(language);
+        await startCampaign();
         break;
       case "4":
-        const newLanguage = await changeLanguage(language);
-        log("Changed Language to " + newLanguage);
-        return newLanguage;
+        await changeLanguage();
+        break;
       case "9":
-        await exitProgram(language);
+        await exitProgram();
       default:
         log("Invalid option selected", LogTypes.ERROR);
     }
-    return language;
   } catch (error) {
     log(`Error in menu operation: ${error.message}`, LogTypes.ERROR);
-    return language;
   }
 }
 
 /**
  * The main menu and game loop of the app
  */
-async function main(language) {
+async function main() {
   try {
     while (true) {
       totalClear();
-      const choice = await select(
-        {
-          message: getTerm("chooseOption", language),
-          choices: getMenuOptions(language),
-        },
-        { clearPromptOnDone: true }
-      );
+      const choice = await themedSelect({
+        message: getTerm("chooseOption"),
+        choices: getMenuOptions(),
+      });
 
-      language = await handleMenuChoice(choice, language);
+      await handleMenuChoice(choice);
     }
   } catch (error) {
     log("Error: " + error, LogTypes.ERROR);
@@ -80,27 +75,37 @@ async function main(language) {
 }
 
 process.on("SIGINT", async () => {
-  exitProgram(language);
+  log("Exiting Program via Ctrl-C", LogTypes.WARN);
+  await exitProgram();
 });
 
-async function exitProgram(language) {
-  saveSettingsData({ language: language });
-  await skippableSlowWrite(getTerm("goodbye", language));
+async function exitProgram() {
+  log("Program ended");
+  saveSettingsData({
+    language: getLanguage(),
+    primaryColor: getPrimaryColor(),
+    secondaryColor: getSecondaryColor(),
+  });
+  await slowWrite(getTerm("goodbye"));
   process.exit(0);
+}
+
+export function getCurrentColor() {
+  return color || "white";
 }
 
 ///////////////////////////////////////////// MAIN PROGRAM /////////////////////////////////////////////////
 const dataDir = path.join(process.cwd(), "storage");
 fs.ensureDirSync(dataDir);
-
 log("Program started");
 
 let settings = await getSettingsData();
-let language = settings?.language || "de";
+setLanguage(settings?.language || "de");
+setPrimaryColor(settings?.primaryColor || "#E04500");
+setSecondaryColor(settings?.secondaryColor || "#FFFFFF")
 
-await newPlayerScreen(language);
-await welcomeScreen(language);
+await newPlayerScreen();
+await welcomeScreen();
 
-main(language);
-main(language);
+main();
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////

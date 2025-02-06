@@ -1,21 +1,21 @@
-import { getTerm, Language } from "../utilities/LanguageService.js";
+import { getTerm } from "../utilities/LanguageService.js";
 
-export function getClassChoices(lang: Language){
+export function getClassChoices(){
   return [
     {
-      name: getTerm("swordFighter", lang),
+      name: getTerm("swordFighter"),
       value: "swordFighter",
     },
     {
-      name: getTerm("mage", lang),
+      name: getTerm("mage"),
       value: "mage",
     },
     {
-      name: getTerm("archer", lang),
+      name: getTerm("archer"),
       value: "archer",
     },
     {
-      name: getTerm("thief", lang),
+      name: getTerm("thief"),
       value: "thief",
     },
   ];}

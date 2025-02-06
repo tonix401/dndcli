@@ -8,7 +8,7 @@ const filename = "../dndcli/storage/settings.json";
  * Reads the saved settings from the settings.json file
  * @returns The settings as an object
  * @example
- * { language: "de" }
+ * { language: "de", color: "#E04500" }
  */
 export function getSettingsData(): ISettings | null {
   try {
@@ -17,7 +17,7 @@ export function getSettingsData(): ISettings | null {
   } catch (error) {
     if (error instanceof Error) {
       log(
-        `Error while loading ${filename}: Something went wrong`,
+        `Error while loading ${filename}: ${error.message}`,
         LogTypes.ERROR
       );
     }
@@ -29,7 +29,7 @@ export function getSettingsData(): ISettings | null {
  * Saves settings data
  * @param settingsData The settings object to write to the settings.json file
  * @example
- * { language: "en" }
+ * { language: "en", color: "#E04500" }
  */
 export function saveSettingsData(settingsData: ISettings): void {
   try {

@@ -1,5 +1,9 @@
 import readline from "readline";
 import { log } from "./LogService.js";
+import { input, select } from "@inquirer/prompts";
+import chalk from "chalk";
+import { getPrimaryColor, getSecondaryColor } from "./CacheService.js";
+import { getTerm } from "./LanguageService.js";
 
 /**
  * Clears the console completely, without leaving any annoying scroll-up buffer behind
@@ -127,6 +131,7 @@ export async function skippableSlowWrite(
   return;
 }
 
+// for skippableSlowWrite()
 function getFormattingFunction(
   index: number,
   formattings: formattingFunction[]
@@ -135,4 +140,72 @@ function getFormattingFunction(
     return formattings[index];
   }
   return formattings[formattings.length - 1];
+}
+
+/**
+ * Theming type for inquirer
+ * @link https://www.npmjs.com/package/@inquirer/select#Theming
+ */
+type inquirerTheme = {
+  prefix?: string | { idle: string; done: string };
+  spinner?: {
+    interval: number;
+    frames: string[];
+  };
+  style?: {
+    answer?: (text: string) => string;
+    message?: (text: string, status: "idle" | "done" | "loading") => string;
+    error?: (text: string) => string;
+    help?: (text: string) => string;
+    highlight?: (text: string) => string;
+    description?: (text: string) => string;
+    disabled?: (text: string) => string;
+  };
+  icon?: {
+    cursor?: string;
+  };
+  helpMode?: "always" | "never" | "auto";
+};
+
+type selectConfig = {
+  message: string;
+  choices: { name: string; value: string }[];
+  pageSize?: number | undefined;
+  loop?: boolean | undefined;
+  default?: unknown;
+  theme?: inquirerTheme | undefined;
+};
+
+/**
+ * A version of the select from inquirer that used the custom theme and current colors
+ * @param config The same config select from inquirer/prompt uses
+ * @returns The value of the choice the user made
+ */
+export async function themedSelect(config: selectConfig): Promise<string> {
+  const theme: inquirerTheme = {
+    prefix: " ",
+    icon: {
+      cursor: "👉",
+    },
+    style: {
+      message: (text: string) => chalk.hex(getPrimaryColor())(chalk.bold(text)),
+      answer: (text: string) => chalk.hex(getSecondaryColor())(text),
+      highlight: (text: string) => chalk.bold(text),
+    },
+    helpMode: "never",
+  };
+  return await select({ ...config, theme: theme }, { clearPromptOnDone: true });
+}
+
+export async function pressEnter() {
+  return await input({
+    message: getTerm("pressEnter"),
+    theme: {
+      style: {
+        message: (text: string) =>
+          chalk.bold(chalk.hex(getSecondaryColor())(text)),
+      },
+      prefix: chalk.bold(chalk.hex(getSecondaryColor())("👉")),
+    },
+  });
 }
