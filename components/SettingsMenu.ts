@@ -1,5 +1,7 @@
+import { getLanguage, setLanguage } from "../utilities/CacheService.js";
 import { getTerm, Language } from "../utilities/LanguageService.js";
-import { select } from "@inquirer/prompts";
+import { log } from "../utilities/LogService.js";
+import { themedSelect } from "../utilities/ConsoleService.js";
 
 /**
  * Shows a menu to change the language setting
@@ -11,59 +13,22 @@ import { select } from "@inquirer/prompts";
  * >German
  *  English
  */
-export async function changeLanguage(lang: Language) {
+export async function changeLanguage() {
   const langChoices: { name: string; value: Language }[] = [
     {
-      name: getTerm("de", lang),
+      name: getTerm("de"),
       value: "de",
     },
     {
-      name: getTerm("en", lang),
+      name: getTerm("en"),
       value: "en",
     },
   ];
-  console.log(`${getTerm("currentLang", lang, true)} ${getTerm(lang, lang)}`);
-  const chosenLang = await select({
-    message: getTerm("chooseLang", lang),
+  console.log(`${getTerm("currentLang", true)} ${getTerm(getLanguage())}`);
+  const chosenLang = await themedSelect({
+    message: getTerm("chooseLang"),
     choices: langChoices,
   });
-
-  return chosenLang;
+  setLanguage(chosenLang as Language);
+  log("Switched language to: " + getTerm(chosenLang));
 }
-
-// General settings in case we need them later:
-
-/*
-export async function changeSettings(lang: Language = "de") {
-  // declarations
-  const langChoices: { name: string; value: Language }[] = [
-    {
-      name: getTerm("de", lang),
-      value: "de",
-    },
-    {
-      name: getTerm("en", lang),
-      value: "en",
-    },
-  ];
-  let settings: ISettings = getSettingsData();
-  const settingsLog = `
-  ${chalk.bold(getTerm("settings", lang))}
-  ${getTerm("language", lang)}: ${getTerm(settings.language, lang)}
-  `;
-
-  // actions
-  totalClear();
-  console.log(settingsLog);
-  const chosenLang: Language = await select({
-    message: getTerm("chooseLang", lang),
-    choices: langChoices,
-  });
-
-  settings.language = chosenLang;
-
-  return await input({
-    message: getTerm("pressEnter", lang),
-  });
-}
-*/
