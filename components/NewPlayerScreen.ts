@@ -1,4 +1,3 @@
-import { input } from "@inquirer/prompts";
 import {
   getCharacterData,
   saveCharacterData,

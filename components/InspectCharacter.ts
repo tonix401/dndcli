@@ -2,7 +2,6 @@ import ICharacterData from "../types/ICharacterData";
 import { getCharacterData } from "../utilities/CharacterService.js";
 import { pressEnter, totalClear } from "../utilities/ConsoleService.js";
 import chalk from "chalk";
-import { input } from "@inquirer/prompts";
 import { getTerm } from "../utilities/LanguageService.js";
 import {
   getPrimaryColor,

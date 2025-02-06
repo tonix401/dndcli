@@ -1,4 +1,3 @@
-import { input } from "@inquirer/prompts";
 import { getTerm } from "../utilities/LanguageService.js";
 import chalk from "chalk";
 import {
@@ -6,7 +5,7 @@ import {
   skippableSlowWrite,
   totalClear,
 } from "../utilities/ConsoleService.js";
-import { getPrimaryColor } from "../utilities/CacheService.js";
+import { getPrimaryColor, getSecondaryColor } from "../utilities/CacheService.js";
 
 /**
  * Initiates the title sequence / welcome screen of the app
@@ -22,8 +21,8 @@ export async function welcomeScreen() {
   await skippableSlowWrite(getTerm("welcome"), {
     formattings: [
       (char) => chalk.bold(chalk.hex(getPrimaryColor())(char)),
-      (char) => char,
-    ],
+      (char) => chalk.hex(getSecondaryColor())(char),
+    ]
   });
   await pressEnter();
 }

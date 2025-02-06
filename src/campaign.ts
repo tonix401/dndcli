@@ -4,7 +4,6 @@ import { generateChatNarrative } from "./aiAssistant.js";
 import { rollDice } from "../utilities/DiceService.js";
 import { GameState } from "./gameState.js";
 import { promptForChoice } from "./gameMaster.js";
-import { totalClear } from "../utilities/ConsoleService.js";
 import { log } from "../utilities/LogService.js";
 import LogTypes from "../types/LogTypes.js";
 import { runCombat } from "./combat.js";

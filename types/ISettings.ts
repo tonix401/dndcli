@@ -1,7 +1,10 @@
+import { Language } from "../utilities/LanguageService";
+
 /**
  * Interface for app settings
  */
 export interface ISettings {
-  language: "de" | "en";
-  color: string
+  language: Language;
+  primaryColor: string,
+  secondaryColor: string
 };

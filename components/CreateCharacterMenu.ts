@@ -1,10 +1,10 @@
 import ICharacterData from "../types/ICharacterData.js";
 import { saveCharacterData } from "../utilities/CharacterService.js";
-import { input, select } from "@inquirer/prompts";
+import { input } from "@inquirer/prompts";
 import { generateChatNarrative } from "../src/aiAssistant.js";
 import { ChatCompletionRequestMessage } from "openai";
 import { getStartingItems } from "../utilities/InventoryService.js";
-import { getTerm, Language } from "../utilities/LanguageService.js";
+import { getTerm } from "../utilities/LanguageService.js";
 import { getClassChoices } from "../types/ClassChoices.js";
 import { log } from "../utilities/LogService.js";
 import LogTypes from "../types/LogTypes.js";
