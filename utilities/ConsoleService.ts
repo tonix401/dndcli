@@ -44,8 +44,16 @@ export async function slowWrite(
   }
 }
 
+/**
+ * Type for a text formatting function
+ * @example
+ * (char) => chalk.bold(chalk.blue(char))
+ */
 type formattingFunction = (char: string) => string;
 
+/**
+ * The config for the skippableSlowWrite function
+ */
 type slowWriteConfig = {
   charDelay?: number;
   lineDelay?: number;
@@ -91,10 +99,9 @@ export async function skippableSlowWrite(
 
   const lines = message.split("\n");
   for (let i in lines) {
-    log(`i: ${i}, lines[i]: ${lines[i]}`);
     const line = lines[i].split("");
     for (let j in line) {
-      // for some weird reason: i is a string here, so i need to parse it into a number
+      // for some weird reason i is a string here, so it has to be parsed into a number
       process.stdout.write(
         getFormattingFunction(parseInt(i), formattings)(line[j])
       );
