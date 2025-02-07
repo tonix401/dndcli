@@ -1,7 +1,10 @@
-import LogTypes from "../types/LogTypes.js";
 import { getTerm, Language } from "./LanguageService.js";
-import { log } from "./LogService.js";
-import { getAllThemeOverrides, IThemeOverride, standardTheme } from "./ThemingService.js";
+import { log, LogTypes } from "./LogService.js";
+import {
+  getAllThemeOverrides,
+  IThemeOverride,
+  standardTheme,
+} from "./ThemingService.js";
 
 let cachedlanguage: Language = "de";
 let cachedTheme = standardTheme;

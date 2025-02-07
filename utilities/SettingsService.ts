@@ -1,6 +1,5 @@
 import fs from "fs";
-import { log } from "./LogService.js";
-import LogTypes from "../types/LogTypes.js";
+import { LogTypes, log } from "./LogService.js";
 import { ISettings } from "../types/ISettings.js";
 
 const filename = "../dndcli/storage/settings.json";
@@ -36,7 +35,10 @@ export function saveSettingsData(settingsData: ISettings): void {
     fs.writeFileSync(filename, JSON.stringify(settingsData, null, 2));
   } catch (error) {
     if (error instanceof Error) {
-      log(`Settings Service: Error while saving ${filename}: ${error.message}`, LogTypes.ERROR);
+      log(
+        `Settings Service: Error while saving ${filename}: ${error.message}`,
+        LogTypes.ERROR
+      );
     }
   }
 }

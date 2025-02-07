@@ -5,9 +5,8 @@ import {
   setTheme,
 } from "../utilities/CacheService.js";
 import { getTerm, Language } from "../utilities/LanguageService.js";
-import { log } from "../utilities/LogService.js";
+import { log, LogTypes } from "../utilities/LogService.js";
 import { pressEnter, themedSelect } from "../utilities/ConsoleService.js";
-import LogTypes from "../types/LogTypes.js";
 import {
   getAllThemeOverrides,
   standardTheme,
@@ -75,6 +74,7 @@ async function changeLanguageMenu() {
   const chosenLang = await themedSelect({
     message: `${getTerm("language")}`,
     choices: langChoices,
+    default: getLanguage(),
   });
   setLanguage(chosenLang as Language);
   log("Settings Menu: Switched language to: " + getTerm(chosenLang));
@@ -96,6 +96,7 @@ async function changeThemeMenu() {
         };
       }),
     ],
+    default: getTheme().name.en,
   });
 
   const selectedTheme = Object.values(getAllThemeOverrides()).find(

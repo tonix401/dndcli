@@ -1,7 +1,6 @@
 import fs from "fs";
 import ICharacterData from "../types/ICharacterData";
-import { log } from "./LogService.js";
-import LogTypes from "../types/LogTypes.js";
+import { log, LogTypes } from "./LogService.js";
 
 const filename = "../dndcli/storage/character.json";
 

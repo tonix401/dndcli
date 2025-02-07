@@ -1,6 +1,5 @@
 import fs from "fs";
-import { log } from "./LogService.js";
-import LogTypes from "../types/LogTypes.js";
+import { LogTypes, log } from "./LogService.js";
 import { IContextData } from "../types/IContextData.js";
 
 const filename = "../dndcli/storage/context.json";
@@ -15,7 +14,10 @@ export function getContextData(): IContextData | null {
     return JSON.parse(data);
   } catch (error) {
     if (error instanceof Error) {
-      log(`Context Service: Error while loading ${filename}: ${error.message}`, LogTypes.ERROR);
+      log(
+        `Context Service: Error while loading ${filename}: ${error.message}`,
+        LogTypes.ERROR
+      );
     }
 
     return null;

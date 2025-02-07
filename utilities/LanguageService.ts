@@ -1,6 +1,5 @@
-import LogTypes from "../types/LogTypes.js";
+import { LogTypes, log } from "./LogService.js";
 import { getLanguage } from "./CacheService.js";
-import { log } from "./LogService.js";
 
 export type ITerm = Record<Language, string>;
 export type IColorTerm = Record<Language | "hex", string>;

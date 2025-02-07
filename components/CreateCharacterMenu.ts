@@ -6,8 +6,7 @@ import { ChatCompletionRequestMessage } from "openai";
 import { getStartingItems } from "../utilities/InventoryService.js";
 import { getTerm } from "../utilities/LanguageService.js";
 import { getClassChoices } from "../types/ClassChoices.js";
-import { log } from "../utilities/LogService.js";
-import LogTypes from "../types/LogTypes.js";
+import { log, LogTypes } from "../utilities/LogService.js";
 import { pressEnter, themedSelect } from "../utilities/ConsoleService.js";
 
 async function validateOrigin(origin: string): Promise<string> {
@@ -61,12 +60,10 @@ export async function createCharacterMenu(): Promise<void> {
     if (charData.name.toLowerCase() === "exit") return;
 
     // Get character class
-    charData.class = await themedSelect(
-      {
-        message: getTerm("classPrompt"),
-        choices: getClassChoices(),
-      }
-    );
+    charData.class = await themedSelect({
+      message: getTerm("classPrompt"),
+      choices: getClassChoices(),
+    });
 
     // Get character origin
     let originInput = await input(
