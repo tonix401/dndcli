@@ -8,7 +8,6 @@ import {
 } from "../utilities/CacheService.js";
 import {
   getAllColors,
-  getColorTerm,
   getTerm,
   IColorTerm,
   Language,
@@ -17,35 +16,6 @@ import { log } from "../utilities/LogService.js";
 import { pressEnter, themedSelect } from "../utilities/ConsoleService.js";
 import LogTypes from "../types/LogTypes.js";
 import chalk from "chalk";
-
-/**
- * Shows a menu to change the language setting
- * @param lang The current language code, to show the menu in
- * @returns The chosen language code
- * @example
- * Your current language is English
- * Which language would you like?
- * >German
- *  English
- */
-async function changeLanguage() {
-  const langChoices: { name: string; value: Language }[] = [
-    {
-      name: getTerm("de"),
-      value: "de",
-    },
-    {
-      name: getTerm("en"),
-      value: "en",
-    },
-  ];
-  const chosenLang = await themedSelect({
-    message: `${getTerm("chooseLang")}`,
-    choices: langChoices,
-  });
-  setLanguage(chosenLang as Language);
-  log("Switched language to: " + getTerm(chosenLang));
-}
 
 export async function settingsMenu() {
   const primaryColorSettingDescription: string =
@@ -62,49 +32,51 @@ export async function settingsMenu() {
       (colorTerm: IColorTerm) => colorTerm.hex === getSecondaryColor()
     )?.[getLanguage()];
 
-  const subSettingChoice = await themedSelect({
-    message: getTerm("settings"),
-    choices: [
-      {
-        name: getTerm("language") + ": " + getTerm(getLanguage()),
-        value: "languageSetting",
-      },
-      {
-        name: primaryColorSettingDescription,
-        value: "primaryColorSetting",
-      },
-      {
-        name: secondaryColorSettingDescription,
-        value: "secondaryColorSetting",
-      },
-      {
-        name: getTerm("goBack"),
-        value: "goBack",
-      },
-    ],
-  });
+  while (true) {
+    const subSettingChoice = await themedSelect({
+      message: getTerm("settings"),
+      choices: [
+        {
+          name: getTerm("language") + ": " + getTerm(getLanguage()),
+          value: "languageSetting",
+        },
+        {
+          name: primaryColorSettingDescription,
+          value: "primaryColorSetting",
+        },
+        {
+          name: secondaryColorSettingDescription,
+          value: "secondaryColorSetting",
+        },
+        {
+          name: getTerm("goBack"),
+          value: "goBack",
+        },
+      ],
+    });
 
-  switch (subSettingChoice) {
-    case "languageSetting":
-      await changeLanguage();
-      break;
-    case "primaryColorSetting":
-      await colorMenu("primaryColor");
-      break;
-    case "secondaryColorSetting":
-      await colorMenu("secondaryColor");
-      break;
-    case "goBack":
-      break;
-    default:
-      log("Settings menu: Unexpected sub setting choice", LogTypes.ERROR);
-      console.log(getTerm("invalid"));
-      await pressEnter();
-      settingsMenu();
+    switch (subSettingChoice) {
+      case "languageSetting":
+        await changeLanguageMenu();
+        break;
+      case "primaryColorSetting":
+        await changeColorMenu("primaryColor");
+        break;
+      case "secondaryColorSetting":
+        await changeColorMenu("secondaryColor");
+        break;
+      case "goBack":
+        return;
+      default:
+        log("Settings menu: Unexpected sub setting choice", LogTypes.ERROR);
+        console.log(getTerm("invalid"));
+        await pressEnter();
+        settingsMenu();
+    }
   }
 }
 
-async function colorMenu(prio: "primaryColor" | "secondaryColor") {
+async function changeColorMenu(prio: "primaryColor" | "secondaryColor") {
   const colorChoice = await themedSelect({
     message: getTerm(prio),
     choices: Object.values(getAllColors()).map((color: IColorTerm) => ({
@@ -118,4 +90,33 @@ async function colorMenu(prio: "primaryColor" | "secondaryColor") {
   } else {
     setSecondaryColor(colorChoice);
   }
+}
+
+/**
+ * Shows a menu to change the language setting
+ * @param lang The current language code, to show the menu in
+ * @returns The chosen language code
+ * @example
+ * Your current language is English
+ * Which language would you like?
+ * >German
+ *  English
+ */
+async function changeLanguageMenu() {
+  const langChoices: { name: string; value: Language }[] = [
+    {
+      name: getTerm("de"),
+      value: "de",
+    },
+    {
+      name: getTerm("en"),
+      value: "en",
+    },
+  ];
+  const chosenLang = await themedSelect({
+    message: `${getTerm("chooseLang")}`,
+    choices: langChoices,
+  });
+  setLanguage(chosenLang as Language);
+  log("Switched language to: " + getTerm(chosenLang));
 }

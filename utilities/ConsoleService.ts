@@ -191,8 +191,8 @@ export async function themedSelect(config: selectConfig): Promise<string> {
     },
     style: {
       message: (text: string) => chalk.hex(getPrimaryColor())(chalk.bold(text)),
-      description: (text: string) => chalk.hex(getSecondaryColor())(text),
-      highlight: (text: string) => chalk.bold(text),
+      highlight: (text: string) =>
+        chalk.bold(chalk.hex(getSecondaryColor())(text)),
     },
     helpMode: "never",
   };
