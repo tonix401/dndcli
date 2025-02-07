@@ -2,8 +2,8 @@ import readline from "readline";
 import { log } from "./LogService.js";
 import { input, select } from "@inquirer/prompts";
 import chalk from "chalk";
-import { getPrimaryColor, getSecondaryColor } from "./CacheService.js";
 import { getTerm } from "./LanguageService.js";
+import { getTheme } from "./CacheService.js";
 
 /**
  * Clears the console completely, without leaving any annoying scroll-up buffer behind
@@ -85,7 +85,7 @@ export async function skippableSlowWrite(
     lineDelay = 500,
     forceSkip = false,
     hasSafetyBuffer = true,
-    formattings = [(char) => chalk.hex(getSecondaryColor())(char)],
+    formattings = [(char) => chalk.hex(getTheme().secondaryColor)(char)],
     indented = true,
   } = config;
 
@@ -98,7 +98,7 @@ export async function skippableSlowWrite(
   // DO NOT REMOVE "str", OTHERWISE STUFF BREAKS
   process.stdin.on("keypress", (str, key) => {
     if (key.name === "return") {
-      log("Skipping text...");
+      log("Console Service: Skipping text...");
       isSkipping = true;
     }
   });
@@ -185,14 +185,15 @@ type selectConfig = {
  */
 export async function themedSelect(config: selectConfig): Promise<string> {
   const theme: inquirerTheme = {
-    prefix: " ",
+    prefix: getTheme().prefix,
     icon: {
-      cursor: "👉",
+      cursor: getTheme().cursor,
     },
     style: {
-      message: (text: string) => chalk.hex(getPrimaryColor())(chalk.bold(text)),
+      message: (text: string) =>
+        chalk.hex(getTheme().primaryColor)(chalk.bold(text)),
       highlight: (text: string) =>
-        chalk.bold(chalk.hex(getSecondaryColor())(text)),
+        chalk.bold(chalk.hex(getTheme().secondaryColor)(text)),
     },
     helpMode: "never",
   };
@@ -205,9 +206,98 @@ export async function pressEnter() {
     theme: {
       style: {
         message: (text: string) =>
-          chalk.bold(chalk.hex(getSecondaryColor())(text)),
+          chalk.bold(chalk.hex(getTheme().secondaryColor)(text)),
       },
-      prefix: chalk.bold(chalk.hex(getSecondaryColor())("👉")),
+      prefix: chalk.bold(
+        chalk.hex(getTheme().secondaryColor)(getTheme().cursor)
+      ),
     },
   });
+}
+
+/**
+ * A function that adds spaces to align multi line text to the center or right, relative to the longest line in the text
+ * @param text The text you want to align
+ * @param direction Center or right, (you don't need this for left)
+ * @param [margin=""] A string that gets added on both sides, mirrored
+ * @param [minWidth=0] The minimum width of the resulting text
+ */
+export function alignText(
+  text: string,
+  direction: "left" | "center" | "right",
+  margin = "",
+  minWidth = 0
+) {
+  // Setup
+  const formattedMargin = chalk.hex(getTheme().secondaryColor)(margin);
+  const reverseformattedMargin = chalk.hex(getTheme().secondaryColor)(
+    margin.split("").reverse().join("")
+  );
+  let lines = text.split("\n");
+
+  // Determine Width
+  const internalMinWidth = minWidth - margin.length * 2;
+  let width = Math.max(...lines.map((line) => line.length));
+  width = width >= internalMinWidth ? width : internalMinWidth;
+
+  // Format lines
+  lines = lines.map((line) => {
+    const space = " ".repeat(Math.floor((width - line.length) / 2));
+    let result;
+    switch (direction) {
+      case "left":
+        result = line + " ".repeat(width - line.length);
+        break;
+      case "center":
+        result = " ".repeat(width - line.length - space.length) + line + space;
+        break;
+      case "right":
+        result = " ".repeat(width - line.length) + line;
+        break;
+    }
+    return formattedMargin + result + reverseformattedMargin;
+  });
+
+  // Return joined lines
+  return lines.join("\n");
+}
+
+/**
+ * A function to format a console.log as a table
+ * @param rows An Array of name/value pairs that will be displayed in the "table" format
+ * @param margin A string that will be added on both sides of the table, mirrored
+ * @param separator A string that will be added between the name and value, recommended is an amount of spaces
+ * @param [minWidth=0] The minimum width of the resulting table
+ * @example
+ * console.log(alignTextAsTable([["First name:", "Jonathan"],["Last name:", "Doe"]], "| "));
+ *
+ * | First name: Jonathan |
+ * | Last name:       Doe |
+ */
+export function alignTextAsTable(
+  rows: [string, string][],
+  margin: string = "",
+  separator: string = "",
+  minWidth: number = 0
+): string {
+  const internalMinWidth = minWidth - margin.length * 2 - separator.length;
+  const formattedMargin = chalk.hex(getTheme().secondaryColor)(margin);
+  const reverseformattedMargin = chalk.hex(getTheme().secondaryColor)(
+    margin.split("").reverse().join("")
+  );
+
+  let width = Math.max(...rows.map((row) => row.join("").length));
+  width = width >= internalMinWidth ? width : internalMinWidth;
+
+  const result = rows.map(
+    (row) =>
+      formattedMargin +
+      row[0] +
+      separator +
+      " ".repeat(width - row.join("").length) +
+      row[1] +
+      reverseformattedMargin
+  );
+
+  return result.join("\n");
 }

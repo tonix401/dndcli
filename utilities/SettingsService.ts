@@ -17,7 +17,7 @@ export function getSettingsData(): ISettings | null {
   } catch (error) {
     if (error instanceof Error) {
       log(
-        `Error while loading ${filename}: ${error.message}`,
+        `Settings Service: Error while loading ${filename}: ${error.message}`,
         LogTypes.ERROR
       );
     }
@@ -36,7 +36,7 @@ export function saveSettingsData(settingsData: ISettings): void {
     fs.writeFileSync(filename, JSON.stringify(settingsData, null, 2));
   } catch (error) {
     if (error instanceof Error) {
-      log(`Error while saving ${filename}: ${error.message}`, LogTypes.ERROR);
+      log(`Settings Service: Error while saving ${filename}: ${error.message}`, LogTypes.ERROR);
     }
   }
 }

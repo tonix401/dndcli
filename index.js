@@ -4,6 +4,7 @@ import { createCharacterMenu } from "./js/components/CreateCharacterMenu.js";
 import { inspectCharacter } from "./js/components/InspectCharacter.js";
 import { startCampaign } from "./js/src/campaign.js";
 import {
+  pressEnter,
   skippableSlowWrite,
   themedSelect,
   totalClear,
@@ -18,12 +19,11 @@ import { saveSettingsData } from "./js/utilities/SettingsService.js";
 import { getTerm } from "./js/utilities/LanguageService.js";
 import {
   getLanguage,
-  getPrimaryColor,
-  getSecondaryColor,
+  getTheme,
   setLanguage,
-  setPrimaryColor,
-  setSecondaryColor,
+  setTheme,
 } from "./js/utilities/CacheService.js";
+import { standardTheme } from "./js/utilities/ThemingService.js";
 
 const getMenuOptions = () => [
   { name: getTerm("createCharacter"), value: "1" },
@@ -37,28 +37,28 @@ async function handleMenuChoice(choice) {
   try {
     switch (choice) {
       case "1":
-        log("Creating new Character");
+        log("Index: Creating new Character");
         await createCharacterMenu();
         break;
       case "2":
-        log("Inspecting Character");
+        log("Index: Inspecting Character");
         await inspectCharacter();
         break;
       case "3":
-        log("Campaign Start");
+        log("Index: Campaign Start");
         await startCampaign();
         break;
       case "4":
-        log("Opening Settings")
+        log("Index: Opening Settings");
         await settingsMenu();
         break;
       case "9":
         await exitProgram();
       default:
-        log("Invalid option selected", LogTypes.ERROR);
+        log("Index: Invalid option selected", LogTypes.ERROR);
     }
   } catch (error) {
-    log(`Error in menu operation: ${error.message}`, LogTypes.ERROR);
+    log(`Index: ${error.message}`, LogTypes.ERROR);
   }
 }
 
@@ -66,33 +66,33 @@ async function handleMenuChoice(choice) {
  * The main menu and game loop of the app
  */
 async function main() {
-  try {
-    while (true) {
+  while (true) {
+    try {
       totalClear();
       const choice = await themedSelect({
-        message: getTerm("chooseOption"),
+        message: getTerm("mainMenu"),
         choices: getMenuOptions(),
       });
 
       await handleMenuChoice(choice);
+    } catch (error) {
+      log("Index: " + error, LogTypes.ERROR);
+      console.log(getTerm("error"));
+      await pressEnter();
     }
-  } catch (error) {
-    log("Error: " + error, LogTypes.ERROR);
-    main();
   }
 }
 
 process.on("SIGINT", async () => {
-  log("Exiting Program via Ctrl-C", LogTypes.WARN);
+  log("Index: Exiting Program via Ctrl-C", LogTypes.WARN);
   await exitProgram();
 });
 
 async function exitProgram() {
-  log("Program ended");
+  log("Index: Program ended");
   saveSettingsData({
     language: getLanguage(),
-    primaryColor: getPrimaryColor(),
-    secondaryColor: getSecondaryColor(),
+    theme: getTheme(),
   });
   await skippableSlowWrite(getTerm("goodbye"));
   process.exit(0);
@@ -105,12 +105,11 @@ export function getCurrentColor() {
 ///////////////////////////////////////////// MAIN PROGRAM /////////////////////////////////////////////////
 const dataDir = path.join(process.cwd(), "storage");
 fs.ensureDirSync(dataDir);
-log("Program started");
+log("Index: Program started");
 
 let settings = await getSettingsData();
 setLanguage(settings?.language || "de");
-setPrimaryColor(settings?.primaryColor || "#E04500");
-setSecondaryColor(settings?.secondaryColor || "#FFFFFF");
+setTheme(settings?.theme || standardTheme);
 
 await newPlayerScreen();
 await welcomeScreen();

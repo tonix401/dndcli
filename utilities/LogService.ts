@@ -20,6 +20,6 @@ export function log(message: string, logType = LogTypes.INFO): void {
   try {
     appendFileSync(debuggingLogFile, log);
   } catch (error) {
-    console.error(`Error writing to log file: ${error}`);
+    console.error(`Log Service: Error writing to log file: ${error}`);
   }
 }

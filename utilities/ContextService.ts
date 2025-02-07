@@ -15,7 +15,7 @@ export function getContextData(): IContextData | null {
     return JSON.parse(data);
   } catch (error) {
     if (error instanceof Error) {
-      log(`Error while loading ${filename}: ${error.message}`, LogTypes.ERROR);
+      log(`Context Service: Error while loading ${filename}: ${error.message}`, LogTypes.ERROR);
     }
 
     return null;
@@ -31,7 +31,10 @@ export function saveContextData(characterData: IContextData): void {
     fs.writeFileSync(filename, JSON.stringify(characterData, null, 2));
   } catch (error) {
     if (error instanceof Error) {
-      log(`Error while saving ${filename}: ${error.message}`, LogTypes.ERROR);
+      log(
+        `Context Service: Error while saving ${filename}: ${error.message}`,
+        LogTypes.ERROR
+      );
     }
   }
 }

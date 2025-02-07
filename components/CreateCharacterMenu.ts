@@ -101,7 +101,7 @@ export async function createCharacterMenu(): Promise<void> {
     await pressEnter();
   } catch (error) {
     if (error instanceof Error) {
-      log("Fatal error: " + error.message, LogTypes.ERROR);
+      log("Create Character Menu: " + error.message, LogTypes.ERROR);
     }
   }
 }

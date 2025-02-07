@@ -10,8 +10,8 @@ import {
   totalClear,
 } from "../utilities/ConsoleService.js";
 import { log } from "../utilities/LogService.js";
-import { getSecondaryColor } from "../utilities/CacheService.js";
 import chalk from "chalk";
+import { getTheme } from "../utilities/CacheService.js";
 
 // The standard character for new players
 const newPlayerChar = {
@@ -45,10 +45,10 @@ export async function newPlayerScreen(): Promise<boolean> {
   isNew = !charData;
 
   if (isNew) {
-    log("New Player detected, showing new player screen...");
+    log("New Player Screen: New Player detected");
     saveCharacterData(newPlayerChar);
     await skippableSlowWrite(getTerm("helloNewPlayer"), {
-      formattings: [(char) => chalk.hex(getSecondaryColor())(char)],
+      formattings: [(char) => chalk.hex(getTheme().secondaryColor)(char)],
     });
     await pause(500);
     await pressEnter();

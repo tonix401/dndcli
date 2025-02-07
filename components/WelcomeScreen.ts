@@ -5,11 +5,10 @@ import {
   skippableSlowWrite,
   totalClear,
 } from "../utilities/ConsoleService.js";
-import { getPrimaryColor, getSecondaryColor } from "../utilities/CacheService.js";
+import { getTheme } from "../utilities/CacheService.js";
 
 /**
  * Initiates the title sequence / welcome screen of the app
- * @param lang The current language code, to show the sequence in
  * @example
  *   Welcome to DnD-CLI
  *   by Julian Thaesler and Tom Weise
@@ -20,9 +19,9 @@ export async function welcomeScreen() {
 
   await skippableSlowWrite(getTerm("welcome"), {
     formattings: [
-      (char) => chalk.bold(chalk.hex(getPrimaryColor())(char)),
-      (char) => chalk.hex(getSecondaryColor())(char),
-    ]
+      (char) => chalk.bold(chalk.hex(getTheme().primaryColor)(char)),
+      (char) => chalk.hex(getTheme().secondaryColor)(char),
+    ],
   });
   await pressEnter();
 }

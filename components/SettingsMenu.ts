@@ -1,37 +1,20 @@
 import {
   getLanguage,
-  getPrimaryColor,
-  getSecondaryColor,
+  getTheme,
   setLanguage,
-  setPrimaryColor,
-  setSecondaryColor,
+  setTheme,
 } from "../utilities/CacheService.js";
-import {
-  getAllColors,
-  getTerm,
-  IColorTerm,
-  Language,
-} from "../utilities/LanguageService.js";
+import { getTerm, Language } from "../utilities/LanguageService.js";
 import { log } from "../utilities/LogService.js";
 import { pressEnter, themedSelect } from "../utilities/ConsoleService.js";
 import LogTypes from "../types/LogTypes.js";
+import {
+  getAllThemeOverrides,
+  standardTheme,
+} from "../utilities/ThemingService.js";
 import chalk from "chalk";
 
 export async function settingsMenu() {
-  const primaryColorSettingDescription: string =
-    getTerm("primaryColor") +
-    ": " +
-    Object.values(getAllColors()).find(
-      (colorTerm: IColorTerm) => colorTerm.hex === getPrimaryColor()
-    )?.[getLanguage()];
-
-  const secondaryColorSettingDescription: string =
-    getTerm("secondaryColor") +
-    ": " +
-    Object.values(getAllColors()).find(
-      (colorTerm: IColorTerm) => colorTerm.hex === getSecondaryColor()
-    )?.[getLanguage()];
-
   while (true) {
     const subSettingChoice = await themedSelect({
       message: getTerm("settings"),
@@ -41,12 +24,8 @@ export async function settingsMenu() {
           value: "languageSetting",
         },
         {
-          name: primaryColorSettingDescription,
-          value: "primaryColorSetting",
-        },
-        {
-          name: secondaryColorSettingDescription,
-          value: "secondaryColorSetting",
+          name: getTerm("theme") + ": " + getTheme().name[getLanguage()],
+          value: "themeSetting",
         },
         {
           name: getTerm("goBack"),
@@ -59,11 +38,8 @@ export async function settingsMenu() {
       case "languageSetting":
         await changeLanguageMenu();
         break;
-      case "primaryColorSetting":
-        await changeColorMenu("primaryColor");
-        break;
-      case "secondaryColorSetting":
-        await changeColorMenu("secondaryColor");
+      case "themeSetting":
+        await changeThemeMenu();
         break;
       case "goBack":
         return;
@@ -76,25 +52,8 @@ export async function settingsMenu() {
   }
 }
 
-async function changeColorMenu(prio: "primaryColor" | "secondaryColor") {
-  const colorChoice = await themedSelect({
-    message: getTerm(prio),
-    choices: Object.values(getAllColors()).map((color: IColorTerm) => ({
-      name: chalk.hex(color.hex)(color[getLanguage()]),
-      value: color.hex,
-    })),
-  });
-
-  if (prio === "primaryColor") {
-    setPrimaryColor(colorChoice);
-  } else {
-    setSecondaryColor(colorChoice);
-  }
-}
-
 /**
  * Shows a menu to change the language setting
- * @param lang The current language code, to show the menu in
  * @returns The chosen language code
  * @example
  * Your current language is English
@@ -114,9 +73,38 @@ async function changeLanguageMenu() {
     },
   ];
   const chosenLang = await themedSelect({
-    message: `${getTerm("chooseLang")}`,
+    message: `${getTerm("language")}`,
     choices: langChoices,
   });
   setLanguage(chosenLang as Language);
-  log("Switched language to: " + getTerm(chosenLang));
+  log("Settings Menu: Switched language to: " + getTerm(chosenLang));
+}
+
+/**
+ *
+ */
+async function changeThemeMenu() {
+  const themeChoice = await themedSelect({
+    message: getTerm("theme"),
+    choices: [
+      ...Object.values(getAllThemeOverrides()).map((theme) => {
+        return {
+          name: chalk.hex(theme.primaryColor || standardTheme.primaryColor)(
+            theme.name[getLanguage()]
+          ),
+          value: theme.name.en,
+        };
+      }),
+    ],
+  });
+
+  const selectedTheme = Object.values(getAllThemeOverrides()).find(
+    (theme) => theme.name.en === themeChoice
+  );
+
+  if (selectedTheme) {
+    setTheme(selectedTheme);
+  } else {
+    log("Setting Menu: Theme selection failed", LogTypes.ERROR);
+  }
 }

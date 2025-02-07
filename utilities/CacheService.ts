@@ -1,51 +1,53 @@
 import LogTypes from "../types/LogTypes.js";
-import { Language } from "./LanguageService.js";
+import { getTerm, Language } from "./LanguageService.js";
 import { log } from "./LogService.js";
+import { getAllThemeOverrides, IThemeOverride, standardTheme } from "./ThemingService.js";
 
-let language: Language = "de";
-let primaryColor = "#E04500";
-let secondaryColor = "#ffffff";
-const hexColorRegex = /^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/;
+let cachedlanguage: Language = "de";
+let cachedTheme = standardTheme;
 
 export function getLanguage() {
-  return language;
+  return cachedlanguage;
 }
 
-export function getPrimaryColor() {
-  return primaryColor;
+export function getTheme() {
+  return cachedTheme;
 }
 
-export function getSecondaryColor() {
-  return secondaryColor;
+export function setLanguage(language: Language): void {
+  cachedlanguage = language;
+  log("Cache service: Language set to " + getTerm(language));
 }
 
-export function setLanguage(lang: Language) {
-  language = lang;
-  log("CacheService: Language set to " + lang);
-}
+export function setThemeByKey(key: string): void {
+  const themeOverrides = getAllThemeOverrides();
+  const tempTheme = themeOverrides[key];
 
-export function setPrimaryColor(color: string) {
-  if (hexColorRegex.test(color)) {
-    primaryColor = color;
-    log("CacheService: Primary color set to " + color);
+  if (tempTheme) {
+    log(`Cache Service: Theme set to ${tempTheme.name.en}`);
+    cachedTheme = {
+      name: { de: tempTheme.name.de, en: tempTheme.name.en },
+      prefix: tempTheme.prefix || standardTheme.prefix,
+      primaryColor: tempTheme.primaryColor || standardTheme.primaryColor,
+      secondaryColor: tempTheme.secondaryColor || standardTheme.secondaryColor,
+      cursor: tempTheme.cursor || standardTheme.cursor,
+    };
   } else {
     log(
-      "CacheService: Invalid Color Format, while trying to set primary color " +
-        color,
+      `Cache Service: There is no theme overide called: "${key}"`,
       LogTypes.ERROR
     );
   }
 }
 
-export function setSecondaryColor(color: string) {
-  if (hexColorRegex.test(color)) {
-    secondaryColor = color;
-    log("CacheService: Secondary color set to " + color);
-  } else {
-    log(
-      "CacheService: Invalid Color Format, while trying to set secondary color: " +
-        color,
-      LogTypes.ERROR
-    );
-  }
+export function setTheme(theme: IThemeOverride) {
+  log(`Cache Service: Theme set to ${theme.name.en}`);
+
+  cachedTheme = {
+    name: { de: theme.name.de, en: theme.name.en },
+    prefix: theme.prefix || standardTheme.prefix,
+    primaryColor: theme.primaryColor || standardTheme.primaryColor,
+    secondaryColor: theme.secondaryColor || standardTheme.secondaryColor,
+    cursor: theme.cursor || standardTheme.cursor,
+  };
 }
