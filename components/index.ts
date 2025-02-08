@@ -1,39 +1,40 @@
-import fs from "fs-extra";
 import path from "path";
-import { createCharacterMenu } from "./js/components/CreateCharacterMenu.js";
-import { inspectCharacter } from "./js/components/InspectCharacter.js";
-import { startCampaign } from "./js/src/campaign.js";
+import fs from "fs-extra";
+import { createCharacterMenu } from "./CreateCharacterMenu.js";
+import { inspectCharacter } from "./InspectCharacter.js";
+import { startCampaign } from "../src/campaign.js";
 import {
   pressEnter,
   skippableSlowWrite,
   themedSelect,
   totalClear,
-} from "./js/utilities/ConsoleService.js";
-import { log } from "./js/utilities/LogService.js";
-import LogTypes from "./js/types/LogTypes.js";
-import { getSettingsData } from "./js/utilities/SettingsService.js";
-import { settingsMenu } from "./js/components/SettingsMenu.js";
-import { newPlayerScreen } from "./js/components/NewPlayerScreen.js";
-import { welcomeScreen } from "./js/components/WelcomeScreen.js";
-import { saveSettingsData } from "./js/utilities/SettingsService.js";
-import { getTerm } from "./js/utilities/LanguageService.js";
+} from "../utilities/ConsoleService.js";
+import { log, LogTypes } from "../utilities/LogService.js";
+import { getSettingsData } from "../utilities/SettingsService.js";
+import { settingsMenu } from "./SettingsMenu.js";
+import { newPlayerScreen } from "./NewPlayerScreen.js";
+import { welcomeScreen } from "./WelcomeScreen.js";
+import { saveSettingsData } from "../utilities/SettingsService.js";
+import { getTerm } from "../utilities/LanguageService.js";
 import {
   getLanguage,
   getTheme,
   setLanguage,
   setTheme,
-} from "./js/utilities/CacheService.js";
-import { standardTheme } from "./js/utilities/ThemingService.js";
+} from "../utilities/CacheService.js";
+import { standardTheme } from "../utilities/ThemingService.js";
+import { secretDevMenu } from "./SecretDevMenu.js";
 
 const getMenuOptions = () => [
   { name: getTerm("createCharacter"), value: "1" },
   { name: getTerm("inspectCharacter"), value: "2" },
   { name: getTerm("startCampaign"), value: "3" },
   { name: getTerm("settings"), value: "4" },
+  { name: getTerm("devMenu"), value: "5" },
   { name: getTerm("exit"), value: "9" },
 ];
 
-async function handleMenuChoice(choice) {
+async function handleMenuChoice(choice: string) {
   try {
     switch (choice) {
       case "1":
@@ -52,19 +53,20 @@ async function handleMenuChoice(choice) {
         log("Index: Opening Settings");
         await settingsMenu();
         break;
+      case "5":
+        await secretDevMenu();
+        break;
       case "9":
         await exitProgram();
       default:
         log("Index: Unexpected menu choice", LogTypes.ERROR);
     }
   } catch (error) {
-    if (error instanceof ExitPromptError) {
-      await exitProgram();
-      log("Index/handleMenuChoices: User force closed the prompt", LogTypes.WARN);
-    }
-    else {
-      log(`Index/handleMenuChoices: ${error}`, LogTypes.ERROR);
-    }
+    await exitProgram();
+    log(
+      "Index/handleMenuChoices: User force closed the prompt",
+      LogTypes.WARNING
+    );
   }
 }
 
@@ -90,11 +92,11 @@ async function main() {
 }
 
 process.on("SIGINT", async () => {
-  log("Index: Exiting Program via Ctrl-C", LogTypes.WARN);
+  log("Index: Exiting Program via Ctrl-C", LogTypes.WARNING);
   await exitProgram();
 });
 
-async function exitProgram() {
+export async function exitProgram() {
   totalClear();
   log("Index: Program ended");
   saveSettingsData({
@@ -105,21 +107,20 @@ async function exitProgram() {
   process.exit(0);
 }
 
-export function getCurrentColor() {
-  return color || "white";
-}
-
 ///////////////////////////////////////////// MAIN PROGRAM /////////////////////////////////////////////////
 const dataDir = path.join(process.cwd(), "storage");
 fs.ensureDirSync(dataDir);
 log("Index: Program started");
 
-let settings = await getSettingsData();
+let settings = getSettingsData();
 setLanguage(settings?.language || "de");
 setTheme(settings?.theme || standardTheme);
 
-await newPlayerScreen();
-await welcomeScreen();
+async function startApp() {
+  await newPlayerScreen();
+  await welcomeScreen();
+  main();
+}
 
-main();
+startApp();
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////

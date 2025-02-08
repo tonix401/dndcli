@@ -244,7 +244,7 @@ Respond in English.
  * Starts the campaign:
  * Loads character data and persistent game state, then enters the campaign loop.
  */
-export async function startCampaign(language?: string): Promise<void> {
+export async function startCampaign(): Promise<void> {
   const { getCharacterData } = await import("../utilities/CharacterService.js");
   const characterData = getCharacterData();
   if (!characterData) {

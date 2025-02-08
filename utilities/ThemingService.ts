@@ -46,7 +46,7 @@ const themes: Record<string, IThemeOverride> = {
   hacker: {
     name: { de: "Hacker", en: "Hacker" },
     primaryColor: "#00FF00",
-    secondaryColor: "#000000",
+    secondaryColor: "#444444",
     cursor: chalk.whiteBright("0"),
     prefix: chalk.bold(chalk.hex("#00FF00")("System \\")),
   },

@@ -1,3 +1,4 @@
+import chalk from "chalk";
 import { appendFileSync } from "fs";
 
 const debuggingLogFile = "./storage/log.txt";
@@ -32,4 +33,3 @@ export function log(message: string, logType = LogTypes.INFO): void {
     console.error(`Log Service: Error writing to log file: ${error}`);
   }
 }
-

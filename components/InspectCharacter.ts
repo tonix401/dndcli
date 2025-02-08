@@ -64,12 +64,12 @@ export async function inspectCharacter() {
     margin,
     separator,
     totalMaxWidth
-  );
+  ).text;
   const formattedBodyTable = chalk.hex(getTheme().secondaryColor)(
     alignText(bodyTable, "center")
   );
 
-  // Finish up
+  // Log out
   console.log(
     chalk.hex(getTheme().secondaryColor)(
       "/" + "‾".repeat(totalMaxWidth - 2) + "\\"

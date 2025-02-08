@@ -182,10 +182,6 @@ const terms: Record<string, ITerm> = {
     de: "Deutsch",
     en: "German",
   },
-  currentLang: {
-    de: "Deine aktuelle Sprache ist",
-    en: "Your current language is",
-  },
   // #endregion
 
   // #region Menu options
@@ -205,10 +201,6 @@ const terms: Record<string, ITerm> = {
     de: "Kampagne starten",
     en: "Start Campaign",
   },
-  changeLang: {
-    de: "Sprache ändern",
-    en: "Change language",
-  },
   exit: {
     de: "Beenden",
     en: "Exit",
@@ -224,21 +216,46 @@ const terms: Record<string, ITerm> = {
     de: "Entwicklermenü",
     en: "Developer menu",
   },
-  showSavedData: {
-    de: "Speicher ansehen",
-    en: "Inspect data",
+  showSettingsData: {
+    de: "Einstellungensdaten",
+    en: "Settings data",
   },
-  showSavedDataDesc: {
-    de: "Zeigt alle gecacheten und gespeicherten Daten",
-    en: "Shows all cached and saved data",
+  showCharacterData: {
+    de: "Charakterdaten",
+    en: "Character data",
   },
-  saveDataToJson: {
-    de: "Cache-Daten permanent speichern",
-    en: "Save cached data permanently",
+  saveData: {
+    de: "Cache-Daten speichern",
+    en: "Commit cached data",
   },
-  saveDataToJsonDesc: {
-    de: "Speichert alle temporären Daten aus dem Cache in den Storage- und Setting-Dokumenten",
-    en: "Saves all temporary data from the cache into the storage and setting files",
+  cursor: {
+    de: "Zeiger",
+    en: "Cursor",
+  },
+  prefix: {
+    de: "Präfix",
+    en: "Prefix",
+  },
+  cacheData: {
+    de: "Cache Daten",
+    en: "Cache Data",
+  },
+  dataFromJson: {
+    de: "Gespeicherte Daten",
+    en: "Saved Data",
+  },
+  currentlyInDev: {
+    de: "🚧 Zurzeit noch in Arbeit 🚧",
+    en: "🚧 Currently in developement 🚧",
+  },
+  flip: {
+    de: "Flip",
+    en: "Flip"
+  },
+  // lets hope we don't ever get to see this one :)
+  undefined: {
+    de: "undefined",
+    en: "undefined",
   },
   //#endregion
 };

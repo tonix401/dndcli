@@ -200,6 +200,9 @@ export async function themedSelect(config: selectConfig): Promise<string> {
   return await select({ ...config, theme: theme }, { clearPromptOnDone: true });
 }
 
+/**
+ * Prompt the user to press enter to continue
+ */
 export async function pressEnter() {
   await input({
     message: getTerm("pressEnter"),
@@ -268,18 +271,19 @@ export function alignText(
  * @param margin A string that will be added on both sides of the table, mirrored
  * @param separator A string that will be added between the name and value, recommended is an amount of spaces
  * @param [minWidth=0] The minimum width of the resulting table
+ * @returns An object containing the result and its width and height
  * @example
- * console.log(alignTextAsTable([["First name:", "Jonathan"],["Last name:", "Doe"]], "| "));
+ * console.log(alignTextAsTable([["First name:", "Jonathan"],["Last name:", "Doe"]], "| ", "  "));
  *
- * | First name: Jonathan |
- * | Last name:       Doe |
+ * | First name  Jonathan |
+ * | Last name        Doe |
  */
 export function alignTextAsTable(
   rows: [string, string][],
   margin: string = "",
   separator: string = "",
   minWidth: number = 0
-): string {
+): { text: string; width: number; height: number } {
   const internalMinWidth = minWidth - margin.length * 2 - separator.length;
   const formattedMargin = chalk.hex(getTheme().secondaryColor)(margin);
   const reverseformattedMargin = chalk.hex(getTheme().secondaryColor)(
@@ -299,5 +303,62 @@ export function alignTextAsTable(
       reverseformattedMargin
   );
 
-  return result.join("\n");
+  const resultWidth = width + margin.length * 2 + separator.length;
+  const resultHeight = result.length;
+
+  return {
+    text: result.join("\n"),
+    width: resultWidth,
+    height: resultHeight,
+  };
+}
+
+/**
+ * Aligns text in several side by side tables
+ * @param tables The strings to process into a multi table
+ * @param tableSeparator The separator between the tables, please use symmetric ones for best outcomes, a space will be added between any separator and data
+ * @example
+ * alignTextAsMultiTable([[["Firstname", "Jon"],["Lastname", "Doe"]][["Firstname", "Peter"],["Lastname", "Poe"]], "|")
+ *
+ * | Firstname  Jon | Firstname  Peter |
+ * | Lastname   Doe | Lastname     Poe |
+ */
+export function alignTextAsMultiTable(
+  tables: [string, string][][],
+  tableSeparator: string
+): { text: string; width: number; height: number } {
+  // Adjust for differing table heights by adding empty rows
+  const height = Math.max(...tables.map((table) => table.length));
+  const heightAdjustedTables = tables.map((table) => {
+    let heightAdjustment: [string, string][] = [];
+    for (let i = 0; i < height - table.length; i++) {
+      heightAdjustment.push(["", ""]);
+    }
+    table.push(...heightAdjustment);
+    return table;
+  });
+
+  // Example: [["Firstname  Jon", "Lastname   Doe"],["Firstname  Peter","Lastname     Poe"]]
+  const alignedTables = heightAdjustedTables.map((table) =>
+    alignTextAsTable(table, "", "   ").text.split("\n")
+  );
+
+  // Example: | Firstname  Jon | Firstname  Peter |
+  //          | Lastname   Doe | Lastname     Poe |
+  const multitableRows = alignedTables[0].map((l, yIndex) => {
+    let line = tableSeparator;
+    for (let xIndex = 0; xIndex < tables.length; xIndex++) {
+      line = line + " " + alignedTables[xIndex][yIndex] + " " + tableSeparator;
+    }
+    return line;
+  });
+
+  // they are all the same length
+  const resultWidth = multitableRows[0].length;
+
+  return {
+    text: multitableRows.join("\n"),
+    width: resultWidth,
+    height: height,
+  };
 }

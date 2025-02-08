@@ -6,16 +6,20 @@ import {
 } from "../utilities/CacheService.js";
 import { getTerm, Language } from "../utilities/LanguageService.js";
 import { log, LogTypes } from "../utilities/LogService.js";
-import { pressEnter, themedSelect } from "../utilities/ConsoleService.js";
+import {
+  pressEnter,
+  themedSelect,
+  totalClear,
+} from "../utilities/ConsoleService.js";
 import {
   getAllThemeOverrides,
   standardTheme,
 } from "../utilities/ThemingService.js";
 import chalk from "chalk";
-import { secretDevMenu } from "./SecretDevMenu.js";
 
 export async function settingsMenu() {
   while (true) {
+    totalClear();
     const subSettingChoice = await themedSelect({
       message: getTerm("settings"),
       choices: [
@@ -26,10 +30,6 @@ export async function settingsMenu() {
         {
           name: getTerm("theme") + ": " + getTheme().name[getLanguage()],
           value: "themeSetting",
-        },
-        {
-          name: getTerm("devMenu"),
-          value: "devMenu",
         },
         {
           name: getTerm("goBack"),
@@ -44,9 +44,6 @@ export async function settingsMenu() {
         break;
       case "themeSetting":
         await changeThemeMenu();
-        break;
-      case "devMenu":
-        await secretDevMenu();
         break;
       case "goBack":
         return;
@@ -88,9 +85,6 @@ async function changeLanguageMenu() {
   log("Settings Menu: Switched language to: " + getTerm(chosenLang));
 }
 
-/**
- *
- */
 async function changeThemeMenu() {
   const themeChoice = await themedSelect({
     message: getTerm("theme"),
