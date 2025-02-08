@@ -12,6 +12,7 @@ import {
   standardTheme,
 } from "../utilities/ThemingService.js";
 import chalk from "chalk";
+import { secretDevMenu } from "./SecretDevMenu.js";
 
 export async function settingsMenu() {
   while (true) {
@@ -27,6 +28,10 @@ export async function settingsMenu() {
           value: "themeSetting",
         },
         {
+          name: getTerm("devMenu"),
+          value: "devMenu",
+        },
+        {
           name: getTerm("goBack"),
           value: "goBack",
         },
@@ -39,6 +44,9 @@ export async function settingsMenu() {
         break;
       case "themeSetting":
         await changeThemeMenu();
+        break;
+      case "devMenu":
+        await secretDevMenu();
         break;
       case "goBack":
         return;

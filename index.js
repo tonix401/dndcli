@@ -55,10 +55,16 @@ async function handleMenuChoice(choice) {
       case "9":
         await exitProgram();
       default:
-        log("Index: Invalid option selected", LogTypes.ERROR);
+        log("Index: Unexpected menu choice", LogTypes.ERROR);
     }
   } catch (error) {
-    log(`Index: ${error.message}`, LogTypes.ERROR);
+    if (error instanceof ExitPromptError) {
+      await exitProgram();
+      log("Index/handleMenuChoices: User force closed the prompt", LogTypes.WARN);
+    }
+    else {
+      log(`Index/handleMenuChoices: ${error}`, LogTypes.ERROR);
+    }
   }
 }
 
@@ -76,7 +82,7 @@ async function main() {
 
       await handleMenuChoice(choice);
     } catch (error) {
-      log("Index: " + error, LogTypes.ERROR);
+      log("Index/main: " + error, LogTypes.ERROR);
       console.log(getTerm("error"));
       await pressEnter();
     }
@@ -89,6 +95,7 @@ process.on("SIGINT", async () => {
 });
 
 async function exitProgram() {
+  totalClear();
   log("Index: Program ended");
   saveSettingsData({
     language: getLanguage(),

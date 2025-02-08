@@ -47,6 +47,14 @@ const terms: Record<string, ITerm> = {
     de: "Es sieht aus, als wärst Du zum ersten Mal hier.\nWir haben Dir schon einmal einen Charakter vorbereitet, damit Du gleich loslegen kannst.\nErstelle Dir aber gerne auch einen eigenen.\nGenieß die Show!",
     en: "It looks like it's your first time around here.\nWe've prepared a character for you, so you can get right into the game.\nFeel free to make yourself a custom one though.\nEnjoy the show!",
   },
+  invalid: {
+    de: "Invalide!",
+    en: "Invalid!",
+  },
+  goBack: {
+    de: "Zurück",
+    en: "Go back",
+  },
   // #endregion
 
   // #region Character Classes
@@ -178,14 +186,6 @@ const terms: Record<string, ITerm> = {
     de: "Deine aktuelle Sprache ist",
     en: "Your current language is",
   },
-  invalid: {
-    de: "Invalide!",
-    en: "Invalid!",
-  },
-  goBack: {
-    de: "Zurück",
-    en: "Go back",
-  },
   // #endregion
 
   // #region Menu options
@@ -218,4 +218,27 @@ const terms: Record<string, ITerm> = {
     en: "Whoops, seems like something went wrong 🤔",
   },
   // #endregion
+
+  //#region
+  devMenu: {
+    de: "Entwicklermenü",
+    en: "Developer menu",
+  },
+  showSavedData: {
+    de: "Speicher ansehen",
+    en: "Inspect data",
+  },
+  showSavedDataDesc: {
+    de: "Zeigt alle gecacheten und gespeicherten Daten",
+    en: "Shows all cached and saved data",
+  },
+  saveDataToJson: {
+    de: "Cache-Daten permanent speichern",
+    en: "Save cached data permanently",
+  },
+  saveDataToJsonDesc: {
+    de: "Speichert alle temporären Daten aus dem Cache in den Storage- und Setting-Dokumenten",
+    en: "Saves all temporary data from the cache into the storage and setting files",
+  },
+  //#endregion
 };

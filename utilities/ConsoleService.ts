@@ -201,7 +201,7 @@ export async function themedSelect(config: selectConfig): Promise<string> {
 }
 
 export async function pressEnter() {
-  return await input({
+  await input({
     message: getTerm("pressEnter"),
     theme: {
       style: {
