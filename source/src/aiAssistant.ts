@@ -7,14 +7,12 @@ import {
 } from "openai";
 
 dotenv.config();
-
 class ChatGenerationError extends Error {
   constructor(message: string) {
     super(message);
     this.name = "ChatGenerationError";
   }
 }
-
 if (!process.env.OPENAI_API_KEY) {
   throw new Error("Missing OPENAI_API_KEY in environment variables");
 }

@@ -58,7 +58,7 @@ const terms: Record<string, ITerm> = {
   // #endregion
 
   // #region Character Classes
-  swordFighter: {
+  swordsman: {
     de: "Schwertkämpfer",
     en: "Sword fighter",
   },
@@ -219,7 +219,7 @@ const terms: Record<string, ITerm> = {
   },
   wrongPassword: {
     de: "Falsches Passwort, übrige Versuche: ",
-    en: "Wrong password, remaining attempts: "
+    en: "Wrong password, remaining attempts: ",
   },
   // #endregion
 
@@ -269,5 +269,17 @@ const terms: Record<string, ITerm> = {
     de: "undefined",
     en: "undefined",
   },
+  // #endregion
+
+  // #region Setup
+  enterApiKey: {
+    de: "Bitte OPENAI_API_KEY eingeben",
+    en: "Please enter your OPENAI_API_KEY",
+  },
+  wrongFormat: {
+    de: "Das scheint nicht das richtige Format zu sein. Bitte versuche es nochmal",
+    en: "That doesn't seem to be the right format, please try again",
+  },
+
   //#endregion
 };

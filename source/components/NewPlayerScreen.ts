@@ -9,9 +9,17 @@ import {
   skippableSlowWrite,
   totalClear,
 } from "../utilities/ConsoleService.js";
-import { log } from "../utilities/LogService.js";
+import { log, LogTypes } from "../utilities/LogService.js";
 import chalk from "chalk";
 import { getTheme } from "../utilities/CacheService.js";
+import path from "path";
+import fs from "fs-extra";
+import { input } from "@inquirer/prompts";
+import { fileURLToPath } from "url";
+import dotenv from "dotenv";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // The standard character for new players
 const newPlayerChar = {
@@ -33,12 +41,16 @@ const newPlayerChar = {
   lastPlayed: new Date().toLocaleDateString(),
 };
 
+await newPlayerScreen();
+await pressEnter();
+
 /**
  * Initializes the settings and a character in case there is none yet
  * @returns Whether the player is new
  */
 export async function newPlayerScreen(): Promise<boolean> {
   totalClear();
+  await ensureFilesExist();
 
   let isNew = false;
   const charData = getCharacterData();
@@ -54,4 +66,52 @@ export async function newPlayerScreen(): Promise<boolean> {
     await pressEnter();
   }
   return isNew;
+}
+
+async function ensureFilesExist() {
+  dotenv.config();
+
+  const filePathsToCheck = {
+    env: path.resolve(__dirname, "../../.env"),
+    log: path.resolve(__dirname, "../../storage/log.txt"),
+    settings: path.resolve(__dirname, "../../storage/settings.json"),
+    character: path.resolve(__dirname, "../../storage/character.json"),
+  };
+
+  Object.values(filePathsToCheck).forEach((filePath) => {
+    try {
+      fs.ensureFileSync(filePath);
+    } catch(error) {
+      log("New Player Screen: " + error, LogTypes.ERROR)
+    }
+  });
+
+  if (!process.env.OPENAI_API_KEY) {
+    fs.writeFileSync(
+      filePathsToCheck.env,
+      "OPENAI_API_KEY=" + (await promptForApiKey())
+    );
+  }
+}
+
+async function promptForApiKey(): Promise<string> {
+  let isCorrectFormat: boolean = false;
+  let userInput: string;
+  const apiKeyRegex = /^sk-[a-zA-Z0-9]{48}$/;
+
+  do {
+    userInput = await input({
+      message: getTerm("enterApiKey"),
+      theme: getTheme(),
+    });
+
+    isCorrectFormat = !apiKeyRegex.test(userInput);
+
+    if (!isCorrectFormat) {
+      totalClear();
+      console.log(chalk.hex(getTheme().secondaryColor)(getTerm("wrongFormat")));
+    }
+  } while (!isCorrectFormat);
+
+  return userInput;
 }
