@@ -1,3 +1,4 @@
+import { Hash } from "crypto";
 import { Language } from "../utilities/LanguageService";
 import { ITheme } from "../utilities/ThemingService";
 
@@ -7,4 +8,5 @@ import { ITheme } from "../utilities/ThemingService";
 export interface ISettings {
   language: Language;
   theme: ITheme;
+  password: string;
 }

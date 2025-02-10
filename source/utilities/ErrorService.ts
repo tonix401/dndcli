@@ -1,4 +1,4 @@
-import { getLanguage, getTheme } from "./CacheService.js";
+import { getLanguage, getPassword, getTheme } from "./CacheService.js";
 import { skippableSlowWrite, totalClear } from "./ConsoleService.js";
 import { getTerm } from "./LanguageService.js";
 import { log } from "./LogService.js";
@@ -10,6 +10,7 @@ export async function exitProgram() {
   saveSettingsData({
     language: getLanguage(),
     theme: getTheme(),
+    password: getPassword(),
   });
   await skippableSlowWrite(getTerm("goodbye"));
   process.exit(0);

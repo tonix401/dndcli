@@ -6,7 +6,7 @@ import {
   totalClear,
 } from "../utilities/ConsoleService.js";
 import { getTerm } from "../utilities/LanguageService.js";
-import { getLanguage, getTheme } from "../utilities/CacheService.js";
+import { getLanguage, getPassword, getTheme } from "../utilities/CacheService.js";
 import chalk from "chalk";
 import { exitProgram } from "../utilities/ErrorService.js";
 import {
@@ -14,8 +14,7 @@ import {
   saveSettingsData,
 } from "../utilities/SettingsService.js";
 import { flipATable } from "./Flip.js";
-import { password } from "@inquirer/prompts";
-import crypto from "crypto";
+import { checkPasswordScreen } from "../utilities/PasswordService.js";
 
 /**
  * The Developer menu, with choices like manipulating the cache and storage data etc...
@@ -137,43 +136,8 @@ async function showSettingsData() {
   });
 
   if (chosenOption === "commit") {
-    saveSettingsData({ language: getLanguage(), theme: getTheme() });
+    saveSettingsData({ language: getLanguage(), theme: getTheme(), password: getPassword()});
     totalClear();
     await showSettingsData();
   }
-}
-
-/**
- * A Screen to check for a password
- * @param attempts How many attempts are left
- * @returns If the password was correct
- */
-async function checkPasswordScreen(attempts: number) {
-  const passwordToCheck = await password({
-    message: getTerm("enterPassword"),
-    mask: "*",
-    theme: getTheme(),
-  });
-
-  const passwordToCheckHash = crypto
-    .createHash("sha256")
-    .update(passwordToCheck)
-    .digest("hex");
-
-  const passwordHash =
-    "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3"; //"123"
-
-  if (passwordToCheckHash === passwordHash) {
-    return true;
-  }
-
-  attempts--;
-
-  if (attempts <= 0) {
-    return false
-  }
-
-  totalClear();
-  console.log(chalk.hex(getTheme().primaryColor)(getTerm("wrongPassword") + attempts));
-  return await checkPasswordScreen(attempts);
 }

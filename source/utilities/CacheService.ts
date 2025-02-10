@@ -1,3 +1,4 @@
+import { Hash } from "crypto";
 import { getTerm, Language } from "./LanguageService.js";
 import { log, LogTypes } from "./LogService.js";
 import {
@@ -8,6 +9,12 @@ import {
 
 let cachedlanguage: Language = "de";
 let cachedTheme = standardTheme;
+let cachedPassword: string =
+  "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3";
+
+export function getPassword() {
+  return cachedPassword
+}
 
 export function getLanguage() {
   return cachedlanguage;
@@ -53,4 +60,8 @@ export function setTheme(theme: IThemeOverride) {
     secondaryColor: theme.secondaryColor || standardTheme.secondaryColor,
     cursor: theme.cursor || standardTheme.cursor,
   };
+}
+
+export function setPassword(password: string) {
+  cachedPassword = password;
 }

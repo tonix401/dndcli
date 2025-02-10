@@ -18,6 +18,7 @@ import { saveSettingsData } from "../utilities/SettingsService.js";
 import { getTerm } from "../utilities/LanguageService.js";
 import {
   getLanguage,
+  getPassword,
   getTheme,
   setLanguage,
   setTheme,
@@ -107,6 +108,7 @@ export async function exitProgram() {
   saveSettingsData({
     language: getLanguage(),
     theme: getTheme(),
+    password: getPassword()
   });
   await skippableSlowWrite(getTerm("goodbye"));
   process.exit(0);
