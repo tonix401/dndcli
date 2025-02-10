@@ -27,7 +27,7 @@ const frames = [
   `\n      ( ${chalk.redBright("■_■")} )  ┻━┻\n`,
   `
      /          \\
-    |   🟥 🟥   | your next
+    |   🟥 🟥   | you're next
      \\   ${chalk.redBright("‾‾")}    /       
 `,
 ];

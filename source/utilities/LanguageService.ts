@@ -190,12 +190,16 @@ const terms: Record<string, ITerm> = {
     en: "Main menu",
   },
   createCharacter: {
-    de: "Erstelle deinen Charakter",
-    en: "Create your Character",
+    de: "Charakter erstellen",
+    en: "Create Character",
   },
   inspectCharacter: {
-    de: "Charakterinfo anzeigen",
-    en: "Inspect your Character",
+    de: "Charakter anzeigen",
+    en: "Inspect Character",
+  },
+  inspectInventory: {
+    de: "Inventar anzeigen",
+    en: "Inspect Inventory",
   },
   startCampaign: {
     de: "Kampagne starten",
@@ -208,6 +212,14 @@ const terms: Record<string, ITerm> = {
   error: {
     de: "Upps, da ist wohl etwas schief gelaufen 🤔",
     en: "Whoops, seems like something went wrong 🤔",
+  },
+  enterPassword: {
+    de: "Bitte Passwort eingeben",
+    en: "PLease enter the password",
+  },
+  wrongPassword: {
+    de: "Falsches Passwort, übrige Versuche: ",
+    en: "Wrong password, remaining attempts: "
   },
   // #endregion
 
@@ -250,7 +262,7 @@ const terms: Record<string, ITerm> = {
   },
   flip: {
     de: "Flip",
-    en: "Flip"
+    en: "Flip",
   },
   // lets hope we don't ever get to see this one :)
   undefined: {

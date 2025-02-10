@@ -24,10 +24,12 @@ import {
 } from "../utilities/CacheService.js";
 import { standardTheme } from "../utilities/ThemingService.js";
 import { secretDevMenu } from "./SecretDevMenu.js";
+import { inspectInventory } from "./InspectInventory.js";
 
 const getMenuOptions = () => [
   { name: getTerm("createCharacter"), value: "1" },
   { name: getTerm("inspectCharacter"), value: "2" },
+  { name: getTerm("inspectInventory"), value: "6" },
   { name: getTerm("startCampaign"), value: "3" },
   { name: getTerm("settings"), value: "4" },
   { name: getTerm("devMenu"), value: "5" },
@@ -55,6 +57,9 @@ async function handleMenuChoice(choice: string) {
         break;
       case "5":
         await secretDevMenu();
+        break;
+      case "6":
+        await inspectInventory();
         break;
       case "9":
         await exitProgram();

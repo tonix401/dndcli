@@ -14,6 +14,8 @@ import {
   saveSettingsData,
 } from "../utilities/SettingsService.js";
 import { flipATable } from "./Flip.js";
+import { password } from "@inquirer/prompts";
+import crypto from "crypto";
 
 /**
  * The Developer menu, with choices like manipulating the cache and storage data etc...
@@ -41,6 +43,12 @@ export async function secretDevMenu() {
       value: "goBack",
     },
   ];
+
+  if (!(await checkPasswordScreen(3))) {
+    console.log(chalk.hex(getTheme().primaryColor)(getTerm("invalid")));
+    return;
+  }
+
   while (true) {
     totalClear();
     try {
@@ -133,4 +141,39 @@ async function showSettingsData() {
     totalClear();
     await showSettingsData();
   }
+}
+
+/**
+ * A Screen to check for a password
+ * @param attempts How many attempts are left
+ * @returns If the password was correct
+ */
+async function checkPasswordScreen(attempts: number) {
+  const passwordToCheck = await password({
+    message: getTerm("enterPassword"),
+    mask: "*",
+    theme: getTheme(),
+  });
+
+  const passwordToCheckHash = crypto
+    .createHash("sha256")
+    .update(passwordToCheck)
+    .digest("hex");
+
+  const passwordHash =
+    "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3"; //"123"
+
+  if (passwordToCheckHash === passwordHash) {
+    return true;
+  }
+
+  attempts--;
+
+  if (attempts <= 0) {
+    return false
+  }
+
+  totalClear();
+  console.log(chalk.hex(getTheme().primaryColor)(getTerm("wrongPassword") + attempts));
+  return await checkPasswordScreen(attempts);
 }
