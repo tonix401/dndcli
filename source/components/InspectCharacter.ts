@@ -1,4 +1,4 @@
-import ICharacterData from "../types/ICharacterData";
+import ICharacterData from "../types/ICharacterData.js";
 import { getCharacterData } from "../utilities/CharacterService.js";
 import {
   alignText,
@@ -21,8 +21,8 @@ export async function inspectCharacter() {
   }
 
   // Sum of items in inventory
-  const inventorySum = charData.inventory.reduce(
-    (sum, item) => sum + item.quantity,
+  const inventorySum: number = charData.inventory.reduce(
+    (sum: number, item: { quantity: number }): number => sum + item.quantity,
     0
   );
 

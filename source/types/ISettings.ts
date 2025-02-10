@@ -6,5 +6,5 @@ import { ITheme } from "../utilities/ThemingService";
  */
 export interface ISettings {
   language: Language;
-  theme: ITheme
-};
+  theme: ITheme;
+}

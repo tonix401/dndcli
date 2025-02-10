@@ -18,7 +18,6 @@ async function validateOrigin(origin: string): Promise<string> {
     { role: "system", content: systemMessage },
     { role: "user", content: origin },
   ];
-
   try {
     const response = await generateChatNarrative(messages, {
       maxTokens: 50,
