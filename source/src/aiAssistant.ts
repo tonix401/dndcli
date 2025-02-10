@@ -76,3 +76,104 @@ export async function generateChatNarrative(
     );
   }
 }
+
+export async function generateEnemyFromNarrative(
+  narrative: string,
+  characterData: any
+): Promise<{
+  name: string;
+  hp: number;
+  attack: number;
+  defense: number;
+  xpReward: number;
+}> {
+  const combatSection =
+    narrative.split("COMBAT ENCOUNTER:")[1]?.split("\n")[0] || narrative;
+
+  const messages: ChatCompletionRequestMessage[] = [
+    {
+      role: "system",
+      content: `You are an enemy generator for a fantasy RPG. Create a balanced enemy based on player stats and narrative context.
+      Player Stats:
+      - Level: ${characterData.level}
+      - HP: ${characterData.hp}/${characterData.abilities.maxhp}
+      - Strength: ${characterData.abilities.strength}
+      - Class: ${characterData.class}
+      
+      Balance Guidelines:
+      - Enemy HP should be 50-150% of player's maxhp
+      - Attack should be balanced against player's strength
+      - Defense should be lower than player's strength to ensure damage is possible
+      - XP reward should scale with enemy difficulty and player level
+      
+      Response must be in JSON format with fields:
+      - name: string (based on narrative context)
+      - hp: number (${Math.floor(
+        Number(characterData.abilities.maxhp) * 0.5
+      )}-${Math.floor(Number(characterData.abilities.maxhp) * 1.5)})
+      - attack: number (${Math.max(
+        1,
+        Number(characterData.abilities.strength) - 2
+      )}-${Number(characterData.abilities.strength) + 3})
+      - defense: number (1-${Math.max(
+        2,
+        Number(characterData.abilities.strength) - 1
+      )})
+      - xpReward: number (${10 + Number(characterData.level) * 3}-${
+        20 + Number(characterData.level) * 5
+      })`,
+    },
+    {
+      role: "user",
+      content: `Combat Description: ${combatSection}\nGenerate an appropriate enemy that matches the narrative tone and provides a balanced challenge.`,
+    },
+  ];
+
+  try {
+    const response = await generateChatNarrative(messages, {
+      temperature: 0.7,
+      maxTokens: 150,
+    });
+
+    const enemy = JSON.parse(response);
+
+    // Validate and adjust enemy stats if necessary
+    return {
+      name: enemy.name,
+      hp: Math.min(
+        Math.max(
+          Math.floor(Number(characterData.abilities.maxhp) * 0.5),
+          enemy.hp
+        ),
+        Math.floor(Number(characterData.abilities.maxhp) * 1.5)
+      ),
+      attack: Math.min(
+        Math.max(
+          Math.max(1, Number(characterData.abilities.strength) - 2),
+          enemy.attack
+        ),
+        Number(characterData.abilities.strength) + 3
+      ),
+      defense: Math.min(
+        Math.max(1, enemy.defense),
+        Math.max(2, Number(characterData.abilities.strength) - 1)
+      ),
+      xpReward: Math.min(
+        Math.max(10 + Number(characterData.level) * 3, enemy.xpReward),
+        20 + Number(characterData.level) * 5
+      ),
+    };
+  } catch (error) {
+    // Fallback enemy with balanced stats based on player
+    return {
+      name: "Mysterious Creature",
+      hp: Math.floor(Number(characterData.abilities.maxhp) * 0.75),
+      attack: Math.max(1, Number(characterData.abilities.strength) - 1),
+      defense: Math.max(
+        1,
+        Math.floor(Number(characterData.abilities.strength) / 2)
+      ),
+      xpReward: 15 + Number(characterData.level) * 4,
+    };
+  }
+}
