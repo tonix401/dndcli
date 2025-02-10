@@ -1,156 +1,194 @@
-// src/campaign.ts
 import inquirer from "inquirer";
-import { generateChatNarrative } from "./aiAssistant.js";
+import chalk from "chalk";
+import ora from "ora";
+import {
+  generateChatNarrative,
+  generateEnemyFromNarrative,
+} from "./aiAssistant.js";
 import { rollDice } from "../utilities/DiceService.js";
-import { GameState } from "./gameState.js";
-import { promptForChoice } from "./gameMaster.js";
+import { GameState, promptForChoice } from "./gameMaster.js";
 import { log, LogTypes } from "../utilities/LogService.js";
 import { runCombat } from "./combat.js";
 import { generateRandomItem } from "../utilities/ItemGenerator.js";
 import { saveGameState, loadGameState } from "../utilities/SaveLoadService.js";
-
+import { getStartingItems } from "../utilities/InventoryService.js";
+import { saveCharacterData } from "../utilities/CharacterService.js";
 /**
- * Remove numbered option lines from narrative.
+ * Displays a persistent status bar showing key character stats.
  */
-function removeOptionsFromNarrative(narrative: string): string {
-  return narrative
-    .split("\n")
-    .filter((line) => !line.trim().match(/^(\d+)\.\s+/))
-    .join("\n");
+function displayStatusBar(character: any): void {
+  console.clear();
+  console.log(chalk.bgBlueBright.black.bold("=== Status ==="));
+  const inventorySummary =
+    character.inventory &&
+    Array.isArray(character.inventory) &&
+    character.inventory.length > 0
+      ? character.inventory.map((item: any) => item.name).join(", ")
+      : "None";
+  console.log(
+    chalk.blueBright(
+      `Name: ${character.name} | HP: ${Number(character.hp)}/${Number(
+        character.abilities.maxhp
+      )} | XP: ${character.xp || 0} | Inventory: ${inventorySummary}`
+    )
+  );
+  console.log(chalk.bgBlueBright.black.bold("===============\n"));
 }
 
 /**
- * Pause function: waits for Enter.
+ * Pauses until user input.
  */
 async function pauseForReflection(
-  message = "Press Enter to continue..."
+  message = "⏳ Press Enter to continue..."
 ): Promise<void> {
-  await inquirer.prompt({ type: "input", name: "pause", message });
-}
-
-/**
- * Introduction Narrative:
- * Builds an immersive world introduction.
- */
-export async function introductionNarrative(
-  gameState: GameState,
-  characterData: any
-): Promise<string> {
-  const baseMessage = {
-    role: "system",
-    content: `
-You are an experienced Dungeon Master for an epic Dungeons & Dragons adventure set in the world of Eldoria.
-Welcome to Eldoria—a vast realm filled with ancient magic, sprawling kingdoms, and mysterious ruins. In Lysoria, legends of both wondrous miracles and dark curses echo throughout the streets and forests.
-This is the beginning of a deep and compelling plot. Dark rumors of an ancient evil have begun to surface.
-Incorporate the following character info:
-  - Character: ${characterData.name}, a level ${characterData.level} ${
-      characterData.class
-    }.
-  - Origin: ${characterData.origin || "Unknown"}.
-  - Stats: HP ${characterData.hp}/${characterData.abilities.maxhp}, Strength ${
-      characterData.abilities.strength
-    }, Mana ${characterData.abilities.mana}, Dexterity ${
-      characterData.abilities.dexterity
-    }, Charisma ${characterData.abilities.charisma}, Luck ${
-      characterData.abilities.luck
-    }.
-Current Plot: ${gameState.plotSummary}
-Describe the world in vivid, evocative detail, introducing the first scene and emphasizing the character’s humble origins and realistic limitations.
-Break the narrative into small, deliberate steps. At the end, present three clear choices plus a fourth option: "Return to main menu".
-Respond in English.
-    `,
-  };
-
-  gameState.conversationHistory = [baseMessage];
-  const narrative = await generateChatNarrative(gameState.conversationHistory, {
-    maxTokens: 500,
-    temperature: 0.85,
+  await inquirer.prompt({
+    type: "input",
+    name: "pause",
+    message: chalk.yellowBright.bold(message),
   });
-  gameState.conversationHistory.push({ role: "assistant", content: narrative });
-  return narrative;
+}
+
+async function pause(duration: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, duration));
 }
 
 /**
- * Campaign Loop:
- * Runs the campaign, handles combat, random item drops, and saves the game state.
+ * Displays a recap of the previous narrative.
+ */
+async function displayRecap(gameState: GameState): Promise<void> {
+  if (gameState.narrativeHistory.length > 0) {
+    const recap =
+      gameState.narrativeHistory[gameState.narrativeHistory.length - 1];
+    console.log(chalk.blueBright.bold("\n🔄 Recap of your previous session:"));
+    console.log(chalk.blueBright(recap));
+    await pauseForReflection(
+      "Review the recap, then press Enter to continue..."
+    );
+  }
+}
+
+/**
+ * Main campaign loop.
  */
 export async function campaignLoop(
   gameState: GameState,
   characterData: any
 ): Promise<void> {
-  if (!gameState || !characterData) {
-    log("Campaign: Invalid game state or character data", LogTypes.ERROR);
-    return;
-  }
-
-  // Try to load an existing game state (if any)
+  // Load saved state if available.
   const loadedState = await loadGameState();
   if (loadedState) {
-    // Replace current gameState values with the loaded ones.
     Object.assign(gameState, loadedState);
-    console.log("Campaign: Loaded saved campaign state.");
+    console.log(chalk.greenBright.bold("✅ Loaded saved campaign state."));
+    await displayRecap(gameState);
   }
 
-  // If no introduction has been recorded, start with one.
+  // Ensure inventory is set.
+  if (
+    !Array.isArray(characterData.inventory) ||
+    characterData.inventory.length === 0
+  ) {
+    characterData.inventory = getStartingItems(characterData.class);
+  }
+
+  // Start with an introduction if no narrative yet.
   if (gameState.narrativeHistory.length === 0) {
-    const intro = await introductionNarrative(gameState, characterData);
-    const cleanedIntro = removeOptionsFromNarrative(intro);
-    console.log("\n" + cleanedIntro + "\n");
-    await pauseForReflection(
-      "Reflect on the introduction and then press Enter to choose your first step..."
+    displayStatusBar(characterData);
+    const introNarrative = await generateChatNarrative(
+      [
+        {
+          role: "system",
+          content: `
+${chalk.bold.underline("🌟 Welcome to Eldoria!")}
+You are embarking on a measured, character-driven journey. The pacing here is like a well-planned novel – each scene unfolds deliberately, giving you time to reflect on the world and your choices.
+**Character Details:**
+  - Name: ${chalk.bold(characterData.name)}
+  - Level: ${chalk.bold(characterData.level + " " + characterData.class)}
+  - Origin: ${chalk.bold(characterData.origin || "Unknown")}
+  - Stats: HP ${characterData.hp}/${characterData.abilities.maxhp}, Strength ${
+            characterData.abilities.strength
+          }, Mana ${characterData.abilities.mana}, Dexterity ${
+            characterData.abilities.dexterity
+          }, Charisma ${characterData.abilities.charisma}, Luck ${
+            characterData.abilities.luck
+          }.
+${chalk.italic("Current Plot:")} ${gameState.plotSummary}
+Please provide a narrative that builds slowly and ends with three carefully considered numbered choices followed by "Return to main menu."
+Respond in English.
+          `,
+        },
+      ],
+      { maxTokens: 500, temperature: 0.7 }
     );
-    const initialChoice = await promptForChoice(intro);
+    console.log("\n" + chalk.cyanBright(introNarrative) + "\n");
+    await pauseForReflection(
+      "Reflect on the introduction and then choose your first action..."
+    );
+    const initialChoice = await promptForChoice(introNarrative);
     if (
       initialChoice.toLowerCase().includes("return to main menu") ||
       initialChoice.toLowerCase() === "exit"
     ) {
-      console.log("Campaign: Returning to main menu...");
+      console.log(chalk.blueBright("Returning to main menu..."));
       return;
     }
-    gameState.narrativeHistory.push(intro);
+    gameState.narrativeHistory.push(introNarrative);
     gameState.conversationHistory.push({
       role: "user",
       content: `Player choice: ${initialChoice}`,
     });
-    // Save state after the introduction.
     await saveGameState(gameState);
   }
 
-  // Main loop for subsequent scenarios.
+  // Main narrative loop.
   while (true) {
     try {
-      // Update plot after milestones.
+      displayStatusBar(characterData);
+
+      // Optionally update the plot if enough choices have been made.
       if (gameState.choices.length >= 5 && gameState.plotStage === 1) {
         gameState.updatePlot(
           2,
-          "Clues now point to a hidden cult aiming to awaken an ancient evil. Your journey faces tougher challenges, testing your skills, limitations, and origins."
+          "New clues emerge slowly. Your challenges remain significant, but time lets you breathe and decide your path carefully."
         );
       }
 
       const baseScenarioMessage = {
         role: "system",
         content: `
-You are an experienced Dungeon Master for an epic Dungeons & Dragons adventure in Eldoria.
-Current Plot (Chapter ${gameState.plotStage}): ${gameState.plotSummary}
-Based on previous events and the following character info:
-  - Character: ${characterData.name}, a level ${characterData.level} ${
-          characterData.class
-        }.
-  - Origin: ${characterData.origin || "Unknown"}.
-  - Stats: HP ${characterData.hp}/${characterData.abilities.maxhp}, Strength ${
-          characterData.abilities.strength
-        }, Mana ${characterData.abilities.mana}, Dexterity ${
-          characterData.abilities.dexterity
-        }, Charisma ${characterData.abilities.charisma}, Luck ${
-          characterData.abilities.luck
-        }.
-Generate the next scene in a step-by-step, realistic manner. Describe a clear event or decision point reflecting your character’s limitations.
-The scene should be paced like a chapter in a well-developed story, then prompt the player.
-Include a dice roll mechanic where appropriate.
-Present exactly three numbered choices, followed by "Return to main menu".
-Ensure NPCs and enemies behave realistically.
-Respond in English.
-        `,
+      ${chalk.bold.underline("Next Chapter Begins:")}
+      Chapter (Stage ${chalk.bold(
+        gameState.plotStage.toString()
+      )}): ${chalk.italic(gameState.plotSummary)}
+      **Character Info:**
+        - Name: ${chalk.bold(characterData.name)}, Level: ${chalk.bold(
+          characterData.level + " " + characterData.class
+        )}
+        - Origin: ${chalk.bold(characterData.origin || "Unknown")}
+        - Stats: HP ${characterData.hp}/${
+          characterData.abilities.maxhp
+        }, Strength ${characterData.abilities.strength}, Mana ${
+          characterData.abilities.mana
+        }, Dexterity ${characterData.abilities.dexterity}, Charisma ${
+          characterData.abilities.charisma
+        }, Luck ${characterData.abilities.luck}.
+  
+  Instructions:
+  1. Generate narrative that unfolds at a measured pace
+  2. For combat situations, use format: "COMBAT ENCOUNTER: [enemy description]" without providing choices
+  3. For non-combat situations, end with exactly three numbered choices
+  4. Only use "COMBAT ENCOUNTER:" at dramatic moments when combat is truly appropriate
+  5. After a player flees combat, generate narrative about their escape and new situation
+  
+  Example combat format:
+  "As you round the corner, COMBAT ENCOUNTER: A massive troll emerges from the shadows, its club dragging across the stone floor."
+  
+  Example non-combat format:
+  "You find yourself in a quiet grove. What do you do?
+  
+  1. Investigate the ancient stones
+  2. Listen for wildlife
+  3. Search for herbs"
+  `,
       };
 
       const messages = [
@@ -158,101 +196,122 @@ Respond in English.
         ...gameState.conversationHistory.slice(-9),
       ];
 
+      const spinner = ora(chalk.cyan("Generating next scene...")).start();
       const narrative = await generateChatNarrative(messages, {
         maxTokens: 500,
-        temperature: 0.85,
+        temperature: 0.7,
       });
-
+      spinner.succeed(chalk.greenBright("Scene generated."));
       gameState.conversationHistory.push({
         role: "assistant",
         content: narrative,
       });
       gameState.narrativeHistory.push(narrative);
 
-      const cleanedNarrative = removeOptionsFromNarrative(narrative);
-      console.log("\n" + cleanedNarrative + "\n");
+      console.log("\n" + chalk.cyanBright(narrative) + "\n");
 
-      // --- Combat and Item Drop Handling ---
-      if (narrative.toLowerCase().includes("combat encounter")) {
-        const enemy = {
-          name: "Goblin Raider",
-          hp: 15,
-          attack: 3,
-          defense: 1,
-          xpReward: 20,
-        };
+      // If the narrative indicates a combat encounter, engage combat.
+      // In campaign.ts, modify the combat section:
+      if (narrative.toLowerCase().includes("combat encounter:")) {
+        // Let user read the narrative first
+        await pauseForReflection("Press Enter when you're ready for combat...");
 
-        console.log("\nCombat encounter detected.");
+        const enemy = await generateEnemyFromNarrative(
+          narrative,
+          characterData
+        );
+
+        console.log(chalk.redBright(`\n⚔️ Combat encounter triggered!`));
+        console.log(chalk.yellow(`A ${enemy.name} appears before you...`));
+
+        // Additional dramatic pause
+        await pause(1500);
+
         const combatResult = await runCombat(characterData, enemy);
+
         if (!combatResult) {
-          console.log("You have been defeated or fled. Campaign over.");
+          console.log(
+            chalk.redBright("You have been defeated or fled. Game over.")
+          );
           return;
         } else {
           characterData.xp = String(Number(characterData.xp) + enemy.xpReward);
-          console.log(`Your XP is now ${characterData.xp}.`);
-          // 50% chance for an item drop.
+          console.log(
+            chalk.greenBright(`Victory! You gained ${enemy.xpReward} XP.`)
+          );
           if (Math.random() < 0.5) {
             const newItem = generateRandomItem(Number(characterData.level));
             console.log(
-              `You found a new item: ${newItem.name} (Rarity: ${newItem.rarity})!`
+              chalk.magentaBright(
+                `You found a new item: ${newItem.name} (Rarity: ${newItem.rarity}).`
+              )
             );
             characterData.inventory.push(newItem);
           }
+          // Save the updated character data
+          saveCharacterData(characterData);
+          // Pause after combat ends
+          await pauseForReflection("Press Enter to continue your journey...");
         }
       } else if (narrative.toLowerCase().includes("roll a d20")) {
-        console.log("A dice roll is needed to determine the outcome...");
+        console.log(chalk.yellowBright("A dice roll is required..."));
         const [rollResult] = rollDice(20, 1);
-        console.log(`You rolled: ${rollResult}`);
+        console.log(chalk.yellowBright(`You rolled: ${rollResult}`));
         gameState.conversationHistory.push({
           role: "user",
           content: `I rolled a ${rollResult} on a d20.`,
         });
       }
-      // --- End Combat Handling ---
 
       await pauseForReflection(
-        "Take a moment to reflect on this scene. Press Enter to view your choices."
+        "Take a moment to reflect on this scene and then choose your next action."
       );
       const choice = await promptForChoice(narrative);
       if (
         choice.toLowerCase().includes("return to main menu") ||
         choice.toLowerCase() === "exit"
       ) {
-        console.log("\nReturning to main menu...\n");
-        // Save the game state before returning.
+        console.log(chalk.blueBright("Returning to main menu..."));
         await saveGameState(gameState);
         return;
       }
-
-      console.log("\nYou chose:", choice, "\n");
+      console.log(chalk.greenBright(`You chose: ${choice}`));
       gameState.conversationHistory.push({
         role: "user",
         content: `Player choice: ${choice}`,
       });
       gameState.narrativeHistory.push(`Player choice: ${choice}`);
-
-      // Save the game state at the end of each iteration.
       await saveGameState(gameState);
     } catch (error: any) {
-      log("Campaign: Error in campaign: " + error.message, LogTypes.ERROR);
+      log("Campaign loop error: " + error.message, LogTypes.ERROR);
       return;
     }
   }
 }
 
 /**
- * Starts the campaign:
- * Loads character data and persistent game state, then enters the campaign loop.
+ * Starts the campaign by loading character data and persistent game state,
+ * then entering the main campaign loop.
  */
 export async function startCampaign(): Promise<void> {
   const { getCharacterData } = await import("../utilities/CharacterService.js");
   const characterData = getCharacterData();
   if (!characterData) {
     log(
-      "Campaign: No character data found. Please create a character first.",
+      "No character data found. Please create a character first.",
       LogTypes.ERROR
     );
     return;
+  }
+  // Ensure inventory is initialized.
+  if (
+    !Array.isArray(characterData.inventory) ||
+    characterData.inventory.length === 0
+  ) {
+    const { getStartingItems } = await import(
+      "../utilities/InventoryService.js"
+    );
+    characterData.inventory = getStartingItems(characterData.class);
   }
   const gameState = new GameState();
   gameState.conversationHistory = [];
