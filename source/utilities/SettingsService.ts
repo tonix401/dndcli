@@ -1,7 +1,9 @@
 import fs from "fs";
-import { log } from "./LogService.js";
-import LogTypes from "../types/LogTypes.js";
+import { LogTypes, log } from "./LogService.js";
 import { ISettings } from "../types/ISettings.js";
+import { Language } from "./LanguageService.js";
+import { ITheme } from "./ThemingService.js";
+import { Hash } from "crypto";
 
 const filename = "../dndcli/storage/settings.json";
 /**
@@ -17,7 +19,7 @@ export function getSettingsData(): ISettings | null {
   } catch (error) {
     if (error instanceof Error) {
       log(
-        `Error while loading ${filename}: ${error.message}`,
+        `Settings Service: Error while loading ${filename}: ${error.message}`,
         LogTypes.ERROR
       );
     }
@@ -36,7 +38,10 @@ export function saveSettingsData(settingsData: ISettings): void {
     fs.writeFileSync(filename, JSON.stringify(settingsData, null, 2));
   } catch (error) {
     if (error instanceof Error) {
-      log(`Error while saving ${filename}: ${error.message}`, LogTypes.ERROR);
+      log(
+        `Settings Service: Error while saving ${filename}: ${error.message}`,
+        LogTypes.ERROR
+      );
     }
   }
 }

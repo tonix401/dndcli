@@ -1,7 +1,17 @@
+import chalk from "chalk";
 import { appendFileSync } from "fs";
-import LogTypes from "../types/LogTypes.js";
 
 const debuggingLogFile = "./storage/log.txt";
+
+/**
+ * These have nothing to do with wood
+ * @options INFO, WARNING, ERROR
+ */
+export enum LogTypes {
+  INFO = "Info ",
+  ERROR = "Error",
+  WARNING = "Warn ",
+}
 
 /**
  * Logs a formatted message to the log.txt file
@@ -20,6 +30,6 @@ export function log(message: string, logType = LogTypes.INFO): void {
   try {
     appendFileSync(debuggingLogFile, log);
   } catch (error) {
-    console.error(`Error writing to log file: ${error}`);
+    console.error(`Log Service: Error writing to log file: ${error}`);
   }
 }

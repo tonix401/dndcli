@@ -1,15 +1,13 @@
-import LogTypes from "../types/LogTypes.js";
+import { LogTypes, log } from "./LogService.js";
 import { getLanguage } from "./CacheService.js";
-import { log } from "./LogService.js";
 
-export type ITerm = Record<Language, string>
-export type IColorTerm = Record<Language | "hex", string>
+export type ITerm = Record<Language, string>;
+export type IColorTerm = Record<Language | "hex", string>;
 export type Language = "de" | "en";
 
 /**
  * Takes a term key and returns the term translated and formatted depending on parameters
  * @param key Defines the key of the term
- * @param language Defines the language to translate the term into
  * @param indented Defines whether or not two spaces get added at the front of the returned term, to align normal output with inquirer prompts
  * @returns The term in the given language and format as a string
  *
@@ -49,10 +47,18 @@ const terms: Record<string, ITerm> = {
     de: "Es sieht aus, als wärst Du zum ersten Mal hier.\nWir haben Dir schon einmal einen Charakter vorbereitet, damit Du gleich loslegen kannst.\nErstelle Dir aber gerne auch einen eigenen.\nGenieß die Show!",
     en: "It looks like it's your first time around here.\nWe've prepared a character for you, so you can get right into the game.\nFeel free to make yourself a custom one though.\nEnjoy the show!",
   },
+  invalid: {
+    de: "Invalide!",
+    en: "Invalid!",
+  },
+  goBack: {
+    de: "Zurück",
+    en: "Go back",
+  },
   // #endregion
 
   // #region Character Classes
-  swordFighter: {
+  swordsman: {
     de: "Schwertkämpfer",
     en: "Sword fighter",
   },
@@ -133,6 +139,10 @@ const terms: Record<string, ITerm> = {
     de: "Inventar",
     en: "Inventory",
   },
+  items: {
+    de: "Items",
+    en: "Items",
+  },
   empty: {
     de: "leer",
     en: "empty",
@@ -160,6 +170,10 @@ const terms: Record<string, ITerm> = {
     de: "Nebenfarbe",
     en: "Secondary color",
   },
+  theme: {
+    de: "Farbschema",
+    en: "Color theme",
+  },
   en: {
     de: "Englisch",
     en: "English",
@@ -168,50 +182,106 @@ const terms: Record<string, ITerm> = {
     de: "Deutsch",
     en: "German",
   },
-  chooseLang: {
-    de: "Welche Sprache hättest Du gerne?",
-    en: "Which language would you like?",
-  },
-  currentLang: {
-    de: "Deine aktuelle Sprache ist",
-    en: "Your current language is",
-  },
-  invalid: {
-    de: "Invalide!",
-    en: "Invalid!",
-  },
-  goBack: {
-    de: "Zurück",
-    en: "Go back"
-  },
   // #endregion
 
   // #region Menu options
-  chooseOption: {
-    de: "Bitte wähle:",
-    en: "Please choose:",
+  mainMenu: {
+    de: "Hauptmenü",
+    en: "Main menu",
   },
   createCharacter: {
-    de: "Erstelle deinen Charakter",
-    en: "Create your Character",
+    de: "Charakter erstellen",
+    en: "Create Character",
   },
   inspectCharacter: {
-    de: "Charakterinfo anzeigen",
-    en: "Inspect your Character",
+    de: "Charakter anzeigen",
+    en: "Inspect Character",
+  },
+  inspectInventory: {
+    de: "Inventar anzeigen",
+    en: "Inspect Inventory",
   },
   startCampaign: {
     de: "Kampagne starten",
     en: "Start Campaign",
   },
-  changeLang: {
-    de: "Sprache ändern",
-    en: "Change language",
-  },
   exit: {
     de: "Beenden",
     en: "Exit",
   },
+  error: {
+    de: "Upps, da ist wohl etwas schief gelaufen 🤔",
+    en: "Whoops, seems like something went wrong 🤔",
+  },
+  enterPassword: {
+    de: "Bitte Passwort eingeben",
+    en: "PLease enter the password",
+  },
+  wrongPassword: {
+    de: "Falsches Passwort, übrige Versuche: ",
+    en: "Wrong password, remaining attempts: ",
+  },
   // #endregion
+
+  //#region
+  devMenu: {
+    de: "Entwicklermenü",
+    en: "Developer menu",
+  },
+  showSettingsData: {
+    de: "Einstellungensdaten",
+    en: "Settings data",
+  },
+  showCharacterData: {
+    de: "Charakterdaten",
+    en: "Character data",
+  },
+  saveData: {
+    de: "Cache-Daten speichern",
+    en: "Commit cached data",
+  },
+  cursor: {
+    de: "Zeiger",
+    en: "Cursor",
+  },
+  prefix: {
+    de: "Präfix",
+    en: "Prefix",
+  },
+  cacheData: {
+    de: "Cache Daten",
+    en: "Cache Data",
+  },
+  dataFromJson: {
+    de: "Gespeicherte Daten",
+    en: "Saved Data",
+  },
+  currentlyInDev: {
+    de: "🚧 Zurzeit noch in Arbeit 🚧",
+    en: "🚧 Currently in developement 🚧",
+  },
+  flip: {
+    de: "Flip",
+    en: "Flip",
+  },
+  // lets hope we don't ever get to see this one :)
+  undefined: {
+    de: "undefined",
+    en: "undefined",
+  },
+  // #endregion
+
+  // #region Setup
+  enterApiKey: {
+    de: "Bitte OPENAI_API_KEY eingeben",
+    en: "Please enter your OPENAI_API_KEY",
+  },
+  wrongFormat: {
+    de: "Das scheint nicht das richtige Format zu sein. Bitte versuche es nochmal",
+    en: "That doesn't seem to be the right format, please try again",
+  },
+
+  //#endregion
 };
 
 export function getColorTerm(key: string) {

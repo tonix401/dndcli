@@ -1,10 +1,10 @@
 import { getTerm } from "../utilities/LanguageService.js";
 
-export function getClassChoices(){
+export function getClassChoices() {
   return [
     {
-      name: getTerm("swordFighter"),
-      value: "swordFighter",
+      name: getTerm("swordsman"),
+      value: "swordsman",
     },
     {
       name: getTerm("mage"),
@@ -18,4 +18,5 @@ export function getClassChoices(){
       name: getTerm("thief"),
       value: "thief",
     },
-  ];}
+  ];
+}

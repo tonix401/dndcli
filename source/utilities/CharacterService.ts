@@ -1,7 +1,6 @@
 import fs from "fs";
 import ICharacterData from "../types/ICharacterData";
-import { log } from "./LogService.js";
-import LogTypes from "../types/LogTypes.js";
+import { log, LogTypes } from "./LogService.js";
 
 const filename = "../dndcli/storage/character.json";
 
@@ -27,7 +26,7 @@ export function getCharacterData(): ICharacterData | null {
   } catch (error) {
     if (error instanceof Error) {
       log(
-        `Error while loading ${filename}: No Character yet saved`,
+        `Character Service: Error while loading ${filename}: No Character yet saved`,
         LogTypes.ERROR
       );
     }
@@ -55,7 +54,10 @@ export function saveCharacterData(characterData: ICharacterData): void {
     fs.writeFileSync(filename, JSON.stringify(characterData, null, 2));
   } catch (error) {
     if (error instanceof Error) {
-      log(`Error while saving ${filename}: ${error.message}`, LogTypes.ERROR);
+      log(
+        `Character Service: Error while saving ${filename}: ${error.message}`,
+        LogTypes.ERROR
+      );
     }
   }
 }

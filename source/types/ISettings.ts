@@ -1,10 +1,12 @@
+import { Hash } from "crypto";
 import { Language } from "../utilities/LanguageService";
+import { ITheme } from "../utilities/ThemingService";
 
 /**
  * Interface for app settings
  */
 export interface ISettings {
   language: Language;
-  primaryColor: string,
-  secondaryColor: string
-};
+  theme: ITheme;
+  password: string;
+}

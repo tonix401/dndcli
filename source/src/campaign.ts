@@ -4,8 +4,7 @@ import { generateChatNarrative } from "./aiAssistant.js";
 import { rollDice } from "../utilities/DiceService.js";
 import { GameState } from "./gameState.js";
 import { promptForChoice } from "./gameMaster.js";
-import { log } from "../utilities/LogService.js";
-import LogTypes from "../types/LogTypes.js";
+import { log, LogTypes } from "../utilities/LogService.js";
 import { runCombat } from "./combat.js";
 import { generateRandomItem } from "../utilities/ItemGenerator.js";
 import { saveGameState, loadGameState } from "../utilities/SaveLoadService.js";
@@ -80,7 +79,7 @@ export async function campaignLoop(
   characterData: any
 ): Promise<void> {
   if (!gameState || !characterData) {
-    log("Invalid game state or character data", LogTypes.ERROR);
+    log("Campaign: Invalid game state or character data", LogTypes.ERROR);
     return;
   }
 
@@ -89,7 +88,7 @@ export async function campaignLoop(
   if (loadedState) {
     // Replace current gameState values with the loaded ones.
     Object.assign(gameState, loadedState);
-    console.log("Loaded saved campaign state.");
+    console.log("Campaign: Loaded saved campaign state.");
   }
 
   // If no introduction has been recorded, start with one.
@@ -105,7 +104,7 @@ export async function campaignLoop(
       initialChoice.toLowerCase().includes("return to main menu") ||
       initialChoice.toLowerCase() === "exit"
     ) {
-      console.log("\nReturning to main menu...\n");
+      console.log("Campaign: Returning to main menu...");
       return;
     }
     gameState.narrativeHistory.push(intro);
@@ -235,7 +234,7 @@ Respond in English.
       // Save the game state at the end of each iteration.
       await saveGameState(gameState);
     } catch (error: any) {
-      log("Error in campaign: " + error.message, LogTypes.ERROR);
+      log("Campaign: Error in campaign: " + error.message, LogTypes.ERROR);
       return;
     }
   }
@@ -245,12 +244,12 @@ Respond in English.
  * Starts the campaign:
  * Loads character data and persistent game state, then enters the campaign loop.
  */
-export async function startCampaign(language?: string): Promise<void> {
+export async function startCampaign(): Promise<void> {
   const { getCharacterData } = await import("../utilities/CharacterService.js");
   const characterData = getCharacterData();
   if (!characterData) {
     log(
-      "No character data found. Please create a character first.",
+      "Campaign: No character data found. Please create a character first.",
       LogTypes.ERROR
     );
     return;
