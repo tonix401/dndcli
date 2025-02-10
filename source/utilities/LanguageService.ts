@@ -283,3 +283,68 @@ const terms: Record<string, ITerm> = {
 
   //#endregion
 };
+
+export function getColorTerm(key: string) {
+  const color = colors[key];
+  if (!color) {
+    log(`Language Service: Color not found: ${key}`, LogTypes.ERROR);
+    return "";
+  }
+  return color[getLanguage()];
+}
+
+export function getColorHex(key: string) {
+  const color = colors[key];
+  if (!color) {
+    log(`Language Service: Color not found: ${key}`, LogTypes.ERROR);
+    return "";
+  }
+  return color.hex;
+}
+
+export function getAllColors(): Record<string, IColorTerm> {
+  return colors;
+}
+
+const colors: Record<string, IColorTerm> = {
+  red: {
+    de: "rot",
+    en: "red",
+    hex: "#E04500",
+  },
+  purple: {
+    de: "lila",
+    en: "purple",
+    hex: "#b00edc",
+  },
+  blue: {
+    de: "blau",
+    en: "blue",
+    hex: "#00AAFF",
+  },
+  turquoise: {
+    de: "türkis",
+    en: "turquoise",
+    hex: "#00CEBD",
+  },
+  green: {
+    de: "grün",
+    en: "green",
+    hex: "#0ad135",
+  },
+  yellow: {
+    de: "gelb",
+    en: "yellow",
+    hex: "#FFCC00",
+  },
+  orange: {
+    de: "orange",
+    en: "orange",
+    hex: "#FFA500",
+  },
+  white: {
+    de: "weiß",
+    en: "white",
+    hex: "#FFFFFF",
+  },
+};
