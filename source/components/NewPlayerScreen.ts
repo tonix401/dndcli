@@ -41,9 +41,6 @@ const newPlayerChar = {
   lastPlayed: new Date().toLocaleDateString(),
 };
 
-await newPlayerScreen();
-await pressEnter();
-
 /**
  * Initializes the settings and a character in case there is none yet
  * @returns Whether the player is new

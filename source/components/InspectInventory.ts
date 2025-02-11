@@ -4,9 +4,9 @@ import chalk from "chalk";
 import { getTerm } from "../utilities/LanguageService.js";
 import { getTheme } from "../utilities/CacheService.js";
 import {
-  alignText,
-  alignTextAsTable,
+  alignTextAsMultiTable,
   pressEnter,
+  slowWrite,
   totalClear,
 } from "../utilities/ConsoleService.js";
 
@@ -21,57 +21,33 @@ export async function inspectInventory() {
   }
 
   if (charData.inventory.length === 0) {
-    console.log(getTerm("empty"));
+    await slowWrite(getTerm("empty"));
     await pressEnter();
     return;
   }
 
-  // Define title and body texts
-  const title = `${charData.name} - ${getTerm("inventory")}`;
-
-  const bodyArray: [string, string][] = charData.inventory.map((item) => [
-    item.name,
-    `${item.quantity}x`,
-  ]);
-
-  // Calculate total width
-  const margin = "| ";
-  const separator = ":  ";
-  const maxWidthOfBody =
-    Math.max(
-      ...bodyArray.map((nameValuePair) => nameValuePair.join("").length)
-    ) +
-    margin.length * 2 +
-    separator.length;
-  const maxWidthOfTitle = title.length + margin.length * 2;
-  const totalMaxWidth = Math.max(maxWidthOfBody, maxWidthOfTitle);
-
-  // Format title and body
-  const formattedTitle = chalk.hex(getTheme().primaryColor)(
-    chalk.bold(alignText(title, "center", margin, totalMaxWidth))
-  );
-  const bodyTable = alignTextAsTable(
-    bodyArray,
-    margin,
-    separator,
-    totalMaxWidth
-  ).text;
-  const formattedBodyTable = chalk.hex(getTheme().secondaryColor)(
-    alignText(bodyTable, "center")
+  const multiTable = alignTextAsMultiTable(
+    charData.inventory.map((item) => {
+      return [
+        [getTerm("name"), item.name],
+        [getTerm("effect"), item.effect],
+        [getTerm("rarity"), item.rarity],
+        [getTerm("quantity"), item.quantity.toString()],
+      ];
+    }),
+    "|"
   );
 
-  // Log out
   console.log(
     chalk.hex(getTheme().secondaryColor)(
-      "/" + "‾".repeat(totalMaxWidth - 2) + "\\"
+      "/" + "‾".repeat(multiTable.width - 2) + "\\"
     )
   );
-  console.log(formattedTitle + "\n" + formattedBodyTable);
+  console.log(chalk.hex(getTheme().secondaryColor)(multiTable.text));
   console.log(
     chalk.hex(getTheme().secondaryColor)(
-      "\\" + "_".repeat(totalMaxWidth - 2) + "/"
+      "\\" + "_".repeat(multiTable.width - 2) + "/"
     )
   );
-
   await pressEnter();
 }

@@ -6,7 +6,11 @@ import {
   totalClear,
 } from "../utilities/ConsoleService.js";
 import { getTerm } from "../utilities/LanguageService.js";
-import { getLanguage, getPassword, getTheme } from "../utilities/CacheService.js";
+import {
+  getLanguage,
+  getPassword,
+  getTheme,
+} from "../utilities/CacheService.js";
 import chalk from "chalk";
 import { exitProgram } from "../utilities/ErrorService.js";
 import {
@@ -14,7 +18,10 @@ import {
   saveSettingsData,
 } from "../utilities/SettingsService.js";
 import { flipATable } from "./Flip.js";
-import { checkPasswordScreen } from "../utilities/PasswordService.js";
+import {
+  checkPasswordScreen,
+  setPasswordScreen,
+} from "../utilities/PasswordService.js";
 
 /**
  * The Developer menu, with choices like manipulating the cache and storage data etc...
@@ -32,6 +39,10 @@ export async function secretDevMenu() {
     {
       name: getTerm("showCharacterData"),
       value: "showCharacterData",
+    },
+    {
+      name: getTerm("setPassword"),
+      value: "setPassword",
     },
     {
       name: getTerm("flip"),
@@ -66,6 +77,9 @@ export async function secretDevMenu() {
             chalk.hex(getTheme().primaryColor)(getTerm("currentlyInDev"))
           );
           await pressEnter();
+          break;
+        case "setPassword":
+          await setPasswordScreen();
           break;
         case "flip":
           await flipATable();
@@ -136,7 +150,11 @@ async function showSettingsData() {
   });
 
   if (chosenOption === "commit") {
-    saveSettingsData({ language: getLanguage(), theme: getTheme(), password: getPassword()});
+    saveSettingsData({
+      language: getLanguage(),
+      theme: getTheme(),
+      password: getPassword(),
+    });
     totalClear();
     await showSettingsData();
   }

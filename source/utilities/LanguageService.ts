@@ -153,6 +153,33 @@ const terms: Record<string, ITerm> = {
   },
   // #endregion
 
+  // #region Inventory Data
+  id: {
+    de: "ID",
+    en: "ID",
+  },
+  name: {
+    de: "Name",
+    en: "Name",
+  },
+  description: {
+    de: "Beschreibung",
+    en: "Description",
+  },
+  effect: {
+    de: "Effekt",
+    en: "Effect",
+  },
+  rarity: {
+    de: "Seltenheit",
+    en: "Rarity",
+  },
+  quantity: {
+    de: "Anzahl",
+    en: "Quantity",
+  },
+  // #endregion
+
   // #region Settings
   settings: {
     de: "Einstellungen",
@@ -223,7 +250,7 @@ const terms: Record<string, ITerm> = {
   },
   // #endregion
 
-  //#region
+  //#region Dev Menu
   devMenu: {
     de: "Entwicklermenü",
     en: "Developer menu",
@@ -235,6 +262,30 @@ const terms: Record<string, ITerm> = {
   showCharacterData: {
     de: "Charakterdaten",
     en: "Character data",
+  },
+  setPassword: {
+    de: "Passwort ändern",
+    en: "Change password",
+  },
+  choosePassword: {
+    de: "Neues Passwort",
+    en: "New password",
+  },
+  confirmPassword: {
+    de: "Passwort bestätigen",
+    en: "Confirm password",
+  },
+  tryAgain: {
+    de: "Erneut versuchen?",
+    en: "Try again?",
+  },
+  yes: {
+    de: "Ja",
+    en: "Yes",
+  },
+  no: {
+    de: "Nein",
+    en: "No",
   },
   saveData: {
     de: "Cache-Daten speichern",
