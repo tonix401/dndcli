@@ -1,9 +1,6 @@
 import fs from "fs";
 import { LogTypes, log } from "./LogService.js";
 import { ISettings } from "../types/ISettings.js";
-import { Language } from "./LanguageService.js";
-import { ITheme } from "./ThemingService.js";
-import { Hash } from "crypto";
 
 const filename = "../dndcli/storage/settings.json";
 /**

@@ -26,6 +26,7 @@ import {
 import { standardTheme } from "../utilities/ThemingService.js";
 import { secretDevMenu } from "./SecretDevMenu.js";
 import { inspectInventory } from "./InspectInventory.js";
+import { titleScreen } from "./TitleScreen.js";
 
 const getMenuOptions = () => [
   { name: getTerm("createCharacter"), value: "1" },
@@ -108,7 +109,7 @@ export async function exitProgram() {
   saveSettingsData({
     language: getLanguage(),
     theme: getTheme(),
-    password: getPassword()
+    password: getPassword(),
   });
   await skippableSlowWrite(getTerm("goodbye"));
   process.exit(0);
@@ -124,6 +125,7 @@ setLanguage(settings?.language || "de");
 setTheme(settings?.theme || standardTheme);
 
 async function startApp() {
+  await titleScreen();
   await newPlayerScreen();
   await welcomeScreen();
   main();
