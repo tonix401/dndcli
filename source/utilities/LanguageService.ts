@@ -32,8 +32,8 @@ export function getTerm(key: string, indented: boolean = false): string {
 const terms: Record<string, ITerm> = {
   // #region Welcome Sequence and Menu
   welcome: {
-    de: "Willkommen zu DnD-CLI\n\nDas ist doch wohl der beste Name, den Du je gehört hast\nRichtig?\nEgal! Das Abenteuer wartet! Lass uns loslegen!\n\nVon Julian Thäsler und Tom Weise",
-    en: "Welcome to DnD-CLI\n\nThat must be the best name you've ever heard\nRight?\nNevermind! Adventures are awaiting us! Let's go!\n\nBy Julian Thaesler and Tom Weise",
+    de: "Von Julian Thäsler und Tom Weise",
+    en: "By Julian Thaesler and Tom Weise",
   },
   goodbye: {
     de: "Wir werden uns wiedersehen!",

@@ -13,7 +13,6 @@ import { log, LogTypes } from "../utilities/LogService.js";
 import { getSettingsData } from "../utilities/SettingsService.js";
 import { settingsMenu } from "./SettingsMenu.js";
 import { newPlayerScreen } from "./NewPlayerScreen.js";
-import { welcomeScreen } from "./WelcomeScreen.js";
 import { saveSettingsData } from "../utilities/SettingsService.js";
 import { getTerm } from "../utilities/LanguageService.js";
 import {
@@ -127,7 +126,6 @@ setTheme(settings?.theme || standardTheme);
 async function startApp() {
   await titleScreen();
   await newPlayerScreen();
-  await welcomeScreen();
   main();
 }
 

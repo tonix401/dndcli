@@ -1,5 +1,6 @@
 import { pressEnter, skippableSlowWrite, totalClear } from "../utilities/ConsoleService.js";
 import package_json from "../../package.json" with {type: "json"};
+import { getTerm } from "../utilities/LanguageService.js";
 
 const titleScreenAscii = `
  /$$$$$$$            /$$$$$$$           /$$$$$$  /$$       /$$$$$$
@@ -11,7 +12,7 @@ const titleScreenAscii = `
 | $$$$$$$/| $$  | $$| $$$$$$$/        |  $$$$$$/| $$$$$$$$ /$$$$$$
 |_______/ |__/  |__/|_______/          \\______/ |________/|______/
 
-${package_json.version}`;
+${package_json.version} - ${getTerm("welcome")}`;
 
 export async function titleScreen() {
   totalClear();
