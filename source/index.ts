@@ -1,31 +1,33 @@
 import path from "path";
 import fs from "fs-extra";
-import { createCharacterMenu } from "./CreateCharacterMenu.js";
-import { inspectCharacter } from "./InspectCharacter.js";
-import { startCampaign } from "../src/campaign.js";
+import { createCharacterMenu } from "./components/CreateCharacterMenu.js";
+import { inspectCharacter } from "./components/InspectCharacter.js";
+import { startCampaign } from "./src/campaign.js";
 import {
   pressEnter,
   skippableSlowWrite,
   themedSelect,
   totalClear,
-} from "../utilities/ConsoleService.js";
-import { log, LogTypes } from "../utilities/LogService.js";
-import { getSettingsData } from "../utilities/SettingsService.js";
-import { settingsMenu } from "./SettingsMenu.js";
-import { newPlayerScreen } from "./NewPlayerScreen.js";
-import { saveSettingsData } from "../utilities/SettingsService.js";
-import { getTerm } from "../utilities/LanguageService.js";
+} from "./utilities/ConsoleService.js";
+import { log, LogTypes } from "./utilities/LogService.js";
+import { getSettingsData } from "./utilities/SettingsService.js";
+import { settingsMenu } from "./components/SettingsMenu.js";
+import { newPlayerScreen } from "./components/NewPlayerScreen.js";
+import { saveSettingsData } from "./utilities/SettingsService.js";
+import { getTerm } from "./utilities/LanguageService.js";
 import {
   getLanguage,
   getPassword,
   getTheme,
   setLanguage,
   setTheme,
-} from "../utilities/CacheService.js";
-import { standardTheme } from "../utilities/ThemingService.js";
-import { secretDevMenu } from "./SecretDevMenu.js";
-import { inspectInventory } from "./InspectInventory.js";
-import { titleScreen } from "./TitleScreen.js";
+} from "./utilities/CacheService.js";
+import { standardTheme } from "./utilities/ThemingService.js";
+import { secretDevMenu } from "./components/SecretDevMenu.js";
+import { inspectInventory } from "./components/InspectInventory.js";
+import { titleScreen } from "./components/TitleScreen.js";
+import Room from "./classes/Room.js";
+import { getRoomVisual } from "./utilities/DungeonService.js";
 
 const getMenuOptions = () => [
   { name: getTerm("createCharacter"), value: "1" },
@@ -119,7 +121,7 @@ const dataDir = path.join(process.cwd(), "storage");
 fs.ensureDirSync(dataDir);
 log("Index: Program started");
 
-let settings = getSettingsData();
+const settings = getSettingsData();
 setLanguage(settings?.language || "de");
 setTheme(settings?.theme || standardTheme);
 
