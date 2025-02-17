@@ -16,6 +16,7 @@ import { newPlayerScreen } from "./components/NewPlayerScreen.js";
 import { saveSettingsData } from "./utilities/SettingsService.js";
 import { getTerm } from "./utilities/LanguageService.js";
 import {
+  getDungeon,
   getLanguage,
   getPassword,
   getTheme,
@@ -26,8 +27,7 @@ import { standardTheme } from "./utilities/ThemingService.js";
 import { secretDevMenu } from "./components/SecretDevMenu.js";
 import { inspectInventory } from "./components/InspectInventory.js";
 import { titleScreen } from "./components/TitleScreen.js";
-import Room from "./classes/Room.js";
-import { getRoomVisual } from "./utilities/DungeonService.js";
+import { getDungeonMapVisual } from "./utilities/DungeonService.js";
 
 const getMenuOptions = () => [
   { name: getTerm("createCharacter"), value: "1" },
@@ -36,6 +36,7 @@ const getMenuOptions = () => [
   { name: getTerm("startCampaign"), value: "3" },
   { name: getTerm("settings"), value: "4" },
   { name: getTerm("devMenu"), value: "5" },
+  { name: "TEST DUNGEON", value: "7" },
   { name: getTerm("exit"), value: "9" },
 ];
 
@@ -63,6 +64,10 @@ async function handleMenuChoice(choice: string) {
         break;
       case "6":
         await inspectInventory();
+        break;
+      case "7":
+        console.log(getDungeonMapVisual());
+        await pressEnter();
         break;
       case "9":
         await exitProgram();
