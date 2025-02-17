@@ -1,3 +1,4 @@
+import { Dungeon, DungeonSize, initiateDungeonMap } from "./DungeonService.js";
 import { getTerm, Language } from "./LanguageService.js";
 import { log, LogTypes } from "./LogService.js";
 import { saveSettingsData } from "./SettingsService.js";
@@ -7,13 +8,37 @@ import {
   standardTheme,
 } from "./ThemingService.js";
 
+const rawDungeonSizes = Object.values(DungeonSize);
+const dungeonSizes: DungeonSize[] = rawDungeonSizes.filter(
+  (size) => typeof size === "number"
+) as DungeonSize[];
+let cachedDungeon: Dungeon = initiateDungeonMap(5);
+let cachedPlayerPosition: { x: number; y: number } = { x: 0, y: 0 };
 let cachedLanguage: Language = "de";
 let cachedTheme = standardTheme;
 let cachedPassword: string =
   "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3";
 
+export function getPlayerPosition() {
+  return cachedPlayerPosition;
+}
+
+export function getDungeon() {
+  return cachedDungeon;
+}
+
+export function setDungeon(dungeon: Dungeon) {
+  cachedDungeon = dungeon;
+}
+
+export function renewDungeon() {
+  cachedDungeon = initiateDungeonMap(
+    dungeonSizes[Math.floor(Math.random() * dungeonSizes.length)]
+  );
+}
+
 export function getPassword() {
-  return cachedPassword
+  return cachedPassword;
 }
 
 export function getLanguage() {
@@ -71,5 +96,9 @@ export function setPassword(password: string) {
 }
 
 function commitToJson() {
-  saveSettingsData({language: cachedLanguage, theme: cachedTheme, password: cachedPassword})
+  saveSettingsData({
+    language: cachedLanguage,
+    theme: cachedTheme,
+    password: cachedPassword,
+  });
 }
