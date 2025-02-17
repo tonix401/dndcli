@@ -30,7 +30,7 @@ export function getRoomVisual(
   const topWall =
     "#########################\n### ╔═══════════════╗ ###\n### ║               ║ ###\n";
 
-  // Xs in the variable names to align the strings, to check for errors (and because it looks nicer)
+  // Xs in the constant names to align the strings, to check for errors (and because it looks nicer)
   const LeftRightHallway = `════╝               ╚════\n            ${character}             \n════╗               ╔════\n### ║               ║ ###\n`;
   const RightHallwayxxxx = `### ║               ╚════\n### ║       ${character}             \n### ║               ╔════\n### ║               ║ ###\n`;
   const LeftHallwayxxxxx = `════╝               ║ ###\n            ${character}        ║ ###\n════╗               ║ ###\n### ║               ║ ###\n`;

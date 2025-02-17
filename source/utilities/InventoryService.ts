@@ -1,4 +1,4 @@
-import { IItem } from "../types/IITem.js";
+import { IItem } from "../types/IItem.js";
 import chalk from "chalk";
 import inquirer from "inquirer";
 
