@@ -25,17 +25,18 @@ const __dirname = path.dirname(__filename);
 const newPlayerChar = {
   name: "Hans",
   class: "swordsman",
-  level: "4",
-  xp: "21",
-  hp: "3",
+  level: 4,
+  xp: 21,
+  hp: 3,
   origin: "unknown",
+  currency: 0,
   abilities: {
-    maxhp: "10",
-    strength: "0",
-    mana: "0",
-    dexterity: "0",
-    charisma: "10",
-    luck: "7",
+    maxhp: 10,
+    strength: 0,
+    mana: 0,
+    dexterity: 0,
+    charisma: 10,
+    luck: 7,
   },
   inventory: [],
   lastPlayed: new Date().toLocaleDateString(),
@@ -78,8 +79,8 @@ async function ensureFilesExist() {
   Object.values(filePathsToCheck).forEach((filePath) => {
     try {
       fs.ensureFileSync(filePath);
-    } catch(error) {
-      log("New Player Screen: " + error, LogTypes.ERROR)
+    } catch (error) {
+      log("New Player Screen: " + error, LogTypes.ERROR);
     }
   });
 

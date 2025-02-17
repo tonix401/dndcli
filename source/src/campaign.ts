@@ -4,19 +4,23 @@ import ora from "ora";
 import {
   generateChatNarrative,
   generateEnemyFromNarrative,
+  ChatCompletionRequestMessage,
 } from "./aiAssistant.js";
 import { rollDice } from "../utilities/DiceService.js";
-import { GameState, promptForChoice } from "./gameMaster.js";
+import { GameState } from "./gameState.js";
+import { promptForChoice } from "./gameMaster.js";
 import { log, LogTypes } from "../utilities/LogService.js";
 import { runCombat } from "./combat.js";
 import { generateRandomItem } from "../utilities/ItemGenerator.js";
 import { saveGameState, loadGameState } from "../utilities/SaveLoadService.js";
 import { getStartingItems } from "../utilities/InventoryService.js";
 import { saveCharacterData } from "../utilities/CharacterService.js";
+import { getLanguage } from "../utilities/CacheService.js";
+
 /**
  * Displays a persistent status bar showing key character stats.
  */
-function displayStatusBar(character: any): void {
+/* function displayStatusBar(character: any): void {
   console.clear();
   console.log(chalk.bgBlueBright.black.bold("=== Status ==="));
   const inventorySummary =
@@ -33,7 +37,7 @@ function displayStatusBar(character: any): void {
     )
   );
   console.log(chalk.bgBlueBright.black.bold("===============\n"));
-}
+} */
 
 /**
  * Pauses until user input.
@@ -56,9 +60,9 @@ async function pause(duration: number): Promise<void> {
  * Displays a recap of the previous narrative.
  */
 async function displayRecap(gameState: GameState): Promise<void> {
-  if (gameState.narrativeHistory.length > 0) {
-    const recap =
-      gameState.narrativeHistory[gameState.narrativeHistory.length - 1];
+  const narrativeHistory = gameState.getNarrativeHistory();
+  if (narrativeHistory.length > 0) {
+    const recap = narrativeHistory[narrativeHistory.length - 1];
     console.log(chalk.blueBright.bold("\n🔄 Recap of your previous session:"));
     console.log(chalk.blueBright(recap));
     await pauseForReflection(
@@ -91,33 +95,79 @@ export async function campaignLoop(
   }
 
   // Start with an introduction if no narrative yet.
-  if (gameState.narrativeHistory.length === 0) {
-    displayStatusBar(characterData);
+  if (gameState.getNarrativeHistory().length === 0) {
+    /*   displayStatusBar(characterData); */
     const introNarrative = await generateChatNarrative(
       [
         {
           role: "system",
           content: `
-${chalk.bold.underline("🌟 Welcome to Eldoria!")}
-You are embarking on a measured, character-driven journey. The pacing here is like a well-planned novel – each scene unfolds deliberately, giving you time to reflect on the world and your choices.
-**Character Details:**
-  - Name: ${chalk.bold(characterData.name)}
-  - Level: ${chalk.bold(characterData.level + " " + characterData.class)}
-  - Origin: ${chalk.bold(characterData.origin || "Unknown")}
-  - Stats: HP ${characterData.hp}/${characterData.abilities.maxhp}, Strength ${
+Act as the Dungeon Master for an immersive, book-like AD&D 2nd Edition game. You are to strictly follow the AD&D 2nd Edition ruleset for all mechanics—including character progression, combat, dice rolls, experience, and currency management. You must never break character, make decisions for the player, or refer to yourself in any way. All in-game actions that require dice rolls must be initiated by the player using curly braces {like this}.
+
+General Guidelines:
+
+World Building & Narrative:
+- Randomly generate the setting, theme, place, current year, and cultural/historical context for the adventure.
+- Provide detailed, immersive descriptions that include at least three sentences per location. Descriptions must mention the time of day, weather, natural environment, notable landmarks, and any relevant historical or cultural details.
+- For dungeon sequences or special encounters, start with "START DUNGEON:" and transition seamlessly into the next scene after the encounter.
+
+Combat & Special Encounters:
+- When a combat situation arises, begin your narrative with "COMBAT ENCOUNTER:" followed by any necessary dice roll calculations (e.g., “(roll: 1d20+3)”).
+- Do not provide in-game choices during combat or dungeon encounters.
+
+Player Actions & In-Game Syntax:
+- The player’s in-game actions must be enclosed in curly braces {like this}. Only perform dice rolls or game mechanics when the player uses the correct syntax.
+- In-character dialogue must be enclosed in quotation marks "like this".
+- Out-of-character instructions will be provided in angle brackets <like this>.
+- For non-combat scenes, always end with exactly three numbered choices enclosed in curly braces (e.g.,
+  1.{Search the area}
+  2.{Talk to the local}
+  3.{Return to main menu}) to indicate the next available actions.
+
+Character Sheet & Tracking:
+- At the very start of the game, output the full character sheet, including:
+  Name: ${characterData.name}
+  Origin: ${characterData.origin}
+  Level & Class: ${characterData.level} ${characterData.class}
+  Stats: HP ${characterData.hp}/${characterData.abilities.maxhp}, STR ${
             characterData.abilities.strength
-          }, Mana ${characterData.abilities.mana}, Dexterity ${
+          }, MANA ${characterData.abilities.mana}, DEX ${
             characterData.abilities.dexterity
-          }, Charisma ${characterData.abilities.charisma}, Luck ${
+          }, CHA ${characterData.abilities.charisma}, LUCK ${
             characterData.abilities.luck
-          }.
-${chalk.italic("Current Plot:")} ${gameState.plotSummary}
-Please provide a narrative that builds slowly and ends with three carefully considered numbered choices followed by "Return to main menu."
-Respond in English.
+          }
+  XP: ${characterData.xp} (displayed as "XP: current/next", e.g., "0/100")
+  Currency: ${
+    characterData.currency
+  } (generate the entire currency system with prices for all transactions strictly according to AD&D 2e)
+  Inventory: ${characterData.inventory
+    .map(
+      (item: { name: string; quantity: number }) =>
+        `${item.name} (x${item.quantity})`
+    )
+    .join(", ")}
+- Always update and display the character sheet after each narrative response, including any changes from events, combat, or transactions.
+- Always display additional details such as Proficiency Points, Ability Score Improvements, and Weapon Proficiencies as per AD&D 2e rules.
+
+Rules & Mechanics:
+- Strictly adhere to AD&D 2e rules for all events, combat, and skill checks.
+- Show all dice roll calculations in parentheses immediately after any narrative that involves a dice roll (e.g., “(roll: 1d20+2)”).
+- When an action requiring a dice roll is not correctly enclosed in curly braces by the player, do not perform the roll or process the action.
+- Reward the player with experience, currency, and track their progression as dictated by the AD&D 2e ruleset.
+- Ensure that the player is allowed to defeat any NPC if they are capable, without making choices on their behalf.
+
+Response Structure:
+- Begin by outputting the full character sheet and an introductory narrative that sets the scene.
+- In non-combat scenes, conclude with exactly three numbered in-game choices (using curly braces) for what the player can do next.
+- For combat or dungeon sequences, follow the special encounter formatting instructions (i.e., "COMBAT ENCOUNTER:" or "START DUNGEON:") and transition smoothly between scenes once the encounter concludes.
+
+Starting Instructions:
+- Begin the session by displaying the full character sheet as described above, followed by an introductory narrative that establishes the initial location, setting, and context for the adventure. Make sure to have the introductory narrative as detailed as possible to help with the initial world building that comes with the story and origin of the character.
+- Wait for the player to provide their first in-game command using the correct syntax.
           `,
         },
       ],
-      { maxTokens: 500, temperature: 0.7 }
+      { maxTokens: 500, temperature: 0.8 }
     );
     console.log("\n" + chalk.cyanBright(introNarrative) + "\n");
     await pauseForReflection(
@@ -131,8 +181,8 @@ Respond in English.
       console.log(chalk.blueBright("Returning to main menu..."));
       return;
     }
-    gameState.narrativeHistory.push(introNarrative);
-    gameState.conversationHistory.push({
+    gameState.addNarrative(introNarrative);
+    gameState.addConversation({
       role: "user",
       content: `Player choice: ${initialChoice}`,
     });
@@ -142,58 +192,60 @@ Respond in English.
   // Main narrative loop.
   while (true) {
     try {
-      displayStatusBar(characterData);
+      /*       displayStatusBar(characterData); */
 
       // Optionally update the plot if enough choices have been made.
-      if (gameState.choices.length >= 5 && gameState.plotStage === 1) {
+      if (
+        gameState.getChoices().length >= 5 &&
+        gameState.getPlotStage() === 1
+      ) {
         gameState.updatePlot(
           2,
           "New clues emerge slowly. Your challenges remain significant, but time lets you breathe and decide your path carefully."
         );
       }
 
-      const baseScenarioMessage = {
+      const contextSummary = gameState.summarizeHistory();
+      const baseScenarioMessage: ChatCompletionRequestMessage = {
         role: "system",
         content: `
-      ${chalk.bold.underline("Next Chapter Begins:")}
-      Chapter (Stage ${chalk.bold(
-        gameState.plotStage.toString()
-      )}): ${chalk.italic(gameState.plotSummary)}
-      **Character Info:**
-        - Name: ${chalk.bold(characterData.name)}, Level: ${chalk.bold(
-          characterData.level + " " + characterData.class
-        )}
-        - Origin: ${chalk.bold(characterData.origin || "Unknown")}
-        - Stats: HP ${characterData.hp}/${
-          characterData.abilities.maxhp
-        }, Strength ${characterData.abilities.strength}, Mana ${
-          characterData.abilities.mana
-        }, Dexterity ${characterData.abilities.dexterity}, Charisma ${
-          characterData.abilities.charisma
-        }, Luck ${characterData.abilities.luck}.
-  
-  Instructions:
-  1. Generate narrative that unfolds at a measured pace
-  2. For combat situations, use format: "COMBAT ENCOUNTER: [enemy description]" without providing choices
-  3. For non-combat situations, end with exactly three numbered choices
-  4. Only use "COMBAT ENCOUNTER:" at dramatic moments when combat is truly appropriate
-  5. After a player flees combat, generate narrative about their escape and new situation
-  
-  Example combat format:
-  "As you round the corner, COMBAT ENCOUNTER: A massive troll emerges from the shadows, its club dragging across the stone floor."
-  
-  Example non-combat format:
-  "You find yourself in a quiet grove. What do you do?
-  
-  1. Investigate the ancient stones
-  2. Listen for wildlife
-  3. Search for herbs"
-  `,
-      };
+     Welcome to the next chapter of your adventure!
 
-      const messages = [
+**Recent Context:**
+${contextSummary}
+
+**Chapter Stage ${gameState.getPlotStage()}**: ${gameState.getPlotSummary()}
+
+**Character Info:**
+- Name: ${characterData.name}
+- Level & Class: ${characterData.level} ${characterData.class}
+- Stats: HP ${characterData.hp}/${characterData.abilities.maxhp}, STR ${
+          characterData.abilities.strength
+        }, MANA ${characterData.abilities.mana}, DEX ${
+          characterData.abilities.dexterity
+        }, CHA ${characterData.abilities.charisma}, LUCK ${
+          characterData.abilities.luck
+        }
+
+**Instructions:**
+1. Generate an immersive, book-like narrative that unfolds slowly.
+2. For combat situations, output a line beginning with "COMBAT ENCOUNTER:" (no choices).
+3. For dungeon sequences, output a line beginning with "START DUNGEON:" (no choices).
+4. For non-combat scenes, end with exactly three numbered in-game choices followed by "Return to main menu."
+5. After any special encounter (combat or dungeon), the narrative should transition seamlessly into the next scene.
+
+Please respond in clear, concise ${getLanguage}.
+    `,
+      };
+      const messages: ChatCompletionRequestMessage[] = [
         baseScenarioMessage,
-        ...gameState.conversationHistory.slice(-9),
+        ...gameState
+          .getConversationHistory()
+          .slice(-9)
+          .map((msg) => ({
+            role: msg.role as "system" | "user" | "assistant",
+            content: msg.content,
+          })),
       ];
 
       const spinner = ora(chalk.cyan("Generating next scene...")).start();
@@ -202,33 +254,23 @@ Respond in English.
         temperature: 0.7,
       });
       spinner.succeed(chalk.greenBright("Scene generated."));
-      gameState.conversationHistory.push({
+      gameState.addConversation({
         role: "assistant",
         content: narrative,
       });
-      gameState.narrativeHistory.push(narrative);
-
+      gameState.addNarrative(narrative);
       console.log("\n" + chalk.cyanBright(narrative) + "\n");
 
-      // If the narrative indicates a combat encounter, engage combat.
-      // In campaign.ts, modify the combat section:
       if (narrative.toLowerCase().includes("combat encounter:")) {
-        // Let user read the narrative first
         await pauseForReflection("Press Enter when you're ready for combat...");
-
         const enemy = await generateEnemyFromNarrative(
           narrative,
           characterData
         );
-
         console.log(chalk.redBright(`\n⚔️ Combat encounter triggered!`));
         console.log(chalk.yellow(`A ${enemy.name} appears before you...`));
-
-        // Additional dramatic pause
         await pause(1500);
-
         const combatResult = await runCombat(characterData, enemy);
-
         if (!combatResult) {
           console.log(
             chalk.redBright("You have been defeated or fled. Game over.")
@@ -248,16 +290,14 @@ Respond in English.
             );
             characterData.inventory.push(newItem);
           }
-          // Save the updated character data
           saveCharacterData(characterData);
-          // Pause after combat ends
           await pauseForReflection("Press Enter to continue your journey...");
         }
       } else if (narrative.toLowerCase().includes("roll a d20")) {
         console.log(chalk.yellowBright("A dice roll is required..."));
         const [rollResult] = rollDice(20, 1);
         console.log(chalk.yellowBright(`You rolled: ${rollResult}`));
-        gameState.conversationHistory.push({
+        gameState.addConversation({
           role: "user",
           content: `I rolled a ${rollResult} on a d20.`,
         });
@@ -276,11 +316,11 @@ Respond in English.
         return;
       }
       console.log(chalk.greenBright(`You chose: ${choice}`));
-      gameState.conversationHistory.push({
+      gameState.addConversation({
         role: "user",
         content: `Player choice: ${choice}`,
       });
-      gameState.narrativeHistory.push(`Player choice: ${choice}`);
+      gameState.addNarrative(`Player choice: ${choice}`);
       await saveGameState(gameState);
     } catch (error: any) {
       log("Campaign loop error: " + error.message, LogTypes.ERROR);
@@ -303,7 +343,6 @@ export async function startCampaign(): Promise<void> {
     );
     return;
   }
-  // Ensure inventory is initialized.
   if (
     !Array.isArray(characterData.inventory) ||
     characterData.inventory.length === 0
@@ -314,6 +353,5 @@ export async function startCampaign(): Promise<void> {
     characterData.inventory = getStartingItems(characterData.class);
   }
   const gameState = new GameState();
-  gameState.conversationHistory = [];
   await campaignLoop(gameState, characterData);
 }

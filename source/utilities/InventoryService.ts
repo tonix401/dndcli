@@ -1,9 +1,10 @@
-import { IItem } from "../types/IItem.js";
 import chalk from "chalk";
 import inquirer from "inquirer";
+import { IItem } from "../types/IITem.js";
 
 /**
  * Returns starting items based on the character class.
+ * Notice that consumable items (which can be used in combat) are flagged.
  */
 export function getStartingItems(characterClass: string): IItem[] {
   if (characterClass.toLowerCase() === "mage") {
@@ -15,6 +16,7 @@ export function getStartingItems(characterClass: string): IItem[] {
         effect: "",
         rarity: "Common",
         quantity: 1,
+        consumable: false, // equipment
       },
       {
         id: "item2",
@@ -23,6 +25,7 @@ export function getStartingItems(characterClass: string): IItem[] {
         effect: "",
         rarity: "Common",
         quantity: 1,
+        consumable: false, // equipment
       },
       {
         id: "item3",
@@ -31,6 +34,7 @@ export function getStartingItems(characterClass: string): IItem[] {
         effect: "restoreMana",
         rarity: "Common",
         quantity: 2,
+        consumable: true, // can be used in combat
       },
     ];
   } else if (characterClass.toLowerCase() === "swordsman") {
@@ -42,6 +46,7 @@ export function getStartingItems(characterClass: string): IItem[] {
         effect: "",
         rarity: "Common",
         quantity: 1,
+        consumable: false,
       },
       {
         id: "item2",
@@ -50,6 +55,7 @@ export function getStartingItems(characterClass: string): IItem[] {
         effect: "",
         rarity: "Common",
         quantity: 1,
+        consumable: false,
       },
       {
         id: "item3",
@@ -58,9 +64,11 @@ export function getStartingItems(characterClass: string): IItem[] {
         effect: "restoreHP",
         rarity: "Common",
         quantity: 2,
+        consumable: true,
       },
     ];
   }
+  // Default items if character class doesn't match
   return [
     {
       id: "item1",
@@ -69,6 +77,7 @@ export function getStartingItems(characterClass: string): IItem[] {
       effect: "",
       rarity: "Common",
       quantity: 1,
+      consumable: false,
     },
     {
       id: "item2",
@@ -77,12 +86,51 @@ export function getStartingItems(characterClass: string): IItem[] {
       effect: "restoreHP",
       rarity: "Common",
       quantity: 1,
+      consumable: true,
     },
   ];
 }
 
 /**
+ * Item effect handlers.
+ * Each function takes the character and item as parameters and applies the effect.
+ */
+const itemEffectHandlers: {
+  [key in Exclude<IItem["effect"], "">]?: (
+    character: any,
+    item: IItem
+  ) => Promise<void>;
+} = {
+  restoreHP: async (character, item) => {
+    const restoreAmount = 10; // You can also make this dynamic.
+    character.hp = Math.min(
+      character.hp + restoreAmount,
+      character.abilities.maxhp
+    );
+    console.log(
+      chalk.greenBright(
+        `You used ${item.name} and restored ${restoreAmount} HP.`
+      )
+    );
+  },
+  restoreMana: async (character, item) => {
+    const restoreAmount = 10;
+    character.mana = Math.min(
+      character.mana + restoreAmount,
+      character.abilities.mana
+    );
+    console.log(
+      chalk.greenBright(
+        `You used ${item.name} and restored ${restoreAmount} Mana.`
+      )
+    );
+  },
+  // Add additional effect handlers as needed (for boostStrength, etc.)
+};
+
+/**
  * Displays a dedicated inventory menu and processes the selected item.
+ * Consumable items (with a defined effect) are processed; equipment items are not usable in combat.
  */
 export async function inventoryMenu(character: any): Promise<void> {
   if (
@@ -94,13 +142,20 @@ export async function inventoryMenu(character: any): Promise<void> {
     return;
   }
 
+  // Build the list of inventory choices. We mark equipment with a gray label.
   const inventoryChoices = character.inventory.map(
-    (item: IItem, index: number) => ({
-      name: `${chalk.bold(item.name)} (x${item.quantity}) - ${
-        item.description
-      }`,
-      value: index,
-    })
+    (item: IItem, index: number) => {
+      const usability =
+        item.consumable === false || item.effect === ""
+          ? chalk.gray("(Equipment)")
+          : "";
+      return {
+        name: `${chalk.bold(item.name)} (x${item.quantity}) - ${
+          item.description
+        } ${usability}`,
+        value: index,
+      };
+    }
   );
 
   inventoryChoices.push({ name: "🔙 Back to combat", value: -1 });
@@ -118,44 +173,31 @@ export async function inventoryMenu(character: any): Promise<void> {
 
   const selectedItem: IItem = character.inventory[selectedItemIndex];
 
-  if (selectedItem.effect === "restoreHP") {
-    const restored = 10;
-    character.hp = String(
-      Math.min(
-        Number(character.hp) + restored,
-        Number(character.abilities.maxhp)
-      )
-    );
+  // Check if the item is consumable (i.e. has an effect).
+  if (selectedItem.effect === "" || selectedItem.consumable === false) {
     console.log(
-      chalk.greenBright(
-        `You used ${selectedItem.name} and restored ${restored} HP.`
+      chalk.yellowBright(
+        `You cannot use ${selectedItem.name} during combat. Consider equipping it instead.`
       )
     );
-    selectedItem.quantity--;
-    if (selectedItem.quantity <= 0) {
-      character.inventory.splice(selectedItemIndex, 1);
-    }
-  } else if (selectedItem.effect === "restoreMana") {
-    const restored = 10;
-    character.mana = String(
-      Math.min(
-        Number(character.mana) + restored,
-        Number(character.abilities.mana)
-      )
-    );
-    console.log(
-      chalk.greenBright(
-        `You used ${selectedItem.name} and restored ${restored} Mana.`
-      )
-    );
-    selectedItem.quantity--;
-    if (selectedItem.quantity <= 0) {
-      character.inventory.splice(selectedItemIndex, 1);
-    }
+    return;
+  }
+
+  // Process the item's effect if a handler exists.
+  const effectHandler =
+    itemEffectHandlers[selectedItem.effect as Exclude<IItem["effect"], "">];
+  if (effectHandler) {
+    await effectHandler(character, selectedItem);
   } else {
     console.log(
-      chalk.yellowBright(`You used ${selectedItem.name} but nothing happened.`)
+      chalk.yellowBright(`You used ${selectedItem.name}, but nothing happened.`)
     );
+  }
+
+  // Decrease quantity and remove the item if the quantity reaches 0.
+  selectedItem.quantity--;
+  if (selectedItem.quantity <= 0) {
+    character.inventory.splice(selectedItemIndex, 1);
   }
 }
 

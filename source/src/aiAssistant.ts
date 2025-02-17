@@ -1,26 +1,27 @@
-import * as dotenv from "dotenv";
-import {
-  Configuration,
-  OpenAIApi,
-  ChatCompletionRequestMessage,
-  CreateChatCompletionRequest,
-} from "openai";
+import { OpenAI } from "openai";
+import dotenv from "dotenv";
 
 dotenv.config();
+
+// Define your own type that mirrors the expected message structure.
+export interface ChatCompletionRequestMessage {
+  role: "system" | "user" | "assistant";
+  content: string;
+  // Optionally add additional fields if needed (e.g., name)
+}
+
 class ChatGenerationError extends Error {
   constructor(message: string) {
     super(message);
     this.name = "ChatGenerationError";
   }
 }
+
 if (!process.env.OPENAI_API_KEY) {
   throw new Error("Missing OPENAI_API_KEY in environment variables");
 }
 
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-const openai = new OpenAIApi(configuration);
+const openai = new OpenAI();
 
 export interface GenerateTextOptions {
   model?: string;
@@ -44,24 +45,23 @@ export async function generateChatNarrative(
     throw new ChatGenerationError("Messages array cannot be empty");
   }
 
-  const requestPayload: CreateChatCompletionRequest = {
-    model: options?.model || "gpt-3.5-turbo",
-    messages,
-    max_tokens: options?.maxTokens ?? 300,
-    temperature: options?.temperature ?? 0.85,
-    top_p: options?.topP ?? 1.0,
-  };
-
   try {
-    const response = await openai.createChatCompletion(requestPayload);
+    const response = await openai.chat.completions.create({
+      model: options?.model || "gpt-3.5-turbo",
+      messages,
+      max_tokens: options?.maxTokens ?? 300,
+      temperature: options?.temperature ?? 0.85,
+      top_p: options?.topP ?? 1.0,
+    });
 
-    if (!response.data.choices?.[0]?.message?.content) {
+    const content = response.choices[0]?.message?.content;
+    if (!content) {
       throw new ChatGenerationError(
         "No valid response content received from OpenAI API"
       );
     }
 
-    return response.data.choices[0].message.content.trim();
+    return content.trim();
   } catch (error) {
     if (error instanceof ChatGenerationError) {
       throw error;
@@ -77,6 +77,9 @@ export async function generateChatNarrative(
   }
 }
 
+/**
+ * Generates an enemy based on the provided narrative and player character data.
+ */
 export async function generateEnemyFromNarrative(
   narrative: string,
   characterData: any
@@ -134,7 +137,6 @@ export async function generateEnemyFromNarrative(
       temperature: 0.7,
       maxTokens: 150,
     });
-
     const enemy = JSON.parse(response);
 
     // Validate and adjust enemy stats if necessary
