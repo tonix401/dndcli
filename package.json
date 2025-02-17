@@ -1,7 +1,8 @@
 {
   "type": "module",
+  "version": "v0.1 Alpha",
   "scripts": {
-    "dev": "tsc && node js/components/index.js",
+    "dev": "tsc && node js/source/index.js",
     "setup": "npm install --silent && tsc --build && powershell -Command \"if (!(Test-Path .env)) { echo 'OPENAI_API_KEY=' > .env }; if (!(Test-Path storage)) { mkdir storage }; echo 'LOG START' > storage/log.txt\"",
     "start": "npm run setup && node js/components/index.js"
   },

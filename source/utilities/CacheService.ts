@@ -1,13 +1,13 @@
-import { Hash } from "crypto";
 import { getTerm, Language } from "./LanguageService.js";
 import { log, LogTypes } from "./LogService.js";
+import { saveSettingsData } from "./SettingsService.js";
 import {
   getAllThemeOverrides,
   IThemeOverride,
   standardTheme,
 } from "./ThemingService.js";
 
-let cachedlanguage: Language = "de";
+let cachedLanguage: Language = "de";
 let cachedTheme = standardTheme;
 let cachedPassword: string =
   "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3";
@@ -17,7 +17,7 @@ export function getPassword() {
 }
 
 export function getLanguage() {
-  return cachedlanguage;
+  return cachedLanguage;
 }
 
 export function getTheme() {
@@ -25,8 +25,9 @@ export function getTheme() {
 }
 
 export function setLanguage(language: Language): void {
-  cachedlanguage = language;
+  cachedLanguage = language;
   log("Cache service: Language set to " + getTerm(language));
+  commitToJson();
 }
 
 export function setThemeByKey(key: string): void {
@@ -48,6 +49,7 @@ export function setThemeByKey(key: string): void {
       LogTypes.ERROR
     );
   }
+  commitToJson();
 }
 
 export function setTheme(theme: IThemeOverride) {
@@ -60,8 +62,14 @@ export function setTheme(theme: IThemeOverride) {
     secondaryColor: theme.secondaryColor || standardTheme.secondaryColor,
     cursor: theme.cursor || standardTheme.cursor,
   };
+  commitToJson();
 }
 
 export function setPassword(password: string) {
   cachedPassword = password;
+  commitToJson();
+}
+
+function commitToJson() {
+  saveSettingsData({language: cachedLanguage, theme: cachedTheme, password: cachedPassword})
 }

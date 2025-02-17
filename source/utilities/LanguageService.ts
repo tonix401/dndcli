@@ -32,8 +32,8 @@ export function getTerm(key: string, indented: boolean = false): string {
 const terms: Record<string, ITerm> = {
   // #region Welcome Sequence and Menu
   welcome: {
-    de: "Willkommen zu DnD-CLI\n\nDas ist doch wohl der beste Name, den Du je gehört hast\nRichtig?\nEgal! Das Abenteuer wartet! Lass uns loslegen!\n\nVon Julian Thäsler und Tom Weise",
-    en: "Welcome to DnD-CLI\n\nThat must be the best name you've ever heard\nRight?\nNevermind! Adventures are awaiting us! Let's go!\n\nBy Julian Thaesler and Tom Weise",
+    de: "Von Julian Thäsler und Tom Weise",
+    en: "By Julian Thaesler and Tom Weise",
   },
   goodbye: {
     de: "Wir werden uns wiedersehen!",
@@ -153,6 +153,33 @@ const terms: Record<string, ITerm> = {
   },
   // #endregion
 
+  // #region Inventory Data
+  id: {
+    de: "ID",
+    en: "ID",
+  },
+  name: {
+    de: "Name",
+    en: "Name",
+  },
+  description: {
+    de: "Beschreibung",
+    en: "Description",
+  },
+  effect: {
+    de: "Effekt",
+    en: "Effect",
+  },
+  rarity: {
+    de: "Seltenheit",
+    en: "Rarity",
+  },
+  quantity: {
+    de: "Anzahl",
+    en: "Quantity",
+  },
+  // #endregion
+
   // #region Settings
   settings: {
     de: "Einstellungen",
@@ -223,7 +250,7 @@ const terms: Record<string, ITerm> = {
   },
   // #endregion
 
-  //#region
+  //#region Dev Menu
   devMenu: {
     de: "Entwicklermenü",
     en: "Developer menu",
@@ -235,6 +262,30 @@ const terms: Record<string, ITerm> = {
   showCharacterData: {
     de: "Charakterdaten",
     en: "Character data",
+  },
+  setPassword: {
+    de: "Passwort ändern",
+    en: "Change password",
+  },
+  choosePassword: {
+    de: "Neues Passwort",
+    en: "New password",
+  },
+  confirmPassword: {
+    de: "Passwort bestätigen",
+    en: "Confirm password",
+  },
+  tryAgain: {
+    de: "Erneut versuchen?",
+    en: "Try again?",
+  },
+  yes: {
+    de: "Ja",
+    en: "Yes",
+  },
+  no: {
+    de: "Nein",
+    en: "No",
   },
   saveData: {
     de: "Cache-Daten speichern",
