@@ -2,13 +2,15 @@ import inquirer from "inquirer";
 import chalk from "chalk";
 import { rollDice } from "../utilities/DiceService.js";
 import { inventoryMenu } from "../utilities/InventoryService.js";
+import ICharacterData from "../types/ICharacterData.js";
+import { IEnemy } from "../types/IEnemy.js";
 
 interface CombatResult {
   success: boolean;
   fled: boolean;
 }
 
-function displayCombatStatus(character: any, enemy: any, round: number): void {
+function displayCombatStatus(character: ICharacterData, enemy: IEnemy, round: number): void {
   console.clear();
   console.log(
     chalk.bgBlackBright.white.bold(`=== Battle Status (Round ${round}) ===`)
