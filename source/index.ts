@@ -66,6 +66,7 @@ async function handleMenuChoice(choice: string) {
         await inspectInventory();
         break;
       case "7":
+        totalClear();
         console.log(getDungeonMapVisual());
         await pressEnter();
         break;

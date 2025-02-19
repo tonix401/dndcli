@@ -111,7 +111,7 @@ export async function skippableSlowWrite(
       process.stdout.write(
         getFormattingFunction(parseInt(i), formattings)(line[j])
       );
-      if (!isSkipping) {
+      if (!isSkipping && charDelay !== 0) {
         await pause(charDelay);
       }
     }

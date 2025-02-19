@@ -242,7 +242,7 @@ const terms: Record<string, ITerm> = {
   },
   enterPassword: {
     de: "Bitte Passwort eingeben",
-    en: "PLease enter the password",
+    en: "Please enter the password",
   },
   wrongPassword: {
     de: "Falsches Passwort, übrige Versuche: ",
