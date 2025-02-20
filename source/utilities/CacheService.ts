@@ -57,6 +57,9 @@ export function setTheme(theme: IThemeOverride) {
     primaryColor: theme.primaryColor || standardTheme.primaryColor,
     secondaryColor: theme.secondaryColor || standardTheme.secondaryColor,
     cursor: theme.cursor || standardTheme.cursor,
+    accentColor: theme.accentColor || standardTheme.accentColor,
+    backgroundColor: theme.backgroundColor || standardTheme.backgroundColor,
+    errorColor: theme.errorColor || standardTheme.errorColor,
   };
   saveData();
 }

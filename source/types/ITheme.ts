@@ -9,4 +9,7 @@ export type ITheme = {
   primaryColor: string;
   secondaryColor: string;
   cursor: string;
+  accentColor: string;
+  backgroundColor: string;
+  errorColor: string;
 };

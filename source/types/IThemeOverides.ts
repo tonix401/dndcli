@@ -9,4 +9,7 @@ export type IThemeOverride = {
   primaryColor?: string;
   secondaryColor?: string;
   cursor?: string;
+  accentColor?: string;
+  backgroundColor?: string;
+  errorColor?: string;
 };
