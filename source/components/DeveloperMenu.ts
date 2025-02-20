@@ -17,7 +17,7 @@ import {
   getSettingsData,
   saveSettingsData,
 } from "../utilities/SettingsService.js";
-import { flipATable } from "./Flip.js";
+import { flipATable } from "./OminousFlip.js";
 import {
   checkPasswordScreen,
   setPasswordScreen,
