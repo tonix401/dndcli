@@ -16,6 +16,6 @@ ${package_json.version} - ${getTerm("welcome")}`;
 
 export async function titleScreen() {
   totalClear();
-  await skippableSlowWrite(titleScreenAscii, { charDelay: 10, lineDelay: 0 });
+  await skippableSlowWrite(titleScreenAscii, { charDelay: 30, lineDelay: 0 });
   await pressEnter();
 }
