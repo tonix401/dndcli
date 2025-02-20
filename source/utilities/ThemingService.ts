@@ -1,16 +1,6 @@
 import chalk from "chalk";
-import { Language } from "./LanguageService";
-
-export type ITheme = {
-  name: Record<Language, string>;
-  prefix: string;
-  primaryColor: string;
-  secondaryColor: string;
-  cursor: string;
-  accentColor?: string;
-  backgroundColor?: string;
-  errorColor?: string;
-};
+import { IThemeOverride } from "../types/IThemeOverides.js";
+import { ITheme } from "../types/ITheme.js";
 
 export const standardTheme: ITheme = {
   name: { de: "Standard", en: "Standard" },
@@ -26,17 +16,6 @@ export const standardTheme: ITheme = {
 export function getAllThemeOverrides() {
   return themes;
 }
-
-export type IThemeOverride = {
-  name: Record<Language, string>;
-  prefix?: string;
-  primaryColor?: string;
-  secondaryColor?: string;
-  cursor?: string;
-  accentColor?: string;
-  backgroundColor?: string;
-  errorColor?: string;
-};
 
 const themes: Record<string, IThemeOverride> = {
   pirate: {
@@ -73,9 +52,6 @@ const themes: Record<string, IThemeOverride> = {
     primaryColor: "#ff3a00",
     secondaryColor: "#ff7e00",
     cursor: "🔥",
-    accentColor: "#FFD700",
-    backgroundColor: "#330000",
-    errorColor: "#FF6347",
   },
   neon: {
     name: { de: "Neon", en: "Neon" },
@@ -103,9 +79,6 @@ const themes: Record<string, IThemeOverride> = {
     secondaryColor: "#8A2BE2",
     prefix: "🌒",
     cursor: "⭐",
-    accentColor: "#00CED1",
-    backgroundColor: "#000033",
-    errorColor: "#FF4500",
   },
   noir: {
     name: { de: "Noir", en: "Noir" },

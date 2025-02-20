@@ -1,6 +1,8 @@
-import { dungeonMinigame } from "./components/DungeonMinigame.js";
+import { themedInput } from "./utilities/ConsoleService.js";
 import { getAllEnglishTermsLength } from "./utilities/LanguageService.js";
 
-await dungeonMinigame();
+console.log("length of all english terms: " + getAllEnglishTermsLength());
 
-console.log(getAllEnglishTermsLength());
+await themedInput({message: "doesnt matter", validate: (text) => {
+  return text === "test" ? true : "not test";
+}})

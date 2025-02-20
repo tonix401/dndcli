@@ -1,6 +1,5 @@
-import { Hash } from "crypto";
-import { Language } from "../utilities/LanguageService";
-import { ITheme } from "../utilities/ThemingService";
+import { Language } from "../utilities/LanguageService.js";
+import { ITheme } from "../types/ITheme.js";
 
 /**
  * Interface for app settings

@@ -1,8 +1,9 @@
 import fs from "fs";
 import { LogTypes, log } from "./LogService.js";
 import { ISettings } from "../types/ISettings.js";
+import config from "./Config.js";
 
-const filename = "../dndcli/storage/settings.json";
+const filename = config.SETTINGS_FILE;
 /**
  * Reads the saved settings from the settings.json file
  * @returns The settings as an object

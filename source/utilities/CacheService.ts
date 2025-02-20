@@ -1,24 +1,21 @@
+import { ITheme } from "../types/ITheme.js";
+import { IThemeOverride } from "../types/IThemeOverides.js";
 import { Dungeon, initiateDungeonMapWithHallways } from "./DungeonService.js";
 import { getTerm, Language } from "./LanguageService.js";
 import { log } from "./LogService.js";
 import { getSettingsData, saveSettingsData } from "./SettingsService.js";
-import { ITheme, IThemeOverride, standardTheme } from "./ThemingService.js";
+import { standardTheme } from "./ThemingService.js";
 
 let cachedDungeon: Dungeon = initiateDungeonMapWithHallways();
-let cachedLanguage: Language = "de";
-let cachedTheme: ITheme = standardTheme;
-let cachedPassword: string =
-  "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3";
+let cachedLanguage: Language;
+let cachedTheme: ITheme;
+let cachedPassword: string;
 
-loadData();
+loadSavedDataIntoCache();
 
 // #region Getters
 export function getDungeon() {
   return cachedDungeon;
-}
-
-export function renewDungeon() {
-  cachedDungeon = initiateDungeonMapWithHallways();
 }
 
 export function getPassword() {
@@ -35,16 +32,20 @@ export function getTheme() {
 // #endregion
 
 // #region Setters
+export function resetDungeon() {
+  cachedDungeon = initiateDungeonMapWithHallways();
+}
+
 export function setDungeon(dungeon: Dungeon) {
   cachedDungeon = dungeon;
-  saveData();
+  saveCachedData();
   log("Cache Service: Dungeon updated");
 }
 
 export function setLanguage(language: Language): void {
   cachedLanguage = language;
   log("Cache service: Language set to " + getTerm(language));
-  saveData();
+  saveCachedData();
 }
 
 export function setTheme(theme: IThemeOverride) {
@@ -56,19 +57,22 @@ export function setTheme(theme: IThemeOverride) {
     primaryColor: theme.primaryColor || standardTheme.primaryColor,
     secondaryColor: theme.secondaryColor || standardTheme.secondaryColor,
     cursor: theme.cursor || standardTheme.cursor,
+    accentColor: theme.accentColor || standardTheme.accentColor,
+    backgroundColor: theme.backgroundColor || standardTheme.backgroundColor,
+    errorColor: theme.errorColor || standardTheme.errorColor,
   };
-  saveData();
+  saveCachedData();
 }
 
 export function setPassword(password: string) {
   cachedPassword = password;
-  saveData();
+  saveCachedData();
   log("Cache Service: Password updated");
 }
 
 // #endregion
 
-function saveData() {
+export function saveCachedData() {
   saveSettingsData({
     language: cachedLanguage,
     theme: cachedTheme,
@@ -76,7 +80,7 @@ function saveData() {
   });
 }
 
-function loadData() {
+export function loadSavedDataIntoCache() {
   let settings = null;
   try {
     settings = getSettingsData();
