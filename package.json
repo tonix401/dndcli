@@ -10,13 +10,15 @@
   "dependencies": {
     "@inquirer/prompts": "^7.3.1",
     "chalk": "^5.4.1",
+    "chalk-animation": "^2.0.3",
     "dotenv": "^16.4.7",
     "fs-extra": "^11.3.0",
     "inquirer": "^12.4.1",
-    "openai": "^3.3.0",
+    "openai": "^4.83.0",
     "ora": "^8.2.0"
   },
   "devDependencies": {
+    "@types/chalk-animation": "^1.6.3",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^22.13.0"
   },

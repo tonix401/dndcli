@@ -1,5 +1,5 @@
 // utilities/ItemGenerator.ts
-import { IItem } from "../types/IItem.js";
+import { IItem } from "../types/IITem.js";
 
 const rarities = [
   { tier: "Common", chance: 0.6, multiplier: 1 },
@@ -32,18 +32,38 @@ export function generateRandomItem(level: number): IItem {
   const effect = effects[Math.floor(Math.random() * effects.length)];
 
   const names = {
-    restoreHP: ["Healing Potion", "Elixir of Vitality", "Red Flask"],
-    restoreMana: ["Mana Potion", "Elixir of Focus", "Blue Vial"],
-    boostStrength: ["Strength Tonic", "Berserker Brew", "Power Elixir"],
+    restoreHP: ["Healing Potion", "Elixir of Vitality", "Crimson Flask"],
+    restoreMana: ["Mana Potion", "Elixir of Focus", "Azure Vial"],
+    boostStrength: ["Strength Tonic", "Berserker Brew", "Might Elixir"],
     boostDexterity: ["Agility Serum", "Quickness Draught", "Dexterity Tonic"],
   };
 
   const nameOptions = names[effect];
   const itemName = nameOptions[Math.floor(Math.random() * nameOptions.length)];
 
-  const description = `${itemName} of ${selectedRarity} quality. Its effect (${effect}) scales with your level (${level}) with a multiplier of ${multiplier}.`;
+  // Calculate a dynamic bonus value based on level and multiplier.
+  const bonusValue = Math.floor(level * multiplier * (Math.random() * 0.5 + 1));
+
+  // Build a description based on the effect.
+  let effectDescription = "";
+  if (effect === "restoreHP") {
+    effectDescription = `restores ${bonusValue} HP`;
+  } else if (effect === "restoreMana") {
+    effectDescription = `restores ${bonusValue} Mana`;
+  } else if (effect === "boostStrength") {
+    effectDescription = `increases Strength by ${bonusValue} points`;
+  } else if (effect === "boostDexterity") {
+    effectDescription = `boosts Dexterity by ${bonusValue} points`;
+  }
+
+  const description = `${itemName} of ${selectedRarity} quality. ${effectDescription}. It scales with your level (${level}) with a multiplier of ${multiplier}.`;
+
+  // Improved unique ID using current timestamp and a random number.
+  const id =
+    Date.now().toString() + Math.floor(Math.random() * 1000).toString();
+
   const item: IItem = {
-    id: Date.now().toString(), // unique id based on timestamp
+    id,
     name: itemName,
     description,
     effect,

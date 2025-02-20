@@ -1,13 +1,19 @@
-import ICharacterData from "../types/ICharacterData.js";
+import chalk from "chalk"; // added missing chalk import
+import type ICharacterData from "../types/ICharacterData.js";
 import { saveCharacterData } from "../utilities/CharacterService.js";
 import { input } from "@inquirer/prompts";
-import { generateChatNarrative } from "../src/aiAssistant.js";
-import { ChatCompletionRequestMessage } from "openai";
+import {
+  generateChatNarrative,
+  ChatCompletionRequestMessage,
+} from "../src/aiAssistant.js";
 import { getStartingItems } from "../utilities/InventoryService.js";
 import { getTerm } from "../utilities/LanguageService.js";
 import { getClassChoices } from "../types/ClassChoices.js";
 import { log, LogTypes } from "../utilities/LogService.js";
 import { pressEnter, themedSelect } from "../utilities/ConsoleService.js";
+import { standardTheme, ITheme } from "../utilities/ThemingService.js";
+import { getDefaultAbilitiesForClass } from "../utilities/defaultAbilities.js";
+import { rollDiceTotal } from "../utilities/DiceService.js";
 
 async function validateOrigin(origin: string): Promise<string> {
   const systemMessage =
@@ -32,68 +38,190 @@ async function validateOrigin(origin: string): Promise<string> {
 
 export async function createCharacterMenu(): Promise<void> {
   try {
+    // Get current theme (using standardTheme here; you could allow selection later)
+    const theme: ITheme = standardTheme;
+
     const charData: ICharacterData = {
       name: "",
       class: "",
       origin: "",
-      level: "1",
-      xp: "0",
-      hp: "10",
+      level: 1,
+      xp: 0,
+      hp: 10,
       abilities: {
-        maxhp: "10",
-        strength: "1",
-        mana: "1",
-        dexterity: "1",
-        charisma: "1",
-        luck: "1",
+        maxhp: 10,
+        strength: 1,
+        mana: 1,
+        dexterity: 1,
+        charisma: 1,
+        luck: 1,
       },
       inventory: [],
       lastPlayed: "",
+      abilitiesList: [],
+      currency: 0, // Added new property for starting currency
     };
 
-    // Get character name
+    // Get character name using themed prompt
+    const namePrompt = chalk.hex(theme.primaryColor)(getTerm("namePrompt"));
     charData.name = await input(
-      { message: getTerm("namePrompt") },
+      { message: namePrompt },
       { clearPromptOnDone: true }
     );
     if (charData.name.toLowerCase() === "exit") return;
 
-    // Get character class
+    // Get character class (the selection itself can be themed using your themedSelect helper)
     charData.class = await themedSelect({
-      message: getTerm("classPrompt"),
+      message: chalk.hex(theme.primaryColor)(getTerm("classPrompt")),
       choices: getClassChoices(),
     });
 
+    // Map the selected class to the key used in defaultAbilities
+    // For example, if getClassChoices() returns "swordsman", we map it to "Warrior"
+    const classMapping: Record<string, string> = {
+      swordsman: "Warrior",
+      mage: "Mage",
+      rogue: "Rogue",
+    };
+    const normalizedClass =
+      classMapping[charData.class.toLowerCase()] || charData.class;
+    // Now assign default abilities
+    charData.abilitiesList = getDefaultAbilitiesForClass(normalizedClass);
+
+    // Ask user if they want default stats or custom allocation
+    const statMethod = await themedSelect({
+      message: chalk.hex(theme.primaryColor)(
+        "Do you want the default stat distribution or allocate custom points?"
+      ),
+      choices: [
+        { name: "Default", value: "default" },
+        { name: "Customize", value: "custom" },
+      ],
+    });
+
+    // Define default stat mappings for example classes
+    const defaultStats: Record<string, typeof charData.abilities> = {
+      Warrior: {
+        maxhp: 20,
+        strength: 5,
+        mana: 2,
+        dexterity: 3,
+        charisma: 2,
+        luck: 3,
+      },
+      Mage: {
+        maxhp: 12,
+        strength: 2,
+        mana: 8,
+        dexterity: 3,
+        charisma: 3,
+        luck: 4,
+      },
+      Rogue: {
+        maxhp: 15,
+        strength: 3,
+        mana: 3,
+        dexterity: 7,
+        charisma: 2,
+        luck: 5,
+      },
+    };
+
+    if (statMethod === "default") {
+      // Map class to default stats if available
+      charData.abilities = defaultStats[normalizedClass] || charData.abilities;
+    } else if (statMethod === "custom") {
+      let pool = 20;
+      console.log(
+        chalk.hex(theme.secondaryColor)(
+          `You have ${pool} points to distribute among your stats.`
+        )
+      );
+      const stats = [
+        "maxhp",
+        "strength",
+        "mana",
+        "dexterity",
+        "charisma",
+        "luck",
+      ];
+      for (const stat of stats) {
+        const promptMsg = chalk.hex(theme.primaryColor)(
+          `Allocate points for ${stat} (points left: ${pool}): `
+        );
+        let allocationStr = await input(
+          { message: promptMsg },
+          { clearPromptOnDone: true }
+        );
+        let allocation = parseInt(allocationStr);
+        if (isNaN(allocation) || allocation < 0) {
+          allocation = 0;
+        }
+        if (allocation > pool) {
+          allocation = pool;
+        }
+        (charData.abilities as any)[stat] = allocation;
+        pool -= allocation;
+        if (pool === 0) break;
+      }
+      // Add remaining points to maxhp if any
+      if (pool > 0) {
+        (charData.abilities as any).maxhp += pool;
+      }
+    }
+
     // Get character origin
+    const originPrompt = chalk.hex(theme.primaryColor)(getTerm("originPrompt"));
     let originInput = await input(
-      { message: getTerm("originPrompt") },
+      { message: originPrompt },
       { clearPromptOnDone: true }
     );
     if (originInput.toLowerCase() === "exit") return;
 
-    // Validate origin
-    let validationResponse = await validateOrigin(originInput);
-    while (!validationResponse.toLowerCase().includes("valid")) {
-      console.log(validationResponse);
-      originInput = await input(
-        {
-          message: getTerm("originClarification"),
-        },
-        { clearPromptOnDone: true }
-      );
-      if (originInput.toLowerCase() === "exit") return;
-      validationResponse = await validateOrigin(originInput);
+    // If no origin is provided, default to "unknown"
+    if (!originInput.trim()) {
+      originInput = "unknown";
+    } else {
+      // Validate origin only if provided
+      let validationResponse = await validateOrigin(originInput);
+      while (!validationResponse.toLowerCase().includes("valid")) {
+        console.log(chalk.hex(theme.secondaryColor)(validationResponse));
+        const clarMsg = chalk.hex(theme.primaryColor)(
+          getTerm("originClarification")
+        );
+        originInput = await input(
+          { message: clarMsg },
+          { clearPromptOnDone: true }
+        );
+        if (originInput.toLowerCase() === "exit") return;
+        // If the user clears the input on subsequent prompts, default to unknown
+        if (!originInput.trim()) {
+          originInput = "unknown";
+          break;
+        }
+        validationResponse = await validateOrigin(originInput);
+      }
     }
     charData.origin = originInput;
 
-    // Set metadata
+    // Set metadata and starting items
     charData.lastPlayed = new Date().toLocaleDateString();
     charData.inventory = getStartingItems(charData.class);
+
+    // Add a random starting currency using a dice roll mechanic.
+    // For example, roll 2 six-sided dice and multiply the total by 10 to determine gold coins.
+    charData.currency = rollDiceTotal(6, 2) * 10;
 
     // Save character
     saveCharacterData(charData);
 
-    console.log(getTerm("characterSuccess"));
+    console.log(
+      chalk.hex(theme.primaryColor)(
+        `${getTerm("characterSuccess")} You start with ${
+          charData.currency
+        } gold coins!`
+      )
+    );
     await pressEnter();
   } catch (error) {
     if (error instanceof Error) {

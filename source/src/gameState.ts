@@ -1,10 +1,19 @@
+export interface ConversationMessage {
+  role: "system" | "user" | "assistant";
+  content: string;
+  timestamp?: string;
+}
+
 export class GameState {
-  theme: string | null;
-  narrativeHistory: string[];
-  conversationHistory: any[];
-  choices: string[];
-  plotStage: number;
-  plotSummary: string;
+  private theme: string | null;
+  private narrativeHistory: string[];
+  private conversationHistory: ConversationMessage[];
+  private choices: string[];
+  private plotStage: number;
+  private plotSummary: string;
+
+  // Limit for how many history entries to store.
+  private readonly maxHistoryItems: number = 50;
 
   constructor() {
     this.theme = null;
@@ -12,20 +21,83 @@ export class GameState {
     this.conversationHistory = [];
     this.choices = [];
     this.plotStage = 1;
-    this.plotSummary =
-      "Your journey begins in the ancient kingdom of Lysoria. Rumors of a dark power are stirring...";
+    this.plotSummary = "";
   }
 
+  // Getters and Setters for theme.
+  getTheme(): string | null {
+    return this.theme;
+  }
+  setTheme(theme: string): void {
+    this.theme = theme;
+  }
+
+  // Add a narrative entry.
   addNarrative(narrative: string): void {
     this.narrativeHistory.push(narrative);
+    if (this.narrativeHistory.length > this.maxHistoryItems) {
+      this.narrativeHistory.shift();
+    }
+  }
+  getNarrativeHistory(): string[] {
+    return this.narrativeHistory;
   }
 
+  // Add a conversation message.
+  addConversation(message: ConversationMessage): void {
+    this.conversationHistory.push(message);
+    if (this.conversationHistory.length > this.maxHistoryItems) {
+      this.conversationHistory.shift();
+    }
+  }
+  getConversationHistory(): ConversationMessage[] {
+    return this.conversationHistory;
+  }
+
+  // Add a choice.
   addChoice(choice: string): void {
     this.choices.push(choice);
   }
+  getChoices(): string[] {
+    return this.choices;
+  }
 
+  // Update plot stage and summary.
   updatePlot(newStage: number, newSummary: string): void {
     this.plotStage = newStage;
     this.plotSummary = newSummary;
+  }
+  getPlotStage(): number {
+    return this.plotStage;
+  }
+  getPlotSummary(): string {
+    return this.plotSummary;
+  }
+
+  // Reset game state histories and plot info if needed.
+  resetState(): void {
+    this.narrativeHistory = [];
+    this.conversationHistory = [];
+    this.choices = [];
+    this.plotStage = 1;
+    this.plotSummary = "";
+  }
+
+  // Optionally, generate a summary from the last few narrative entries.
+  summarizeHistory(): string {
+    const summaryCount = 3;
+    return this.narrativeHistory.slice(-summaryCount).join("\n");
+  }
+
+  // Export the state as a plain object for saving.
+  toJSON(): object {
+    return {
+      theme: this.theme,
+      narrativeHistory: this.narrativeHistory,
+      conversationHistory: this.conversationHistory,
+      choices: this.choices,
+      plotStage: this.plotStage,
+      plotSummary: this.plotSummary,
+    };
   }
 }
