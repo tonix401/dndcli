@@ -16,7 +16,6 @@ import { newPlayerScreen } from "./components/NewPlayerScreen.js";
 import { saveSettingsData } from "./utilities/SettingsService.js";
 import { getTerm } from "./utilities/LanguageService.js";
 import {
-  getDungeon,
   getLanguage,
   getPassword,
   getTheme,
@@ -24,10 +23,9 @@ import {
   setTheme,
 } from "./utilities/CacheService.js";
 import { standardTheme } from "./utilities/ThemingService.js";
-import { secretDevMenu } from "./components/SecretDevMenu.js";
+import { secretDevMenu } from "./components/DeveloperMenu.js";
 import { inspectInventory } from "./components/InspectInventory.js";
 import { titleScreen } from "./components/TitleScreen.js";
-import { getDungeonMapVisual } from "./utilities/DungeonService.js";
 
 const getMenuOptions = () => [
   { name: getTerm("createCharacter"), value: "1" },
@@ -36,7 +34,6 @@ const getMenuOptions = () => [
   { name: getTerm("startCampaign"), value: "3" },
   { name: getTerm("settings"), value: "4" },
   { name: getTerm("devMenu"), value: "5" },
-  { name: "TEST DUNGEON", value: "7" },
   { name: getTerm("exit"), value: "9" },
 ];
 
@@ -64,11 +61,6 @@ async function handleMenuChoice(choice: string) {
         break;
       case "6":
         await inspectInventory();
-        break;
-      case "7":
-        totalClear();
-        console.log(getDungeonMapVisual());
-        await pressEnter();
         break;
       case "9":
         await exitProgram();
@@ -113,11 +105,6 @@ process.on("SIGINT", async () => {
 export async function exitProgram() {
   totalClear();
   log("Index: Program ended");
-  saveSettingsData({
-    language: getLanguage(),
-    theme: getTheme(),
-    password: getPassword(),
-  });
   await skippableSlowWrite(getTerm("goodbye"));
   process.exit(0);
 }

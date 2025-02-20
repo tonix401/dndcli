@@ -1,40 +1,24 @@
-import { Dungeon, DungeonSize, initiateDungeonMap } from "./DungeonService.js";
+import { Dungeon, initiateDungeonMapWithHallways } from "./DungeonService.js";
 import { getTerm, Language } from "./LanguageService.js";
-import { log, LogTypes } from "./LogService.js";
-import { saveSettingsData } from "./SettingsService.js";
-import {
-  getAllThemeOverrides,
-  IThemeOverride,
-  standardTheme,
-} from "./ThemingService.js";
+import { log } from "./LogService.js";
+import { getSettingsData, saveSettingsData } from "./SettingsService.js";
+import { ITheme, IThemeOverride, standardTheme } from "./ThemingService.js";
 
-const rawDungeonSizes = Object.values(DungeonSize);
-const dungeonSizes: DungeonSize[] = rawDungeonSizes.filter(
-  (size) => typeof size === "number"
-) as DungeonSize[];
-let cachedDungeon: Dungeon = initiateDungeonMap(5);
-let cachedPlayerPosition: { x: number; y: number } = { x: 0, y: 0 };
+let cachedDungeon: Dungeon = initiateDungeonMapWithHallways();
 let cachedLanguage: Language = "de";
-let cachedTheme = standardTheme;
+let cachedTheme: ITheme = standardTheme;
 let cachedPassword: string =
   "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3";
 
-export function getPlayerPosition() {
-  return cachedPlayerPosition;
-}
+loadData();
 
+// #region Getters
 export function getDungeon() {
   return cachedDungeon;
 }
 
-export function setDungeon(dungeon: Dungeon) {
-  cachedDungeon = dungeon;
-}
-
 export function renewDungeon() {
-  cachedDungeon = initiateDungeonMap(
-    dungeonSizes[Math.floor(Math.random() * dungeonSizes.length)]
-  );
+  cachedDungeon = initiateDungeonMapWithHallways();
 }
 
 export function getPassword() {
@@ -48,33 +32,19 @@ export function getLanguage() {
 export function getTheme() {
   return cachedTheme;
 }
+// #endregion
+
+// #region Setters
+export function setDungeon(dungeon: Dungeon) {
+  cachedDungeon = dungeon;
+  saveData();
+  log("Cache Service: Dungeon updated");
+}
 
 export function setLanguage(language: Language): void {
   cachedLanguage = language;
   log("Cache service: Language set to " + getTerm(language));
-  commitToJson();
-}
-
-export function setThemeByKey(key: string): void {
-  const themeOverrides = getAllThemeOverrides();
-  const tempTheme = themeOverrides[key];
-
-  if (tempTheme) {
-    log(`Cache Service: Theme set to ${tempTheme.name.en}`);
-    cachedTheme = {
-      name: { de: tempTheme.name.de, en: tempTheme.name.en },
-      prefix: tempTheme.prefix || standardTheme.prefix,
-      primaryColor: tempTheme.primaryColor || standardTheme.primaryColor,
-      secondaryColor: tempTheme.secondaryColor || standardTheme.secondaryColor,
-      cursor: tempTheme.cursor || standardTheme.cursor,
-    };
-  } else {
-    log(
-      `Cache Service: There is no theme overide called: "${key}"`,
-      LogTypes.ERROR
-    );
-  }
-  commitToJson();
+  saveData();
 }
 
 export function setTheme(theme: IThemeOverride) {
@@ -87,18 +57,35 @@ export function setTheme(theme: IThemeOverride) {
     secondaryColor: theme.secondaryColor || standardTheme.secondaryColor,
     cursor: theme.cursor || standardTheme.cursor,
   };
-  commitToJson();
+  saveData();
 }
 
 export function setPassword(password: string) {
   cachedPassword = password;
-  commitToJson();
+  saveData();
+  log("Cache Service: Password updated");
 }
 
-function commitToJson() {
+// #endregion
+
+function saveData() {
   saveSettingsData({
     language: cachedLanguage,
     theme: cachedTheme,
     password: cachedPassword,
   });
+}
+
+function loadData() {
+  let settings = null;
+  try {
+    settings = getSettingsData();
+  } catch (error) {
+    log("Cache Service: " + error);
+  }
+  cachedLanguage = settings?.language || "de";
+  cachedTheme = settings?.theme || standardTheme;
+  cachedPassword =
+    settings?.password ||
+    "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3";
 }
