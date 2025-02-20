@@ -1,5 +1,6 @@
 import chalk from "chalk";
-import { Language } from "./LanguageService";
+import { IThemeOverride } from "../types/IThemeOverides";
+import { ITheme } from "../types/ITheme";
 
 export const standardTheme: ITheme = {
   name: { de: "Standard", en: "Standard" },
@@ -12,22 +13,6 @@ export const standardTheme: ITheme = {
 export function getAllThemeOverrides() {
   return themes;
 }
-
-export type ITheme = {
-  name: Record<Language, string>;
-  prefix: string;
-  primaryColor: string;
-  secondaryColor: string;
-  cursor: string;
-};
-
-export type IThemeOverride = {
-  name: Record<Language, string>;
-  prefix?: string;
-  primaryColor?: string;
-  secondaryColor?: string;
-  cursor?: string;
-};
 
 const themes: Record<string, IThemeOverride> = {
   pirate: {

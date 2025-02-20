@@ -13,7 +13,6 @@ import { log, LogTypes } from "./utilities/LogService.js";
 import { getSettingsData } from "./utilities/SettingsService.js";
 import { settingsMenu } from "./components/SettingsMenu.js";
 import { newPlayerScreen } from "./components/NewPlayerScreen.js";
-import { saveSettingsData } from "./utilities/SettingsService.js";
 import { getTerm } from "./utilities/LanguageService.js";
 import {
   getLanguage,
