@@ -128,6 +128,7 @@ export function getDungeonMapVisual() {
     let rowVisual = [[""], [""], [""], [""], [""]];
     for (let col = 0; col < dungeon.size; col++) {
       const miniRoom = getMiniRoomVisual(dungeon.rooms[row][col], row, col);
+      const miniRoom = getMiniRoomVisual(dungeon.rooms[row][col], row, col);
       rowVisual[0].push(miniRoom.split("\n")[0]);
       rowVisual[1].push(miniRoom.split("\n")[1]);
       rowVisual[2].push(miniRoom.split("\n")[2]);
@@ -161,6 +162,10 @@ function getMiniRoomVisual(room: Room, row: number, col: number) {
   } else if (!room.discovered) {
     symbol = "?";
   } else {
+    symbol =
+      room.type === RoomTypes.EMPTY || room.cleared
+        ? " "
+        : room.type.substring(0, 1);
     symbol =
       room.type === RoomTypes.EMPTY || room.cleared
         ? " "
