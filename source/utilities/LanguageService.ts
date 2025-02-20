@@ -5,6 +5,13 @@ export type ITerm = Record<Language, string>;
 export type IColorTerm = Record<Language | "hex", string>;
 export type Language = "de" | "en";
 
+export function getAllEnglishTermsLength(): number {
+  const allEnglish = Object.values(terms)
+    .map(term => term.en)
+    .join('');
+  return allEnglish.length;
+}
+
 /**
  * Takes a term key and returns the term translated and formatted depending on parameters
  * @param key Defines the key of the term
@@ -331,8 +338,26 @@ const terms: Record<string, ITerm> = {
     de: "Das scheint nicht das richtige Format zu sein. Bitte versuche es nochmal",
     en: "That doesn't seem to be the right format, please try again",
   },
-
   //#endregion
+
+  //#region Dungeon
+  north: {
+    de: "Norden",
+    en: "North",
+  },
+  south: {
+    de: "Süden",
+    en: "South",
+  },
+  east: {
+    de: "Osten",
+    en: "East",
+  },
+  west: {
+    de: "Westen",
+    en: "West",
+  },
+  // #endregion
 };
 
 export function getColorTerm(key: string) {
