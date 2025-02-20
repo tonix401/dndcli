@@ -15,9 +15,6 @@ import { settingsMenu } from "./components/SettingsMenu.js";
 import { newPlayerScreen } from "./components/NewPlayerScreen.js";
 import { getTerm } from "./utilities/LanguageService.js";
 import {
-  getLanguage,
-  getPassword,
-  getTheme,
   setLanguage,
   setTheme,
 } from "./utilities/CacheService.js";
@@ -123,5 +120,5 @@ async function startApp() {
   main();
 }
 
-startApp();
+await startApp();
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
