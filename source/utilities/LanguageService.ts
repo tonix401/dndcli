@@ -20,7 +20,6 @@ export function getAllEnglishTermsLength(): number {
  *
  * @example
  * key = "pressEnter",
- * language = "de",
  * indented = true,
  * returns "  Drücke [Enter], um ins Menü zu kommen",
  */
@@ -255,6 +254,15 @@ const terms: Record<string, ITerm> = {
     de: "Falsches Passwort, übrige Versuche: ",
     en: "Wrong password, remaining attempts: ",
   },
+  yes: {
+    de: "Ja",
+    en: "Yes",
+  },
+  no: {
+    de: "Nein",
+    en: "No",
+  },
+
   // #endregion
 
   //#region Dev Menu
@@ -286,17 +294,29 @@ const terms: Record<string, ITerm> = {
     de: "Erneut versuchen?",
     en: "Try again?",
   },
-  yes: {
-    de: "Ja",
-    en: "Yes",
-  },
-  no: {
-    de: "Nein",
-    en: "No",
-  },
   saveData: {
     de: "Cache-Daten speichern",
     en: "Commit cached data",
+  },
+  logsMenu: {
+    de: "Log Optionen",
+    en: "Log options",
+  },
+  showLogs: {
+    de: "Logs der letzten Stunde",
+    en: "Logs of the last hour",
+  },
+  clearLogs: {
+    de: "Logs löschen",
+    en: "Clear logs",
+  },
+  logsCleared: {
+    de: "Logs gelöscht",
+    en: "Logs cleared",
+  },
+  noLogs: {
+    de: "Keine Logs vorhanden",
+    en: "No logs found",
   },
   cursor: {
     de: "Zeiger",
@@ -305,6 +325,30 @@ const terms: Record<string, ITerm> = {
   prefix: {
     de: "Präfix",
     en: "Prefix",
+  },
+  accentColor: {
+    de: "Akzentfarbe",
+    en: "Accent color",
+  },
+  backgroundColor: {
+    de: "Hintergrundfarbe",
+    en: "Background color",
+  },
+  errorColor: {
+    de: "Fehlerfarbe",
+    en: "Error color",
+  },
+  invalidColor: {
+    de: "Das ist keine gültige Farbe, denk an das #HexFormat",
+    en: "That is not a valid color, remember the #HexFormat",
+  },
+  invalidLanguage: {
+    de: "Das ist keine gültige Sprache: 'de' oder 'en'",
+    en: "That is not a valid language: 'de' or 'en'",
+  },
+  tooLong: {
+    de: "Das ist zu lang: maximal ",
+    en: "That is too long: maximum ",
   },
   cacheData: {
     de: "Cache Daten",

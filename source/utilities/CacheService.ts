@@ -11,7 +11,7 @@ let cachedLanguage: Language;
 let cachedTheme: ITheme;
 let cachedPassword: string;
 
-loadData();
+loadSavedDataIntoCache();
 
 // #region Getters
 export function getDungeon() {
@@ -38,14 +38,14 @@ export function resetDungeon() {
 
 export function setDungeon(dungeon: Dungeon) {
   cachedDungeon = dungeon;
-  saveData();
+  saveCachedData();
   log("Cache Service: Dungeon updated");
 }
 
 export function setLanguage(language: Language): void {
   cachedLanguage = language;
   log("Cache service: Language set to " + getTerm(language));
-  saveData();
+  saveCachedData();
 }
 
 export function setTheme(theme: IThemeOverride) {
@@ -61,18 +61,18 @@ export function setTheme(theme: IThemeOverride) {
     backgroundColor: theme.backgroundColor || standardTheme.backgroundColor,
     errorColor: theme.errorColor || standardTheme.errorColor,
   };
-  saveData();
+  saveCachedData();
 }
 
 export function setPassword(password: string) {
   cachedPassword = password;
-  saveData();
+  saveCachedData();
   log("Cache Service: Password updated");
 }
 
 // #endregion
 
-function saveData() {
+export function saveCachedData() {
   saveSettingsData({
     language: cachedLanguage,
     theme: cachedTheme,
@@ -80,7 +80,7 @@ function saveData() {
   });
 }
 
-function loadData() {
+export function loadSavedDataIntoCache() {
   let settings = null;
   try {
     settings = getSettingsData();

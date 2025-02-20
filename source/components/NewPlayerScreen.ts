@@ -7,6 +7,7 @@ import {
   pause,
   pressEnter,
   skippableSlowWrite,
+  themedInput,
   totalClear,
 } from "../utilities/ConsoleService.js";
 import { log, LogTypes } from "../utilities/LogService.js";
@@ -14,9 +15,9 @@ import chalk from "chalk";
 import { getTheme } from "../utilities/CacheService.js";
 import path from "path";
 import fs from "fs-extra";
-import { input } from "@inquirer/prompts";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
+import config from "../utilities/Config.js"; // import constants from Config.ts
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -69,11 +70,12 @@ export async function newPlayerScreen(): Promise<boolean> {
 async function ensureFilesExist() {
   dotenv.config();
 
+  // Use the file paths defined in Config.ts
   const filePathsToCheck = {
-    env: path.resolve(__dirname, "../../.env"),
-    log: path.resolve(__dirname, "../../storage/log.txt"),
-    settings: path.resolve(__dirname, "../../storage/settings.json"),
-    character: path.resolve(__dirname, "../../storage/character.json"),
+    env: config.ENV_FILE,
+    log: config.LOG_FILE,
+    settings: config.SETTINGS_FILE,
+    character: config.CHARACTER_FILE,
   };
 
   Object.values(filePathsToCheck).forEach((filePath) => {
@@ -98,12 +100,11 @@ async function promptForApiKey(): Promise<string> {
   const apiKeyRegex = /^sk-[a-zA-Z0-9]{48}$/;
 
   do {
-    userInput = await input({
+    userInput = await themedInput({
       message: getTerm("enterApiKey"),
-      theme: getTheme(),
     });
 
-    isCorrectFormat = !apiKeyRegex.test(userInput);
+    isCorrectFormat = apiKeyRegex.test(userInput);
 
     if (!isCorrectFormat) {
       totalClear();

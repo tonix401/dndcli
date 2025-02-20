@@ -1,9 +1,9 @@
 import crypto from "crypto";
 import chalk from "chalk";
-import { input, password } from "@inquirer/prompts";
+import { password } from "@inquirer/prompts";
 import { getTerm } from "./LanguageService.js";
 import { getTheme, setPassword } from "./CacheService.js";
-import { themedSelect, totalClear } from "./ConsoleService.js";
+import { themedInput, themedSelect, totalClear } from "./ConsoleService.js";
 import { getSettingsData } from "./SettingsService.js";
 
 /**
@@ -33,7 +33,9 @@ export async function checkPasswordScreen(attempts: number) {
 
   totalClear();
   console.log(
-    chalk.hex(getTheme().primaryColor)(getTerm("wrongPassword", true) + attempts)
+    chalk.hex(getTheme().primaryColor)(
+      getTerm("wrongPassword", true) + attempts
+    )
   );
   return await checkPasswordScreen(attempts);
 }
@@ -50,19 +52,19 @@ export async function setPasswordScreen() {
   let resultPassword = "";
 
   do {
-    const newPassword = await input({
+    const newPassword = await themedInput({
       message: getTerm("choosePassword"),
-      theme: getTheme(),
     });
-    const confirmPassword = await input({
+    const confirmPassword = await themedInput({
       message: getTerm("confirmPassword"),
-      theme: getTheme(),
     });
 
     isPasswordConfirmed = newPassword === confirmPassword;
 
     if (!isPasswordConfirmed) {
-      console.log(chalk.hex(getTheme().primaryColor)(getTerm("notTheSame", true)));
+      console.log(
+        chalk.hex(getTheme().primaryColor)(getTerm("notTheSame", true))
+      );
       if (
         (await themedSelect({
           message: getTerm("tryAgain"),

@@ -52,9 +52,6 @@ const themes: Record<string, IThemeOverride> = {
     primaryColor: "#ff3a00",
     secondaryColor: "#ff7e00",
     cursor: "🔥",
-    accentColor: "#FFD700",
-    backgroundColor: "#330000",
-    errorColor: "#FF6347",
   },
   neon: {
     name: { de: "Neon", en: "Neon" },
@@ -82,9 +79,6 @@ const themes: Record<string, IThemeOverride> = {
     secondaryColor: "#8A2BE2",
     prefix: "🌒",
     cursor: "⭐",
-    accentColor: "#00CED1",
-    backgroundColor: "#000033",
-    errorColor: "#FF4500",
   },
   noir: {
     name: { de: "Noir", en: "Noir" },

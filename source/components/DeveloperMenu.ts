@@ -28,6 +28,8 @@ import {
   saveCharacterData as saveCharData,
 } from "../utilities/CharacterService.js";
 import { getStartingItems } from "../utilities/InventoryService.js";
+import { showSettingsData } from "./ShowSettingsData.js";
+import { showLogsMenu } from "./ShowLogsMenu.js";
 
 // ----------------- (Temporary) Test Combat Section -----------------
 
@@ -112,69 +114,9 @@ async function testCombat() {
 
 // ----------------- Old Developer Menu Section -----------------
 
-async function showSettingsData() {
-  // Data tables for cache and settings
-  const cacheDataTable: [string, string][] = [
-    [getTerm("cacheData"), ""],
-    [getTerm("language"), getTerm(getLanguage())],
-    [getTerm("theme"), getTheme().name[getLanguage()]],
-    [getTerm("primaryColor"), getTheme().primaryColor],
-    [getTerm("secondaryColor"), getTheme().secondaryColor],
-    [getTerm("cursor"), '"' + getTheme().cursor + '"'],
-    [getTerm("prefix"), '"' + getTheme().prefix + '"'],
-  ];
-
-  const settingsData = getSettingsData();
-
-  const settingsDataTable: [string, string][] = [
-    [getTerm("dataFromJson"), ""],
-    [getTerm("language"), getTerm(settingsData?.language || "undefined")],
-    [getTerm("theme"), (settingsData?.theme?.name[getLanguage()] || "") + ""],
-    [getTerm("primaryColor"), (settingsData?.theme?.primaryColor || "") + ""],
-    [
-      getTerm("secondaryColor"),
-      (settingsData?.theme?.secondaryColor || "") + "",
-    ],
-    [getTerm("cursor"), '"' + (settingsData?.theme?.cursor || "") + '"'],
-    [getTerm("prefix"), '"' + (settingsData?.theme?.prefix || "") + '"'],
-  ];
-
-  // Show formatted data using a multi-table view.
-  const multiTable = alignTextAsMultiTable(
-    [cacheDataTable, settingsDataTable],
-    "|"
-  );
-
-  console.log(
-    chalk.hex(getTheme().secondaryColor)(
-      "/" + "‾".repeat(multiTable.width - 2) + "\\"
-    )
-  );
-  console.log(chalk.hex(getTheme().secondaryColor)(multiTable.text));
-  console.log(
-    chalk.hex(getTheme().secondaryColor)(
-      "\\" + "_".repeat(multiTable.width - 2) + "/"
-    )
-  );
-
-  // Options: Save settings data or go back
-  const chosenOption = await themedSelect({
-    message: "",
-    choices: [
-      { name: getTerm("saveData"), value: "commit" },
-      { name: getTerm("goBack"), value: "goBack" },
-    ],
-  });
-
-  if (chosenOption === "commit") {
-    saveSettingsData({
-      language: getLanguage(),
-      theme: getTheme(),
-      password: getPassword(),
-    });
-    totalClear();
-    await showSettingsData();
-  }
+async function showWorkInProgress() {
+  console.log(chalk.hex(getTheme().primaryColor)(getTerm("currentlyInDev")));
+  await pressEnter();
 }
 
 export async function secretDevMenu() {
@@ -191,6 +133,10 @@ export async function secretDevMenu() {
     {
       name: getTerm("showCharacterData"),
       value: "showCharacterData",
+    },
+    {
+      name: getTerm("logsMenu"),
+      value: "showLogs",
     },
     {
       name: getTerm("setPassword"),
@@ -228,11 +174,12 @@ export async function secretDevMenu() {
           await showSettingsData();
           break;
         case "showCharacterData":
-          log("Dev Menu: showing saved data");
-          console.log(
-            chalk.hex(getTheme().primaryColor)(getTerm("currentlyInDev"))
-          );
-          await pressEnter();
+          log("Dev Menu: showing character data");
+          await showWorkInProgress();
+          break;
+        case "showLogs":
+          log("Dev Menu: showing log options");
+          await showLogsMenu();
           break;
         case "setPassword":
           await setPasswordScreen();

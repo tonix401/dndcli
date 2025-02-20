@@ -4,6 +4,7 @@ import { input, select } from "@inquirer/prompts";
 import chalk from "chalk";
 import { getTerm } from "./LanguageService.js";
 import { getTheme } from "./CacheService.js";
+import { ITheme } from "../types/ITheme.js";
 
 /**
  * Clears the console completely, without leaving any annoying scroll-up buffer behind
@@ -144,47 +145,14 @@ function getFormattingFunction(
   return formattings[formattings.length - 1];
 }
 
-/**
- * Theming type for inquirer
- * @link https://www.npmjs.com/package/@inquirer/select#Theming
- */
-type inquirerTheme = {
-  prefix?: string | { idle: string; done: string };
-  spinner?: {
-    interval: number;
-    frames: string[];
-  };
-  style?: {
-    answer?: (text: string) => string;
-    message?: (text: string, status: "idle" | "done" | "loading") => string;
-    error?: (text: string) => string;
-    help?: (text: string) => string;
-    highlight?: (text: string) => string;
-    description?: (text: string) => string;
-    disabled?: (text: string) => string;
-  };
-  icon?: {
-    cursor?: string;
-  };
-  helpMode?: "always" | "never" | "auto";
-};
-
-type selectConfig = {
-  message: string;
-  choices: { name: string; value: string }[];
-  pageSize?: number | undefined;
-  loop?: boolean | undefined;
-  default?: unknown;
-  theme?: inquirerTheme | undefined;
-};
 
 /**
  * A version of the select from inquirer that used the custom theme and current colors
  * @param config The same config select from inquirer/prompt uses
  * @returns The value of the choice the user made
  */
-export async function themedSelect(config: selectConfig): Promise<string> {
-  const theme: inquirerTheme = {
+export async function themedSelect(config: any): Promise<string> {
+  const theme = {
     prefix: getTheme().prefix,
     icon: {
       cursor: getTheme().cursor,
@@ -196,10 +164,31 @@ export async function themedSelect(config: selectConfig): Promise<string> {
         chalk.bold(chalk.hex(getTheme().secondaryColor)(text)),
       disabled: (text: string) =>
         chalk.hex(getTheme().secondaryColor).dim("  " + text),
+      error: (text: string) => chalk.hex(getTheme().errorColor)(text),
+
+      // doesnt work like i hoped it would
+      help: () => "",
     },
     helpMode: "never",
   };
-  return await select({ ...config, theme: theme }, { clearPromptOnDone: true });
+  return await select({ ...config, pageSize: 50, theme: theme }, { clearPromptOnDone: true });
+}
+
+export async function themedInput(config: {
+  message: string;
+  default?: string;
+  required?: boolean;
+  validate?: (value: string) => boolean | string | Promise<string | boolean>;
+}): Promise<string> {
+  const theme = {
+    prefix: getTheme().prefix,
+    style: {
+      message: (text: string) =>
+        chalk.hex(getTheme().primaryColor)(chalk.bold(text)),
+    },
+    helpMode: "never",
+  };
+  return await input({ ...config, theme }, { clearPromptOnDone: true });
 }
 
 /**
@@ -282,8 +271,8 @@ export function alignText(
  */
 export function alignTextAsTable(
   rows: [string, string][],
-  margin: string = "",
-  separator: string = "",
+  margin: string = "| ",
+  separator: string = "   ",
   minWidth: number = 0
 ): { text: string; width: number; height: number } {
   const internalMinWidth = minWidth - margin.length * 2 - separator.length;

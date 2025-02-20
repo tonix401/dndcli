@@ -1,7 +1,7 @@
-import chalk from "chalk";
-import { appendFileSync } from "fs";
+import { appendFileSync, readFileSync, writeFileSync } from "fs";
+import config from "../utilities/Config.js";
 
-const debuggingLogFile = "./storage/log.txt";
+const debuggingLogFile = config.LOG_FILE;
 
 /**
  * These have nothing to do with wood
@@ -29,6 +29,29 @@ export function log(message: string, logType = LogTypes.INFO): void {
 
   try {
     appendFileSync(debuggingLogFile, log);
+  } catch (error) {
+    console.error(`Log Service: Error writing to log file: ${error}`);
+  }
+}
+
+export function getLogData(): string | null {
+  try {
+    const data = readFileSync(debuggingLogFile, "utf-8");
+    return data;
+  } catch (error) {
+    if (error instanceof Error) {
+      log(
+        `Log Service: Error while loading ${debuggingLogFile}: ${error.message}`,
+        LogTypes.ERROR
+      );
+    }
+    return null;
+  }
+}
+
+export function clearLogs(): void {
+  try {
+    writeFileSync(debuggingLogFile, "");
   } catch (error) {
     console.error(`Log Service: Error writing to log file: ${error}`);
   }
