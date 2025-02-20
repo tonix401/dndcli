@@ -3,11 +3,10 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-// Define your own type that mirrors the expected message structure.
 export interface ChatCompletionRequestMessage {
   role: "system" | "user" | "assistant";
   content: string;
-  // Optionally add additional fields if needed (e.g., name)
+
 }
 
 class ChatGenerationError extends Error {
