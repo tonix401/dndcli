@@ -25,7 +25,9 @@ export enum LogTypes {
  * -> "12:34:56 | Info  | Wer das liest, gibt gute Noten"
  */
 export function log(message: string, logType = LogTypes.INFO): void {
-  let log = `${new Date().toLocaleTimeString()} | ${logType} | ${message}\n`;
+  let log = `${new Date().toLocaleTimeString(
+    "de-DE"
+  )} | ${logType} | ${message}\n`;
 
   try {
     appendFileSync(debuggingLogFile, log);

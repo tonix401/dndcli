@@ -202,7 +202,7 @@ export async function createCharacterMenu(): Promise<void> {
     charData.origin = originInput;
 
     // Set metadata and starting items
-    charData.lastPlayed = new Date().toLocaleDateString();
+    charData.lastPlayed = new Date().toLocaleDateString("de-DE");
     charData.inventory = getStartingItems(charData.class);
 
     // Add a random starting currency using a dice roll mechanic.

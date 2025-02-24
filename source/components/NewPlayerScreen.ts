@@ -40,7 +40,7 @@ const newPlayerChar = {
     luck: 7,
   },
   inventory: [],
-  lastPlayed: new Date().toLocaleDateString(),
+  lastPlayed: new Date().toLocaleDateString("de-DE"),
 };
 
 /**

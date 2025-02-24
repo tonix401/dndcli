@@ -1,8 +1,6 @@
 import chalk from "chalk";
 import { IEnemy } from "../types/IEnemy";
-import { getDungeon, getTheme, setDungeon } from "./CacheService.js";
-import { themedSelect } from "./ConsoleService.js";
-import { getTerm } from "./LanguageService.js";
+import { getDungeon, getTheme } from "./CacheService.js";
 
 export enum RoomTypes {
   START = "START",
@@ -10,7 +8,7 @@ export enum RoomTypes {
   TRAP = "TRAP",
   BOSS = "BOSS",
   EMPTY = "EMPTY",
-  CHEST = "CHEST", // added CHEST for random room type generation
+  CHEST = "CHEST",
 
   // for future additions
 
@@ -151,7 +149,7 @@ function getMiniRoomVisual(room: Room, row: number, col: number) {
 
   // In case we want to adjust the room design later (also need to adjust the dungeon map visual to include the new rows)
   const westHallway = westRoom?.hallways.east ? "=" : " ";
-  const northHallway = northRoom?.hallways.south ? "║" : " ";
+  const northHallway = northRoom?.hallways.south ? "| |" : " ";
 
   let symbol = " ";
   if (room === undefined) {
