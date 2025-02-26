@@ -1,10 +1,7 @@
-import path from "path";
-import fs from "fs-extra";
 import { createCharacterMenu } from "./components/CreateCharacterMenu.js";
 import { inspectCharacter } from "./components/InspectCharacter.js";
 import { startCampaign } from "./src/campaign.js";
 import {
-  pressEnter,
   skippableSlowWrite,
   themedSelect,
   totalClear,
@@ -14,14 +11,12 @@ import { getSettingsData } from "./utilities/SettingsService.js";
 import { settingsMenu } from "./components/SettingsMenu.js";
 import { newPlayerScreen } from "./components/NewPlayerScreen.js";
 import { getTerm } from "./utilities/LanguageService.js";
-import {
-  setLanguage,
-  setTheme,
-} from "./utilities/CacheService.js";
+import { getTheme, setLanguage, setTheme } from "./utilities/CacheService.js";
 import { standardTheme } from "./utilities/ThemingService.js";
 import { secretDevMenu } from "./components/DeveloperMenu.js";
 import { inspectInventory } from "./components/InspectInventory.js";
 import { titleScreen } from "./components/TitleScreen.js";
+import chalk from "chalk";
 
 const getMenuOptions = () => [
   { name: getTerm("createCharacter"), value: "1" },
@@ -77,48 +72,41 @@ async function handleMenuChoice(choice: string) {
  */
 async function main() {
   while (true) {
-    try {
-      totalClear();
-      const choice = await themedSelect({
-        message: getTerm("mainMenu"),
-        choices: getMenuOptions(),
-      });
-
-      await handleMenuChoice(choice);
-    } catch (error) {
-      log("Index/main: " + error, LogTypes.ERROR);
-      console.log(getTerm("error"));
-      await pressEnter();
-    }
+    totalClear();
+    const choice = await themedSelect({
+      message: getTerm("mainMenu"),
+      choices: getMenuOptions(),
+    });
+    await handleMenuChoice(choice);
   }
 }
-
-process.on("SIGINT", async () => {
-  log("Index: Exiting Program via Ctrl-C", LogTypes.WARNING);
-  await exitProgram();
-});
 
 export async function exitProgram() {
   totalClear();
   log("Index: Program ended");
   await skippableSlowWrite(getTerm("goodbye"));
-  process.exit(0);
 }
 
+process.on("uncaughtException", async (error) => {
+  log("Index: " + error.message, LogTypes.ERROR);
+  await setTimeout(() => {},1000)
+  if (choice === "backToMainMenu") {
+    await main();
+  } else if (choice === "exit") {
+    await exitProgram();
+  }
+});
+
 ///////////////////////////////////////////// MAIN PROGRAM /////////////////////////////////////////////////
-const dataDir = path.join(process.cwd(), "storage");
-fs.ensureDirSync(dataDir);
 log("Index: Program started");
+// process.removeAllListeners("warning");
 
 const settings = getSettingsData();
 setLanguage(settings?.language || "de");
 setTheme(settings?.theme || standardTheme);
 
-async function startApp() {
-  await titleScreen();
-  await newPlayerScreen();
-  main();
-}
+await titleScreen();
+await newPlayerScreen();
+await main();
 
-await startApp();
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////

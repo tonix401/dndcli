@@ -3,8 +3,8 @@
   "version": "v0.1 Alpha",
   "scripts": {
     "dev": "tsc && node js/source/index.js",
-    "setup": "npm install --silent && tsc --build && powershell -Command \"if (!(Test-Path .env)) { echo 'OPENAI_API_KEY=' > .env }; if (!(Test-Path storage)) { mkdir storage }; echo 'LOG START' > storage/log.txt\"",
-    "start": "npm run setup && node js/components/index.js",
+    "setup": "npm install --silent && tsc",
+    "start": "npm run setup && node js/source/index.js",
     "test": "tsc && node js/source/testing.js"
   },
   "dependencies": {
@@ -14,15 +14,17 @@
     "dotenv": "^16.4.7",
     "fs-extra": "^11.3.0",
     "inquirer": "^12.4.1",
-    "openai": "^4.83.0",
-    "ora": "^8.2.0"
+    "node-fetch": "^3.3.2",
+    "ora": "^8.2.0",
+    "whatwg-url": "14.1.1"
   },
   "devDependencies": {
     "@types/chalk-animation": "^1.6.3",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^22.13.0"
   },
-  "config": {
-    "checkEnv": "node -e \"if(!require('fs').readFileSync('.env','utf8').match(/OPENAI_API_KEY=.+/)){console.error('\\u001b[31mError: OPENAI_API_KEY not set in .env file\\u001b[0m');process.exit(1)}\""
-  }
+  "overrides": {
+  "whatwg-url": "14.1.1"
+}
+
 }

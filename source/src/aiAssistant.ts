@@ -1,12 +1,9 @@
 import { OpenAI } from "openai";
 import dotenv from "dotenv";
 
-dotenv.config();
-
 export interface ChatCompletionRequestMessage {
   role: "system" | "user" | "assistant";
   content: string;
-
 }
 
 class ChatGenerationError extends Error {
@@ -16,11 +13,19 @@ class ChatGenerationError extends Error {
   }
 }
 
-if (!process.env.OPENAI_API_KEY) {
-  throw new Error("Missing OPENAI_API_KEY in environment variables");
-}
+let isItConfigured = false;
+let openai: OpenAI;
 
-const openai = new OpenAI();
+function ensureConfig() {
+  if (!isItConfigured) {
+    dotenv.config();
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error("Missing OPENAI_API_KEY in environment variables");
+    }
+    openai = new OpenAI();
+    isItConfigured = true;
+  }
+}
 
 export interface GenerateTextOptions {
   model?: string;
@@ -40,6 +45,8 @@ export async function generateChatNarrative(
   messages: ChatCompletionRequestMessage[],
   options?: GenerateTextOptions
 ): Promise<string> {
+  ensureConfig();
+
   if (!messages?.length) {
     throw new ChatGenerationError("Messages array cannot be empty");
   }
@@ -89,6 +96,7 @@ export async function generateEnemyFromNarrative(
   defense: number;
   xpReward: number;
 }> {
+  ensureConfig();
   const combatSection =
     narrative.split("COMBAT ENCOUNTER:")[1]?.split("\n")[0] || narrative;
 

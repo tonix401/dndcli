@@ -1,17 +1,18 @@
-import bossAscii from "./resources/bossAscii.js";
-import emptyAscii from "./resources/emptyAscii.js";
-import enemyAscii from "./resources/enemyAscii.js";
-import trapAscii from "./resources/trapAscii.js";
-import treasureAscii from "./resources/treasureAscii.js";
+import chalk from "chalk";
+import { pressEnter } from "./utilities/ConsoleService.js";
+import getTrapAscii from "./resources/rooms/trapAscii.js";
+import getEnemyAscii from "./resources/rooms/enemyAscii.js";
+import getBossAscii from "./resources/rooms/bossAscii.js";
+import getEmptyAscii from "./resources/rooms/emptyAscii.js";
+import getTreasureAscii from "./resources/rooms/treasureAscii.js";
 
-console.log("empty:");
-console.log(emptyAscii);
-console.log("trap:");
-console.log(trapAscii)
-console.log("treasure:");
-console.log(treasureAscii);
-console.log("enemy:");
-console.log(enemyAscii)
-console.log("boss:");
-console.log(bossAscii)
+/////////////////////////
+console.log(getEmptyAscii());
+console.log(getTrapAscii());
+console.log(getEnemyAscii());
+console.log(getBossAscii());
+console.log(getTreasureAscii());
 
+/////////////////////////
+console.log(chalk.red("END OF TEST"));
+await pressEnter();

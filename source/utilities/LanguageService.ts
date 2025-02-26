@@ -246,6 +246,10 @@ const terms: Record<string, ITerm> = {
     de: "Upps, da ist wohl etwas schief gelaufen 🤔",
     en: "Whoops, seems like something went wrong 🤔",
   },
+  backToMainMenu: {
+    de: "Zurück zum Hauptmenü",
+    en: "Back to main menu"
+  },
   enterPassword: {
     de: "Bitte Passwort eingeben",
     en: "Please enter the password",
@@ -401,70 +405,37 @@ const terms: Record<string, ITerm> = {
     de: "Westen",
     en: "West",
   },
+  emptyRoomDiscovered: {
+    de: "Du hast einen leeren Raum entdeckt",
+    en: "You discovered an empty room",
+  },
+  inpectRoom: {
+    de: "Hier könnten noch versteckte Schätze sein, willst Du Dir den Raum genauer ansehen?",
+    en: "There could be hidden treasures here, would you like to inspect the room more closely?"
+  },
+  nothingHere: {
+    de: "Scheint als wäre wirklich nichts hier... schade",
+    en: "Seems like there is really nothing here... sad"
+  },
+  enemyRoomDiscovered: {
+    de: "Du hast einen Raum mit Gegnern entdeckt",
+    en: "You discovered a room with enemies",
+  },
+  enterToFight: {
+    de:"Drücke [Enter], um den Kampf zu beginnen",
+    en:"Press [Enter] to start the fight"
+  },
+  chestRoomDiscovered: {
+    de: "Du hast eine Schatzkiste entdeckt",
+    en: "You discovered a treasure chest",
+  },
+  bossRoomDiscovered: {
+    de: "Du hast den BOSS-Raum entdeckt",
+    en: "You discovered the BOSS room",
+  },
+  engageFight: {
+    de: "Willst Du kämpfen?",
+    en: "Would you like to fight?"
+  }
   // #endregion
-};
-
-export function getColorTerm(key: string) {
-  const color = colors[key];
-  if (!color) {
-    log(`Language Service: Color not found: ${key}`, LogTypes.ERROR);
-    return "";
-  }
-  return color[getLanguage()];
-}
-
-export function getColorHex(key: string) {
-  const color = colors[key];
-  if (!color) {
-    log(`Language Service: Color not found: ${key}`, LogTypes.ERROR);
-    return "";
-  }
-  return color.hex;
-}
-
-export function getAllColors(): Record<string, IColorTerm> {
-  return colors;
-}
-
-const colors: Record<string, IColorTerm> = {
-  red: {
-    de: "rot",
-    en: "red",
-    hex: "#E04500",
-  },
-  purple: {
-    de: "lila",
-    en: "purple",
-    hex: "#b00edc",
-  },
-  blue: {
-    de: "blau",
-    en: "blue",
-    hex: "#00AAFF",
-  },
-  turquoise: {
-    de: "türkis",
-    en: "turquoise",
-    hex: "#00CEBD",
-  },
-  green: {
-    de: "grün",
-    en: "green",
-    hex: "#0ad135",
-  },
-  yellow: {
-    de: "gelb",
-    en: "yellow",
-    hex: "#FFCC00",
-  },
-  orange: {
-    de: "orange",
-    en: "orange",
-    hex: "#FFA500",
-  },
-  white: {
-    de: "weiß",
-    en: "white",
-    hex: "#FFFFFF",
-  },
 };

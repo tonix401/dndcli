@@ -110,7 +110,11 @@ async function changeSettingsScreen(choice: string) {
     case "primaryColor":
     case "secondaryColor":
       changeSettingFunction = (input: string) =>
-        setTheme({ ...getTheme(), [choice]: input });
+        setTheme({
+          ...getTheme(),
+          [choice]: input,
+          name: { de: "Benutzerdefiniert", en: "Custom" },
+        });
       functionToValidate = (input: string) =>
         colorRegex.test(input) ? true : getTerm("invalidColor");
       break;

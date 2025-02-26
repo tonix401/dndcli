@@ -13,14 +13,10 @@ import {
 import { log, LogTypes } from "../utilities/LogService.js";
 import chalk from "chalk";
 import { getTheme } from "../utilities/CacheService.js";
-import path from "path";
 import fs from "fs-extra";
-import { fileURLToPath } from "url";
 import dotenv from "dotenv";
-import config from "../utilities/Config.js"; // import constants from Config.ts
+import config from "../utilities/Config.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 // The standard character for new players
 const newPlayerChar = {
@@ -97,7 +93,7 @@ async function ensureFilesExist() {
 async function promptForApiKey(): Promise<string> {
   let isCorrectFormat: boolean = false;
   let userInput: string;
-  const apiKeyRegex = /^sk-[a-zA-Z0-9]{48}$/;
+  const apiKeyRegex = /^sk-[a-zA-Z0-9_-]{40,}$/;
 
   do {
     userInput = await themedInput({
