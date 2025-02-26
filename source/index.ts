@@ -11,11 +11,12 @@ import { getSettingsData } from "./utilities/SettingsService.js";
 import { settingsMenu } from "./components/SettingsMenu.js";
 import { newPlayerScreen } from "./components/NewPlayerScreen.js";
 import { getTerm } from "./utilities/LanguageService.js";
-import { setLanguage, setTheme } from "./utilities/CacheService.js";
+import { getTheme, setLanguage, setTheme } from "./utilities/CacheService.js";
 import { standardTheme } from "./utilities/ThemingService.js";
 import { secretDevMenu } from "./components/DeveloperMenu.js";
 import { inspectInventory } from "./components/InspectInventory.js";
 import { titleScreen } from "./components/TitleScreen.js";
+import chalk from "chalk";
 
 const getMenuOptions = () => [
   { name: getTerm("createCharacter"), value: "1" },
@@ -84,55 +85,28 @@ export async function exitProgram() {
   totalClear();
   log("Index: Program ended");
   await skippableSlowWrite(getTerm("goodbye"));
-  process.exit(0);
 }
 
-async function promptError() {
-  totalClear();
-  log("Index: showing error to user");
-  const choice = await themedSelect({
-    message: getTerm("error"),
-    choices: [
-      {
-        name: getTerm("backToMainMenu"),
-        value: "backToMainMenu",
-      },
-      {
-        name: getTerm("exit"),
-        value: "exit",
-      },
-    ],
-  });
-
+process.on("uncaughtException", async (error) => {
+  log("Index: " + error.message, LogTypes.ERROR);
+  await setTimeout(() => {},1000)
   if (choice === "backToMainMenu") {
     await main();
   } else if (choice === "exit") {
     await exitProgram();
   }
-}
-
-process.on("SIGINT", async () => {
-  log("Index: User pressed Ctrl+C", LogTypes.WARNING);
-  await exitProgram();
-});
-
-process.on("uncaughtException", async () => {
-  log("Index: Error during running program", LogTypes.ERROR);
-  await promptError();
 });
 
 ///////////////////////////////////////////// MAIN PROGRAM /////////////////////////////////////////////////
 log("Index: Program started");
+// process.removeAllListeners("warning");
 
 const settings = getSettingsData();
 setLanguage(settings?.language || "de");
 setTheme(settings?.theme || standardTheme);
 
-try {
-  await titleScreen();
-  await newPlayerScreen();
-  await main();
-} catch (error) {
-  await promptError();
-}
+await titleScreen();
+await newPlayerScreen();
+await main();
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
