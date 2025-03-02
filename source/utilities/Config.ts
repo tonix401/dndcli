@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import path from "path";
-import { ITheme } from "types/ITheme";
-import ICharacterData from "types/ICharacterData";
+import { ITheme } from "@utilities/ITheme.js";
+import ICharacterData from "@utilities/ICharacterData.js";
 
 // #region Paths
 // Base directory (assumes process.cwd() is the project root)

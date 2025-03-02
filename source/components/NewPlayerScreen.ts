@@ -30,6 +30,7 @@ export async function newPlayerScreen(): Promise<boolean> {
   isNew = !charData;
 
   if (isNew) {
+    totalClear();
     log("New Player Screen: New Player detected");
     saveCharacterData(Config.STANDARD_CHARACTER);
     await skippableSlowWrite(secondaryColor(getTerm("helloNewPlayer")));

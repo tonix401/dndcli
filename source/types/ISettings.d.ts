@@ -1,5 +1,5 @@
 import { Language } from "@utilities/LanguageService.js";
-import { ITheme } from "types/ITheme.js";
+import { ITheme } from "@utilities/ITheme.js";
 
 /**
  * Interface for app settings

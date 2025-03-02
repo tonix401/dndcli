@@ -17,7 +17,7 @@ export async function titleScreen() {
 
 const checkWindowSize = () => {
   const { columns, rows } = process.stdout;
-  return { isOk: columns >= 100 && rows >= 36, rows: rows, columns: columns };
+  return { isOk: columns >= 100 && rows >= 35, rows: rows, columns: columns };
 };
 
 async function ensureWindowSize() {

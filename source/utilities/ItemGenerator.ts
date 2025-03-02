@@ -1,5 +1,5 @@
 // utilities/ItemGenerator.ts
-import { IItem } from "types/IITem.js";
+import { IItem } from "@utilities/IITem.js";
 
 const rarities = [
   { tier: "Common", chance: 0.6, multiplier: 1 },

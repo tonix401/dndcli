@@ -1,7 +1,0 @@
-{
-  "search.exclude": {
-    "": true,
-    "**/bower_components": false,
-    "**/node_modules": false
-  }
-}

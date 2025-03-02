@@ -1,6 +1,6 @@
 import fs from "fs";
 import { LogTypes, log } from "@utilities/LogService.js";
-import { ISettings } from "types/ISettings.js";
+import { ISettings } from "@utilities/ISettings.js";
 import config from "@utilities/Config.js";
 
 const filename = config.SETTINGS_FILE;

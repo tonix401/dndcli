@@ -1,7 +1,7 @@
 import chalk from "chalk";
-import { IEnemy } from "types/IEnemy";
-import { getDungeon } from "utilities/CacheService.js";
-import { primaryColor, secondaryColor } from "utilities/ConsoleService.js";
+import { IEnemy } from "@utilities/IEnemy.js";
+import { getDungeon } from "@utilities/CacheService.js";
+import { primaryColor, secondaryColor } from "@utilities/ConsoleService.js";
 
 export enum RoomTypes {
   START = "START",

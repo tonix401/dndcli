@@ -1,8 +1,8 @@
 import fs from "fs";
-import ICharacterData from "types/ICharacterData";
+import ICharacterData from "@utilities/ICharacterData.js";
 import { log, LogTypes } from "@utilities/LogService.js";
 
-const filename = "../dndcli/storage/character.json";
+const filename = "@storage/character.json";
 
 /**
  * Reads the saved character data from the character.json file

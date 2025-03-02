@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { IThemeOverride } from "types/IThemeOverides.js";
+import { IThemeOverride } from "@utilities/IThemeOverides.js";
 
 export function getAllThemeOverrides() {
   return themes;

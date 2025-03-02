@@ -1,5 +1,5 @@
 // defaultAbilities.ts
-import type { IAbility } from "types/IAbility.js";
+import type { IAbility } from "@utilities/IAbility.js";
 
 export const defaultAbilities: Record<string, IAbility[]> = {
   swordsman: [

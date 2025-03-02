@@ -1,4 +1,4 @@
-import ICharacterData from "types/ICharacterData.js";
+import ICharacterData from "@utilities/ICharacterData.js";
 import { getCharacterData } from "@utilities/CharacterService.js";
 import {
   alignText,

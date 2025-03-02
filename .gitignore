@@ -1,5 +1,22 @@
+# Environment variables
 .env
-storage
-js
-node_modules
-log.txt
+
+# Directories
+storage/
+js/
+node_modules/
+
+# Editor directories and files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+
+# Dependency lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

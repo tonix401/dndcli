@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import type ICharacterData from "types/ICharacterData.js";
+import type ICharacterData from "@utilities/ICharacterData.js";
 import { saveCharacterData } from "@utilities/CharacterService.js";
 import {
   generateChatNarrative,
@@ -13,9 +13,8 @@ import {
   themedInput,
   themedSelect,
 } from "@utilities/ConsoleService.js";
-import { getDefaultAbilitiesForClass } from "@utilities/defaultAbilities.js";
 import { rollDiceTotal } from "@utilities/DiceService.js";
-import { ITheme } from "types/ITheme.js";
+import { ITheme } from "@utilities/ITheme.js";
 import Config from "@utilities/Config.js";
 import { getTheme } from "@utilities/CacheService.js";
 

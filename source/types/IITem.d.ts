@@ -1,4 +1,4 @@
-// types/IItem.ts
+// @utilities/IItem.ts
 export interface IItem {
   id: string;
   name: string;

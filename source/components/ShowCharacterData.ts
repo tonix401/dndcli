@@ -12,7 +12,7 @@ import {
   getCharacterData,
   saveCharacterData,
 } from "@utilities/CharacterService.js";
-import ICharacterData from "types/ICharacterData.js";
+import ICharacterData from "@utilities/ICharacterData.js";
 import Config from "@utilities/Config.js";
 
 const validators = {

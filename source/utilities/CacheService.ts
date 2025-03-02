@@ -1,5 +1,5 @@
-import { ITheme } from "types/ITheme.js";
-import { IThemeOverride } from "types/IThemeOverides.js";
+import { ITheme } from "@utilities/ITheme.js";
+import { IThemeOverride } from "@utilities/IThemeOverides.js";
 import Config from "@utilities/Config.js";
 import {
   Dungeon,
@@ -18,7 +18,7 @@ let cachedLanguage: Language;
 let cachedTheme: ITheme;
 let cachedPassword: string;
 
-loadSavedDataIntoCache();
+sync();
 
 // #region Getters
 export function getDungeon() {
@@ -45,14 +45,14 @@ export function resetDungeon() {
 
 export function setDungeon(dungeon: Dungeon) {
   cachedDungeon = dungeon;
-  saveCachedData();
+  sync();
   log("Cache Service: Dungeon updated");
 }
 
 export function setLanguage(language: Language): void {
   cachedLanguage = language;
   log("Cache service: Language set to " + getTerm(language));
-  saveCachedData();
+  sync();
 }
 
 export function setTheme(theme: IThemeOverride) {
@@ -68,26 +68,18 @@ export function setTheme(theme: IThemeOverride) {
     backgroundColor: theme.backgroundColor || standardTheme.backgroundColor,
     errorColor: theme.errorColor || standardTheme.errorColor,
   };
-  saveCachedData();
+  sync();
 }
 
 export function setPassword(password: string) {
   cachedPassword = password;
-  saveCachedData();
+  sync();
   log("Cache Service: Password updated");
 }
 
 // #endregion
 
-export function saveCachedData() {
-  saveSettingsData({
-    language: cachedLanguage,
-    theme: cachedTheme,
-    password: cachedPassword,
-  });
-}
-
-export function loadSavedDataIntoCache() {
+export function sync() {
   let settings = null;
   try {
     settings = getSettingsData();
@@ -99,4 +91,10 @@ export function loadSavedDataIntoCache() {
   cachedPassword =
     settings?.password ||
     "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3";
+
+  saveSettingsData({
+    language: cachedLanguage,
+    theme: cachedTheme,
+    password: cachedPassword,
+  });
 }

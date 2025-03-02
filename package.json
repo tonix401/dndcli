@@ -1,16 +1,16 @@
 {
   "type": "module",
-  "version": "v0.1 Alpha",
+  "version": "0.1.0",
   "authors": [
     "twe",
     "jth"
   ],
   "scripts": {
-    "setup": "npm install --silent && tsc",
-    "start": "node --no-deprecation js/source/index.js",
-    "dev": "ts-node source/index.ts",
-    "test": "ts-node source/testing.ts",
-    "reset": "ts-node source/reset.ts"
+    "build": "tsc && tsc-alias",
+    "setup": "npm install --silent && npm run build",
+    "start": "node --no-deprecation js/index.js",
+    "test": "node --no-deprecation js/testing.js",
+    "reset": "node --no-deprecation js/reset.js"
   },
   "dependencies": {
     "@inquirer/prompts": "^7.3.1",
@@ -30,9 +30,7 @@
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^22.13.0",
     "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.11",
     "typescript": "^5.8.2"
-  },
-  "overrides": {
-    "whatwg-url": "14.1.1"
   }
 }
