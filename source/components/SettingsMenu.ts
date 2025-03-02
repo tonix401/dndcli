@@ -49,7 +49,6 @@ export async function settingsMenu() {
         log("Settings menu: Unexpected sub setting choice", LogTypes.ERROR);
         console.log(getTerm("invalid"));
         await pressEnter();
-        settingsMenu();
     }
   }
 }

@@ -39,7 +39,7 @@ export function getTheme() {
 // #endregion
 
 // #region Setters
-export function resetDungeon() {
+export function renewDungeon() {
   cachedDungeon = initiateDungeonMapWithHallways();
 }
 
@@ -80,6 +80,13 @@ export function setPassword(password: string) {
 // #endregion
 
 export function sync() {
+  saveSettingsData({
+    language: cachedLanguage,
+    theme: cachedTheme,
+    password: cachedPassword,
+  });
+  log("Cache Service: Settings synced");
+
   let settings = null;
   try {
     settings = getSettingsData();
@@ -91,10 +98,4 @@ export function sync() {
   cachedPassword =
     settings?.password ||
     "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3";
-
-  saveSettingsData({
-    language: cachedLanguage,
-    theme: cachedTheme,
-    password: cachedPassword,
-  });
 }

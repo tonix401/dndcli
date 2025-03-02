@@ -1,8 +1,9 @@
 import fs from "fs";
 import ICharacterData from "@utilities/ICharacterData.js";
 import { log, LogTypes } from "@utilities/LogService.js";
+import Config from "./Config.js";
 
-const filename = "@storage/character.json";
+const filename = Config.CHARACTER_FILE;
 
 /**
  * Reads the saved character data from the character.json file

@@ -1,5 +1,3 @@
-import chalk from "chalk";
-import { getTheme } from "@utilities/CacheService.js";
 import {
   themedSelect,
   themedInput,

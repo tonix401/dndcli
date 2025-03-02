@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { getTerm } from "@utilities/LanguageService.js";
-import { setPassword } from "@utilities/CacheService.js";
+import { getPassword, setPassword } from "@utilities/CacheService.js";
 import {
   primaryColor,
   themedInput,
@@ -25,7 +25,7 @@ export async function checkPasswordScreen(attempts: number) {
     .update(passwordToCheck)
     .digest("hex");
 
-  const passwordHash = getSettingsData()?.password;
+  const passwordHash = getPassword();
   attempts--;
   if (attempts <= 0) {
     return false;
