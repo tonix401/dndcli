@@ -1,19 +1,27 @@
-import chalk from "chalk";
-import emptyAscii from "../resources/rooms/emptyAscii";
-import trapAscii from "../resources/rooms/trapAscii";
-import { pressEnter, themedInput, themedSelect, totalClear } from "../utilities/ConsoleService";
-import { RoomTypes } from "../utilities/DungeonService";
-import { getTerm } from "../utilities/LanguageService";
-import { log } from "../utilities/LogService";
-import { getTheme } from "../utilities/CacheService";
-import enemyAscii from "../resources/rooms/enemyAscii";
+import {
+  pressEnter,
+  primaryColor,
+  secondaryColor,
+  themedInput,
+  themedSelect,
+  totalClear,
+} from "@utilities/ConsoleService.js";
+import { Room, RoomTypes } from "@utilities/DungeonService.js";
+import { getTerm } from "@utilities/LanguageService.js";
+import { log } from "@utilities/LogService.js";
+import getTreasureAscii from "../resources/rooms/treasureAscii.js";
+import getEmptyAscii from "../resources/rooms/emptyAscii.js";
+import getTrapAscii from "../resources/rooms/trapAscii.js";
+import getEnemyAscii from "../resources/rooms/enemyAscii.js";
+import getBossAscii from "../resources/rooms/bossAscii.js";
 
 const yesno = [
   { name: getTerm("yes"), value: true },
   { name: getTerm("no"), value: false },
 ];
 
-export async function enterRoom(type: RoomTypes) {
+export async function enterRoom(room: Room) {
+  const { type } = room;
   totalClear();
   switch (type) {
     case RoomTypes.EMPTY:
@@ -36,22 +44,19 @@ export async function enterRoom(type: RoomTypes) {
 
 async function emptyRoom() {
   log("Enter Room: empty room");
-  console.log(emptyAscii);
-  console.log(
-    chalk.hex(getTheme().primaryColor)(getTerm("emptyRoomDiscovered"))
-  );
+  console.log(getEmptyAscii());
+  console.log(primaryColor(getTerm("emptyRoomDiscovered")));
 
   const wantsToInspect = await themedSelect({
     message: getTerm("inspectRoom"),
     choices: yesno,
   });
 
-  if(wantsToInspect) {
-    if(Math.random() < 0.25) {
+  if (wantsToInspect) {
+    if (Math.random() < 0.25) {
       // TODO: add "get small item" logic
-      console.log("TODO: add get small item logic");
     } else {
-      console.log(chalk.hex(getTheme().secondaryColor)(getTerm("nothingHere")));
+      console.log(secondaryColor(getTerm("nothingHere")));
     }
   }
   await pressEnter();
@@ -59,10 +64,10 @@ async function emptyRoom() {
 
 async function trapRoom() {
   log("Enter Room: trap room");
-  console.log(trapAscii);
+  console.log(getTrapAscii());
   console.log(
     // user is not supposed to notice that its a trap, at least not easily, so the term is the same as with an empty room
-    chalk.hex(getTheme().primaryColor)(getTerm("emptyRoomDiscovered"))
+    primaryColor(getTerm("emptyRoomDiscovered"))
   );
 
   const wantsToInspect = await themedSelect({
@@ -72,7 +77,7 @@ async function trapRoom() {
 
   if (wantsToInspect) {
     if (Math.random() < 0.25) {
-      console.log(chalk.hex(getTheme().secondaryColor)(getTerm("nothingHere")));
+      console.log(secondaryColor(getTerm("nothingHere")));
     } else {
       // TODO: implement falling for trap logic
       console.log("TODO: implement falling for trap logic");
@@ -83,37 +88,30 @@ async function trapRoom() {
 
 async function enemyRoom() {
   log("Enter Room: enemy room");
-  console.log(enemyAscii);
-  console.log(
-    chalk.hex(getTheme().primaryColor)(getTerm("enemyRoomDiscovered"))
-  );
+  console.log(getEnemyAscii());
+  console.log(primaryColor(getTerm("enemyRoomDiscovered")));
 
-  await themedInput({message: getTerm("enterToFight")});
+  await themedInput({ message: getTerm("enterToFight") });
 
   // TODO: implement runCombat();
 }
 
 async function chestRoom() {
   log("Enter Room: enemy room");
-  console.log(enemyAscii);
-  console.log(
-    chalk.hex(getTheme().primaryColor)(getTerm("enemyRoomDiscovered"))
-  );
+  console.log(getTreasureAscii());
+  console.log(primaryColor(getTerm("enemyRoomDiscovered")));
 
   await themedInput({ message: "chest" });
 
-  // TODO: implement runCombat();
+  // TODO: implement openChest();
 }
 
 async function bossRoom() {
   log("Enter Room: enemy room");
-  console.log(enemyAscii);
-  console.log(
-    chalk.hex(getTheme().primaryColor)(getTerm("enemyRoomDiscovered"))
-  );
+  console.log(getBossAscii());
+  console.log(primaryColor(getTerm("enemyRoomDiscovered")));
 
   await themedInput({ message: "boss" });
 
-  // TODO: implement runCombat();
+  // TODO: implement engageBossFight();
 }
-

@@ -1,8 +1,8 @@
 // defaultAbilities.ts
-import type { IAbility } from "../types/IAbility.js";
+import type { IAbility } from "types/IAbility.js";
 
 export const defaultAbilities: Record<string, IAbility[]> = {
-  Warrior: [
+  swordsman: [
     {
       name: "Power Strike",
       manaCost: 0,
@@ -18,7 +18,7 @@ export const defaultAbilities: Record<string, IAbility[]> = {
       description: "A cry that temporarily boosts your strength.",
     },
   ],
-  Mage: [
+  mage: [
     {
       name: "Fireball",
       manaCost: 3,
@@ -34,7 +34,7 @@ export const defaultAbilities: Record<string, IAbility[]> = {
       description: "Summons a gentle light to restore your health.",
     },
   ],
-  Rogue: [
+  thief: [
     {
       name: "Backstab",
       manaCost: 0,

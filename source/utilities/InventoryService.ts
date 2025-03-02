@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import inquirer from "inquirer";
-import { IItem } from "../types/IITem.js";
+import { IItem } from "types/IITem.js";
 
 /**
  * Returns starting items based on the character class.

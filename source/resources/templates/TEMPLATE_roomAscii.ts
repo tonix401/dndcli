@@ -1,9 +1,8 @@
-import chalk from "chalk";
-import { getTheme } from "../../utilities/CacheService.js";
+import { primaryColor, secondaryColor } from "@utilities/ConsoleService.js";
 
 export default function getTemplateAscii() {
-  const p = (text: string) => chalk.hex(getTheme().primaryColor)(text);
-  const s = (text: string) => chalk.hex(getTheme().secondaryColor)(text);
+  const p = (text: string) => primaryColor(text);
+  const s = (text: string) => secondaryColor(text);
   return s(`*******************************************************************************
           |                   |                  |                  |          
  _________|___________________|__________________|__________________|__________
@@ -23,4 +22,5 @@ ____/______/______/______/______/______/______/______/______/______/______/____
 /______/______/______/______/______/______/______/______/______/______/______/_
 ____/______/______/______/______/______/______/______/______/______/______/____
 /______/______/______/______/______/______/______/______/______/______/______/_
-*******************************************************************************`)};
+*******************************************************************************`);
+}

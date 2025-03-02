@@ -1,11 +1,18 @@
-import { ITheme } from "../types/ITheme.js";
-import { IThemeOverride } from "../types/IThemeOverides.js";
-import { Dungeon, initiateDungeonMapWithHallways } from "./DungeonService.js";
-import { getTerm, Language } from "./LanguageService.js";
-import { log } from "./LogService.js";
-import { getSettingsData, saveSettingsData } from "./SettingsService.js";
-import { standardTheme } from "./ThemingService.js";
+import { ITheme } from "types/ITheme.js";
+import { IThemeOverride } from "types/IThemeOverides.js";
+import Config from "@utilities/Config.js";
+import {
+  Dungeon,
+  initiateDungeonMapWithHallways,
+} from "@utilities/DungeonService.js";
+import { getTerm, Language } from "@utilities/LanguageService.js";
+import { log } from "@utilities/LogService.js";
+import {
+  getSettingsData,
+  saveSettingsData,
+} from "@utilities/SettingsService.js";
 
+const standardTheme = Config.STANDARD_THEME;
 let cachedDungeon: Dungeon = initiateDungeonMapWithHallways();
 let cachedLanguage: Language;
 let cachedTheme: ITheme;

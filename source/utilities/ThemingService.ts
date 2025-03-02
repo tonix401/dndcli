@@ -1,17 +1,5 @@
 import chalk from "chalk";
-import { IThemeOverride } from "../types/IThemeOverides.js";
-import { ITheme } from "../types/ITheme.js";
-
-export const standardTheme: ITheme = {
-  name: { de: "Standard", en: "Standard" },
-  prefix: " ",
-  primaryColor: "#00a4ff",
-  secondaryColor: "#F0FFFF",
-  cursor: "👉",
-  accentColor: "#FFAA00",
-  backgroundColor: "#222222",
-  errorColor: "#FF5555",
-};
+import { IThemeOverride } from "types/IThemeOverides.js";
 
 export function getAllThemeOverrides() {
   return themes;

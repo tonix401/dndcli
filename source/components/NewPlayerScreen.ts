@@ -1,43 +1,21 @@
 import {
   getCharacterData,
   saveCharacterData,
-} from "../utilities/CharacterService.js";
-import { getTerm } from "../utilities/LanguageService.js";
+} from "@utilities/CharacterService.js";
+import { getTerm } from "@utilities/LanguageService.js";
 import {
   pause,
   pressEnter,
+  secondaryColor,
   skippableSlowWrite,
   themedInput,
   totalClear,
-} from "../utilities/ConsoleService.js";
-import { log, LogTypes } from "../utilities/LogService.js";
-import chalk from "chalk";
-import { getTheme } from "../utilities/CacheService.js";
+} from "@utilities/ConsoleService.js";
+import { log, LogTypes } from "@utilities/LogService.js";
 import fs from "fs-extra";
 import dotenv from "dotenv";
-import config from "../utilities/Config.js";
-
-
-// The standard character for new players
-const newPlayerChar = {
-  name: "Hans",
-  class: "swordsman",
-  level: 4,
-  xp: 21,
-  hp: 3,
-  origin: "unknown",
-  currency: 0,
-  abilities: {
-    maxhp: 10,
-    strength: 0,
-    mana: 0,
-    dexterity: 0,
-    charisma: 10,
-    luck: 7,
-  },
-  inventory: [],
-  lastPlayed: new Date().toLocaleDateString("de-DE"),
-};
+import config from "@utilities/Config.js";
+import Config from "@utilities/Config.js";
 
 /**
  * Initializes the settings and a character in case there is none yet
@@ -53,10 +31,8 @@ export async function newPlayerScreen(): Promise<boolean> {
 
   if (isNew) {
     log("New Player Screen: New Player detected");
-    saveCharacterData(newPlayerChar);
-    await skippableSlowWrite(getTerm("helloNewPlayer"), {
-      formattings: [(char) => chalk.hex(getTheme().secondaryColor)(char)],
-    });
+    saveCharacterData(Config.STANDARD_CHARACTER);
+    await skippableSlowWrite(secondaryColor(getTerm("helloNewPlayer")));
     await pause(500);
     await pressEnter();
   }
@@ -104,7 +80,7 @@ async function promptForApiKey(): Promise<string> {
 
     if (!isCorrectFormat) {
       totalClear();
-      console.log(chalk.hex(getTheme().secondaryColor)(getTerm("wrongFormat")));
+      console.log(secondaryColor(getTerm("wrongFormat")));
     }
   } while (!isCorrectFormat);
 

@@ -1,6 +1,5 @@
-// types/ICharacterData.ts
-import { IItem } from "./IITem.js";
-import { IAbility } from "./IAbility.js";
+import { IItem } from "types/IITem.js";
+import { IAbility } from "types/IAbility.js";
 
 export default interface ICharacterData {
   name: string;

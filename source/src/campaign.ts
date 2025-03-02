@@ -6,16 +6,16 @@ import {
   generateEnemyFromNarrative,
   ChatCompletionRequestMessage,
 } from "./aiAssistant.js";
-import { rollDice } from "../utilities/DiceService.js";
+import { rollDice } from "@utilities/DiceService.js";
 import { GameState } from "./gameState.js";
 import { promptForChoice } from "./gameMaster.js";
-import { log, LogTypes } from "../utilities/LogService.js";
+import { log, LogTypes } from "@utilities/LogService.js";
 import { runCombat } from "./combat.js";
-import { generateRandomItem } from "../utilities/ItemGenerator.js";
-import { saveGameState, loadGameState } from "../utilities/SaveLoadService.js";
-import { getStartingItems } from "../utilities/InventoryService.js";
-import { saveCharacterData } from "../utilities/CharacterService.js";
-import { getLanguage } from "../utilities/CacheService.js";
+import { generateRandomItem } from "@utilities/ItemGenerator.js";
+import { saveGameState, loadGameState } from "@utilities/SaveLoadService.js";
+import { getStartingItems } from "@utilities/InventoryService.js";
+import { saveCharacterData } from "@utilities/CharacterService.js";
+import { getLanguage } from "@utilities/CacheService.js";
 
 /**
  * Displays a persistent status bar showing key character stats.
@@ -334,7 +334,7 @@ Please respond in clear, concise ${getLanguage}.
  * then entering the main campaign loop.
  */
 export async function startCampaign(): Promise<void> {
-  const { getCharacterData } = await import("../utilities/CharacterService.js");
+  const { getCharacterData } = await import("@utilities/CharacterService.js");
   const characterData = getCharacterData();
   if (!characterData) {
     log(
@@ -347,9 +347,7 @@ export async function startCampaign(): Promise<void> {
     !Array.isArray(characterData.inventory) ||
     characterData.inventory.length === 0
   ) {
-    const { getStartingItems } = await import(
-      "../utilities/InventoryService.js"
-    );
+    const { getStartingItems } = await import("@utilities/InventoryService.js");
     characterData.inventory = getStartingItems(characterData.class);
   }
   const gameState = new GameState();

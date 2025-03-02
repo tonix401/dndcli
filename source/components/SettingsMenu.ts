@@ -3,19 +3,17 @@ import {
   getTheme,
   setLanguage,
   setTheme,
-} from "../utilities/CacheService.js";
-import { getTerm, Language } from "../utilities/LanguageService.js";
-import { log, LogTypes } from "../utilities/LogService.js";
+} from "@utilities/CacheService.js";
+import { getTerm, Language } from "@utilities/LanguageService.js";
+import { log, LogTypes } from "@utilities/LogService.js";
 import {
   pressEnter,
   themedSelect,
   totalClear,
-} from "../utilities/ConsoleService.js";
-import {
-  getAllThemeOverrides,
-  standardTheme,
-} from "../utilities/ThemingService.js";
+} from "@utilities/ConsoleService.js";
+import { getAllThemeOverrides } from "@utilities/ThemingService.js";
 import chalk from "chalk";
+import Config from "@utilities/Config.js";
 
 export async function settingsMenu() {
   while (true) {
@@ -91,9 +89,9 @@ async function changeThemeMenu() {
     choices: [
       ...Object.values(getAllThemeOverrides()).map((theme) => {
         return {
-          name: chalk.hex(theme.primaryColor || standardTheme.primaryColor)(
-            theme.name[getLanguage()]
-          ),
+          name: chalk.hex(
+            theme.primaryColor || Config.STANDARD_THEME.primaryColor
+          )(theme.name[getLanguage()]),
           value: theme.name.en,
         };
       }),

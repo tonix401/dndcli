@@ -4,17 +4,21 @@ import {
   getTheme,
   setLanguage,
   setTheme,
-} from "../utilities/CacheService.js";
-import { themedInput, themedSelect } from "../utilities/ConsoleService.js";
-import { getTerm, Language } from "../utilities/LanguageService.js";
+} from "@utilities/CacheService.js";
+import {
+  primaryColor,
+  themedInput,
+  themedSelect,
+} from "@utilities/ConsoleService.js";
+import { getTerm, Language } from "@utilities/LanguageService.js";
 import { Separator } from "@inquirer/prompts";
-import config from "../utilities/Config.js";
+import config from "@utilities/Config.js";
 
-export async function showSettingsData() {
-  let theme = getTheme();
-  let language = getLanguage();
+const getSettingsOptions = () => {
+  const theme = getTheme();
+  const language = getLanguage();
 
-  const menuOptions = [
+  return [
     {
       name: getTerm("language") + ": " + getTerm(language),
       value: "language",
@@ -29,7 +33,9 @@ export async function showSettingsData() {
       value: "prefix",
     },
     new Separator(config.SELECT_SEPARATOR),
-    new Separator(" " + getTerm("theme") + ":"),
+    new Separator(
+      " " + getTerm("theme") + ": " + getTheme().name[getLanguage()]
+    ),
     {
       name:
         getTerm("primaryColor") +
@@ -68,12 +74,13 @@ export async function showSettingsData() {
     new Separator(config.SELECT_SEPARATOR),
     { name: getTerm("goBack"), value: "goBack" },
   ];
+};
+
+export async function showSettingsData() {
   while (true) {
-    theme = getTheme();
-    language = getLanguage();
     const choice = await themedSelect({
-      message: chalk.hex(getTheme().primaryColor)(getTerm("showSettingsData")),
-      choices: menuOptions,
+      message: primaryColor(getTerm("showSettingsData")),
+      choices: getSettingsOptions(),
     });
     if (choice === "goBack") return;
     await changeSettingsScreen(choice);

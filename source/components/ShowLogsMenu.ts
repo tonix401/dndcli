@@ -1,12 +1,12 @@
-import chalk from "chalk";
-import { getTheme } from "../utilities/CacheService.js";
 import {
   pressEnter,
+  primaryColor,
+  secondaryColor,
   themedSelect,
   totalClear,
-} from "../utilities/ConsoleService.js";
-import { getTerm } from "../utilities/LanguageService.js";
-import { clearLogs, getLogData, log } from "../utilities/LogService.js";
+} from "@utilities/ConsoleService.js";
+import { getTerm } from "@utilities/LanguageService.js";
+import { clearLogs, getLogData, log } from "@utilities/LogService.js";
 
 export async function showLogsMenu() {
   const logMenuChoices = [
@@ -76,13 +76,11 @@ async function showLogsScreen() {
 
 function logFormattedLogs(logs?: string) {
   console.log(
-    chalk.hex(getTheme().primaryColor)(
-      `################## ${getTerm("showLogs")} ##################`
-    )
+    primaryColor(`################## ${getTerm("showLogs")} ##################`)
   );
-  console.log(chalk.hex(getTheme().secondaryColor)(logs || getTerm("noLogs")));
+  console.log(secondaryColor(logs || getTerm("noLogs")));
   console.log(
-    chalk.hex(getTheme().primaryColor)(
+    primaryColor(
       `##################${"#".repeat(
         getTerm("showLogs").length + 2
       )}##################`
@@ -93,6 +91,6 @@ function logFormattedLogs(logs?: string) {
 async function clearLogsScreen() {
   log("Log Menu: Cleared logs");
   clearLogs();
-  console.log(chalk.bold.hex(getTheme().primaryColor)(getTerm("logsCleared", true)));
+  console.log(primaryColor(getTerm("logsCleared", true)));
   await pressEnter();
 }

@@ -1,8 +1,8 @@
-import { getLanguage, getPassword, getTheme } from "./CacheService.js";
-import { skippableSlowWrite, totalClear } from "./ConsoleService.js";
-import { getTerm } from "./LanguageService.js";
-import { log } from "./LogService.js";
-import { saveSettingsData } from "./SettingsService.js";
+import { getLanguage, getPassword, getTheme } from "@utilities/CacheService.js";
+import { skippableSlowWrite, totalClear } from "@utilities/ConsoleService.js";
+import { getTerm } from "@utilities/LanguageService.js";
+import { log } from "@utilities/LogService.js";
+import { saveSettingsData } from "@utilities/SettingsService.js";
 
 export async function exitProgram() {
   totalClear();

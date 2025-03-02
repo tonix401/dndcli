@@ -1,10 +1,14 @@
 import crypto from "crypto";
-import chalk from "chalk";
-import { password } from "@inquirer/prompts";
-import { getTerm } from "./LanguageService.js";
-import { getTheme, setPassword } from "./CacheService.js";
-import { themedInput, themedSelect, totalClear } from "./ConsoleService.js";
-import { getSettingsData } from "./SettingsService.js";
+import { getTerm } from "@utilities/LanguageService.js";
+import { setPassword } from "@utilities/CacheService.js";
+import {
+  primaryColor,
+  themedInput,
+  themedPassword,
+  themedSelect,
+  totalClear,
+} from "@utilities/ConsoleService.js";
+import { getSettingsData } from "@utilities/SettingsService.js";
 
 /**
  * A Screen to check for a password
@@ -12,10 +16,8 @@ import { getSettingsData } from "./SettingsService.js";
  * @returns If the password was correct
  */
 export async function checkPasswordScreen(attempts: number) {
-  const passwordToCheck = await password({
+  const passwordToCheck = await themedPassword({
     message: getTerm("enterPassword"),
-    mask: "*",
-    theme: getTheme(),
   });
 
   const passwordToCheckHash = crypto
@@ -32,11 +34,7 @@ export async function checkPasswordScreen(attempts: number) {
   }
 
   totalClear();
-  console.log(
-    chalk.hex(getTheme().primaryColor)(
-      getTerm("wrongPassword", true) + attempts
-    )
-  );
+  console.log(primaryColor(getTerm("wrongPassword", true) + attempts));
   return await checkPasswordScreen(attempts);
 }
 
@@ -62,9 +60,7 @@ export async function setPasswordScreen() {
     isPasswordConfirmed = newPassword === confirmPassword;
 
     if (!isPasswordConfirmed) {
-      console.log(
-        chalk.hex(getTheme().primaryColor)(getTerm("notTheSame", true))
-      );
+      console.log(primaryColor(getTerm("notTheSame", true)));
       if (
         (await themedSelect({
           message: getTerm("tryAgain"),

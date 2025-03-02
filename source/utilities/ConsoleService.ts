@@ -1,10 +1,10 @@
 import readline from "readline";
-import { log } from "./LogService.js";
-import { input, select } from "@inquirer/prompts";
+import { log } from "@utilities/LogService.js";
+import { input, password, select } from "@inquirer/prompts";
 import chalk from "chalk";
-import { getTerm } from "./LanguageService.js";
-import { getTheme } from "./CacheService.js";
-import { ITheme } from "../types/ITheme.js";
+import { getTerm } from "@utilities/LanguageService.js";
+import { getTheme } from "@utilities/CacheService.js";
+import ansiRegex from "ansi-regex";
 
 /**
  * Clears the console completely, without leaving any annoying scroll-up buffer behind
@@ -74,7 +74,6 @@ type slowWriteConfig = {
  * @param hasSafetyBuffer Defines whether there is a short delay after skipping to prevent accidental input from affecting the next part of the CLI
  * @param charDelay The delay between characters
  * @param lineDelay The delay between lines
- * @param formatting A formatting function
  * @example slowWrite("Some text", 40, 500, false, (char) => chalk.bold(chalk.cyan(char)));
  */
 export async function skippableSlowWrite(
@@ -86,7 +85,6 @@ export async function skippableSlowWrite(
     lineDelay = 500,
     forceSkip = false,
     hasSafetyBuffer = true,
-    formattings = [(char) => chalk.hex(getTheme().secondaryColor)(char)],
     indented = true,
   } = config;
 
@@ -95,56 +93,68 @@ export async function skippableSlowWrite(
   // Enable raw mode to capture key presses
   readline.emitKeypressEvents(process.stdin);
   process.stdin.setRawMode(true);
-
-  // DO NOT REMOVE "str", OTHERWISE STUFF BREAKS
-  process.stdin.on("keypress", (str, key) => {
+  process.stdin.on("keypress", (_str, key) => {
     if (key.name === "return") {
       log("Console Service: Skipping text...");
       isSkipping = true;
     }
   });
 
+  const ansiPattern = ansiRegex();
   const lines = message.split("\n");
-  for (let i in lines) {
-    const line = ((indented ? " " : "") + lines[i]).split("");
-    for (let j in line) {
-      // for some weird reason i is a string here, so it has to be parsed into a number
-      process.stdout.write(
-        getFormattingFunction(parseInt(i), formattings)(line[j])
-      );
-      if (!isSkipping && charDelay !== 0) {
-        await pause(charDelay);
+
+  for (let i = 0; i < lines.length; i++) {
+    let fullLine = (indented ? " " : "") + lines[i];
+    const tokens: { text: string; isAnsi: boolean }[] = [];
+    let lastIndex = 0;
+
+    // Tokenize the fullLine using ansi-regex
+    for (const match of fullLine.matchAll(ansiPattern)) {
+      const index = match.index!;
+      if (index > lastIndex) {
+        // Plain text before the ANSI token
+        tokens.push({
+          text: fullLine.substring(lastIndex, index),
+          isAnsi: false,
+        });
+      }
+      // The ANSI token itself
+      tokens.push({ text: match[0], isAnsi: true });
+      lastIndex = index + match[0].length;
+    }
+    if (lastIndex < fullLine.length) {
+      tokens.push({
+        text: fullLine.substring(lastIndex),
+        isAnsi: false,
+      });
+    }
+
+    // Process tokens: apply formatting only to plain text
+    for (const token of tokens) {
+      if (token.isAnsi) {
+        process.stdout.write(token.text);
+      } else {
+        for (const char of token.text) {
+          process.stdout.write(char);
+          if (!isSkipping && charDelay !== 0) {
+            await pause(charDelay);
+          }
+        }
       }
     }
     process.stdout.write("\n");
-    if (!isSkipping) {
+    if (!isSkipping && lineDelay !== 0) {
       await pause(lineDelay);
     }
   }
 
-  // Prevent accidental input from affecting the next part of the CLI
   if (isSkipping && hasSafetyBuffer) {
     await pause(500);
   }
 
-  // Restore terminal settings
-  process.stdin.setRawMode(false);
   process.stdin.removeAllListeners("keypress");
-
   return;
 }
-
-// for skippableSlowWrite()
-function getFormattingFunction(
-  index: number,
-  formattings: formattingFunction[]
-): formattingFunction {
-  if (formattings[index]) {
-    return formattings[index];
-  }
-  return formattings[formattings.length - 1];
-}
-
 
 /**
  * A version of the select from inquirer that used the custom theme and current colors
@@ -158,20 +168,18 @@ export async function themedSelect(config: any): Promise<string> {
       cursor: getTheme().cursor,
     },
     style: {
-      message: (text: string) =>
-        chalk.hex(getTheme().primaryColor)(chalk.bold(text)),
-      highlight: (text: string) =>
-        chalk.bold(chalk.hex(getTheme().secondaryColor)(text)),
+      message: (text: string) => primaryColor(chalk.bold(text)),
+      highlight: (text: string) => chalk.bold(secondaryColor(text)),
       disabled: (text: string) =>
         chalk.hex(getTheme().secondaryColor).dim("  " + text),
       error: (text: string) => chalk.hex(getTheme().errorColor)(text),
-
-      // doesnt work like i hoped it would
-      help: () => "",
     },
     helpMode: "never",
   };
-  return await select({ ...config, pageSize: 50, theme: theme }, { clearPromptOnDone: true });
+  return await select(
+    { ...config, pageSize: 50, theme: theme },
+    { clearPromptOnDone: true }
+  );
 }
 
 export async function themedInput(config: {
@@ -183,12 +191,40 @@ export async function themedInput(config: {
   const theme = {
     prefix: getTheme().prefix,
     style: {
-      message: (text: string) =>
-        chalk.hex(getTheme().primaryColor)(chalk.bold(text)),
+      message: (text: string) => primaryColor(chalk.bold(text)),
     },
     helpMode: "never",
   };
   return await input({ ...config, theme }, { clearPromptOnDone: true });
+}
+
+export function themedPassword(config: { message: string }): Promise<string> {
+  const theme = {
+    prefix: getTheme().prefix,
+    style: {
+      message: (text: string) => primaryColor(chalk.bold(text)),
+    },
+    helpMode: "never",
+  };
+  return password({ ...config, theme, mask: "*" }, { clearPromptOnDone: true });
+}
+
+/**
+ * Formats text with the primary color
+ * @param text The text to format
+ * @returns Formatted string
+ */
+export function primaryColor(text: string) {
+  return chalk.hex(getTheme().primaryColor)(text);
+}
+
+/**
+ * Formats text with the secondary color
+ * @param text The text to format
+ * @returns Formatted string
+ */
+export function secondaryColor(text: string) {
+  return chalk.hex(getTheme().secondaryColor)(text);
 }
 
 /**
@@ -199,12 +235,9 @@ export async function pressEnter() {
     message: getTerm("pressEnter"),
     theme: {
       style: {
-        message: (text: string) =>
-          chalk.bold(chalk.hex(getTheme().secondaryColor)(text)),
+        message: (text: string) => chalk.bold(secondaryColor(text)),
       },
-      prefix: chalk.bold(
-        chalk.hex(getTheme().secondaryColor)(getTheme().cursor)
-      ),
+      prefix: chalk.bold(secondaryColor(getTheme().cursor)),
     },
   });
 }
@@ -223,8 +256,8 @@ export function alignText(
   minWidth = 0
 ) {
   // Setup
-  const formattedMargin = chalk.hex(getTheme().secondaryColor)(margin);
-  const reverseformattedMargin = chalk.hex(getTheme().secondaryColor)(
+  const formattedMargin = secondaryColor(margin);
+  const reverseformattedMargin = secondaryColor(
     margin.split("").reverse().join("")
   );
   let lines = text.split("\n");
@@ -276,8 +309,8 @@ export function alignTextAsTable(
   minWidth: number = 0
 ): { text: string; width: number; height: number } {
   const internalMinWidth = minWidth - margin.length * 2 - separator.length;
-  const formattedMargin = chalk.hex(getTheme().secondaryColor)(margin);
-  const reverseformattedMargin = chalk.hex(getTheme().secondaryColor)(
+  const formattedMargin = secondaryColor(margin);
+  const reverseformattedMargin = secondaryColor(
     margin.split("").reverse().join("")
   );
 
@@ -336,7 +369,7 @@ export function alignTextAsMultiTable(
 
   // Example: | Firstname  Jon | Firstname  Peter |
   //          | Lastname   Doe | Lastname     Poe |
-  const multitableRows = alignedTables[0].map((l, yIndex) => {
+  const multitableRows = alignedTables[0].map((_l, yIndex) => {
     let line = tableSeparator;
     for (let xIndex = 0; xIndex < tables.length; xIndex++) {
       line = line + " " + alignedTables[xIndex][yIndex] + " " + tableSeparator;

@@ -1,4 +1,4 @@
-import { Language } from "../utilities/LanguageService";
+import { Language } from "@utilities/LanguageService";
 
 /**
  * Interface for app theme overrides that can be used to override the standard theme values, and therefore have optional properties
