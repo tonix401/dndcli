@@ -3,7 +3,11 @@ import { getTerm } from "@utilities/LanguageService.js";
 import { getTheme, setLanguage, setTheme } from "@utilities/CacheService.js";
 import Config from "@utilities/Config.js";
 import { clearLogs } from "@utilities/LogService.js";
-import { primaryColor } from "@utilities/ConsoleService.js";
+import {
+  pressEnter,
+  primaryColor,
+  secondaryColor,
+} from "@utilities/ConsoleService.js";
 import { saveDataToFile } from "@utilities/StorageService.js";
 
 /**
@@ -11,39 +15,48 @@ import { saveDataToFile } from "@utilities/StorageService.js";
  */
 export async function resetDataMenu(): Promise<void> {
   const options = [
-    { name: getTerm("showCharacterData"), value: "character" },
-    { name: getTerm("showSettingsData"), value: "settings" },
+    { name: getTerm("characterData"), value: "characterData" },
+    { name: getTerm("settingsData"), value: "settingsData" },
     { name: getTerm("logs"), value: "logs" },
-    { name: getTerm("cancel"), value: "cancel" },
   ];
 
-  const choice = await checkbox(
+  const choices = await checkbox(
     {
       message: getTerm("resetData"),
       choices: options,
-      instructions: getTerm(""),
+      instructions: getTerm("checkboxHelp"),
       theme: {
+        style: {
+          message: primaryColor,
+          highlight: secondaryColor,
+          help: secondaryColor,
+        },
         icon: {
           cursor: getTheme().cursor,
-          checked: `(${primaryColor("x")})`,
-          unchecked: "( )",
+          checked: "☑",
+          unchecked: "☐",
         },
-        helpMode: "never",
         prefix: getTheme().prefix,
       },
     },
     { clearPromptOnDone: true }
   );
 
-  if (choice.includes("cancel")) return;
-  if (choice.includes("character")) {
+  if (choices.includes("characterData")) {
     saveDataToFile("character", Config.START_CHARACTER);
   }
-  if (choice.includes("settings")) {
+  if (choices.includes("settingsData")) {
     setLanguage("de");
     setTheme(Config.STANDARD_THEME);
   }
-  if (choice.includes("logs")) {
+  if (choices.includes("logs")) {
     clearLogs();
   }
+
+  console.log(
+    `${getTerm("resetDone")}: ${
+      choices.length === 0 ? getTerm("none") : choices.map(choice => getTerm(choice)).join(", ")
+    }`
+  );
+  await pressEnter();
 }

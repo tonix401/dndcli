@@ -79,7 +79,7 @@ const getSettingsOptions = () => {
 export async function showSettingsData() {
   while (true) {
     const choice = await themedSelect({
-      message: primaryColor(getTerm("showSettingsData")),
+      message: primaryColor(getTerm("settingsData")),
       choices: getSettingsOptions(),
     });
     if (choice === "goBack") return;

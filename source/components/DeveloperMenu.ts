@@ -118,12 +118,12 @@ export async function secretDevMenu() {
     description?: string;
   }[] = [
     {
-      name: getTerm("showSettingsData"),
-      value: "showSettingsData",
+      name: getTerm("settingsData"),
+      value: "settings",
     },
     {
-      name: getTerm("showCharacterData"),
-      value: "showCharacterData",
+      name: getTerm("characterData"),
+      value: "character",
     },
     {
       name: getTerm("logsMenu"),
@@ -164,11 +164,11 @@ export async function secretDevMenu() {
         choices: devMenuOptions,
       });
       switch (chosenOption) {
-        case "showSettingsData":
+        case "settings":
           log("Dev Menu: showing saved data");
           await showSettingsData();
           break;
-        case "showCharacterData":
+        case "character":
           log("Dev Menu: showing character data");
           await showCharacterData();
           break;

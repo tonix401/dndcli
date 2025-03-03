@@ -285,11 +285,11 @@ const terms: Record<string, ITerm> = {
     de: "Entwicklermenü",
     en: "Developer menu",
   },
-  showSettingsData: {
+  settingsData: {
     de: "Einstellungensdaten",
     en: "Settings data",
   },
-  showCharacterData: {
+  characterData: {
     de: "Charakterdaten",
     en: "Character data",
   },
@@ -336,6 +336,18 @@ const terms: Record<string, ITerm> = {
   resetData: {
     de: "Daten zurücksetzen",
     en: "Reset data",
+  },
+  resetDone: {
+    de: "Daten zurückgesetzt",
+    en: "Data reset",
+  },
+  none: {
+    de: "Keine",
+    en: "None",
+  },
+  checkboxHelp: {
+    de: " Drücke [Space], um auszuwählen und [Enter], um fortzufahren",
+    en: " Press [Space] to select and [Enter] to continue",
   },
   areYouSure: {
     de: "Bist Du dir sicher?",
