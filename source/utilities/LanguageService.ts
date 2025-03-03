@@ -1,5 +1,5 @@
-import { LogTypes, log } from "./LogService.js";
-import { getLanguage } from "./CacheService.js";
+import { LogTypes, log } from "@utilities/LogService.js";
+import { getLanguage } from "@utilities/CacheService.js";
 
 export type ITerm = Record<Language, string>;
 export type IColorTerm = Record<Language | "hex", string>;
@@ -7,8 +7,8 @@ export type Language = "de" | "en";
 
 export function getAllEnglishTermsLength(): number {
   const allEnglish = Object.values(terms)
-    .map(term => term.en)
-    .join('');
+    .map((term) => term.en)
+    .join("");
   return allEnglish.length;
 }
 
@@ -25,10 +25,9 @@ export function getAllEnglishTermsLength(): number {
  */
 export function getTerm(key: string, indented: boolean = false): string {
   const term = terms[key];
-
   if (!term) {
     log(`Language Service: Term not found: ${key}`, LogTypes.ERROR);
-    return "";
+    return "NO TERM";
   }
 
   const translation = term[getLanguage()];
@@ -52,6 +51,10 @@ const terms: Record<string, ITerm> = {
   helloNewPlayer: {
     de: "Es sieht aus, als wärst Du zum ersten Mal hier.\nWir haben Dir schon einmal einen Charakter vorbereitet, damit Du gleich loslegen kannst.\nErstelle Dir aber gerne auch einen eigenen.\nGenieß die Show!",
     en: "It looks like it's your first time around here.\nWe've prepared a character for you, so you can get right into the game.\nFeel free to make yourself a custom one though.\nEnjoy the show!",
+  },
+  enlargeWindowPrompt: {
+    de: "Oh, dein Fenster ist etwas zu klein. Bitte vergrößere das Fenster auf mindestens 100 x 35 Zeichen. Aktuell: ",
+    en: "Oh, your window is a bit too small. Please enlarge the window to at least 100 x 35 characters. Currently: ",
   },
   invalid: {
     de: "Invalide!",
@@ -109,9 +112,17 @@ const terms: Record<string, ITerm> = {
   },
 
   // Character Stats
+  class: {
+    de: "Klasse",
+    en: "Class",
+  },
   hp: {
     de: "HP",
     en: "HP",
+  },
+  maxhp: {
+    de: "Max HP",
+    en: "Max HP",
   },
   level: {
     de: "Level",
@@ -248,7 +259,7 @@ const terms: Record<string, ITerm> = {
   },
   backToMainMenu: {
     de: "Zurück zum Hauptmenü",
-    en: "Back to main menu"
+    en: "Back to main menu",
   },
   enterPassword: {
     de: "Bitte Passwort eingeben",
@@ -298,13 +309,13 @@ const terms: Record<string, ITerm> = {
     de: "Erneut versuchen?",
     en: "Try again?",
   },
-  saveData: {
-    de: "Cache-Daten speichern",
-    en: "Commit cached data",
-  },
   logsMenu: {
     de: "Log Optionen",
     en: "Log options",
+  },
+  logs: {
+    de: "Logs",
+    en: "Logs",
   },
   showLogs: {
     de: "Logs der letzten Stunde",
@@ -321,6 +332,18 @@ const terms: Record<string, ITerm> = {
   noLogs: {
     de: "Keine Logs vorhanden",
     en: "No logs found",
+  },
+  resetData: {
+    de: "Daten zurücksetzen",
+    en: "Reset data",
+  },
+  areYouSure: {
+    de: "Bist Du dir sicher?",
+    en: "Are you sure?",
+  },
+  cancel: {
+    de: "Abbrechen",
+    en: "Cancel",
   },
   cursor: {
     de: "Zeiger",
@@ -409,21 +432,21 @@ const terms: Record<string, ITerm> = {
     de: "Du hast einen leeren Raum entdeckt",
     en: "You discovered an empty room",
   },
-  inpectRoom: {
+  inspectRoom: {
     de: "Hier könnten noch versteckte Schätze sein, willst Du Dir den Raum genauer ansehen?",
-    en: "There could be hidden treasures here, would you like to inspect the room more closely?"
+    en: "There could be hidden treasures here, would you like to inspect the room more closely?",
   },
   nothingHere: {
     de: "Scheint als wäre wirklich nichts hier... schade",
-    en: "Seems like there is really nothing here... sad"
+    en: "Seems like there is really nothing here... sad",
   },
   enemyRoomDiscovered: {
     de: "Du hast einen Raum mit Gegnern entdeckt",
     en: "You discovered a room with enemies",
   },
   enterToFight: {
-    de:"Drücke [Enter], um den Kampf zu beginnen",
-    en:"Press [Enter] to start the fight"
+    de: "Drücke [Enter], um den Kampf zu beginnen",
+    en: "Press [Enter] to start the fight",
   },
   chestRoomDiscovered: {
     de: "Du hast eine Schatzkiste entdeckt",
@@ -435,7 +458,7 @@ const terms: Record<string, ITerm> = {
   },
   engageFight: {
     de: "Willst Du kämpfen?",
-    en: "Would you like to fight?"
-  }
+    en: "Would you like to fight?",
+  },
   // #endregion
 };

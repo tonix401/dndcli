@@ -1,6 +1,7 @@
 import chalk from "chalk";
-import { IEnemy } from "../types/IEnemy";
-import { getDungeon, getTheme } from "./CacheService.js";
+import { IEnemy } from "@utilities/IEnemy.js";
+import { getDungeon } from "@utilities/CacheService.js";
+import { primaryColor, secondaryColor } from "@utilities/ConsoleService.js";
 
 export enum RoomTypes {
   START = "START",
@@ -155,7 +156,7 @@ function getMiniRoomVisual(room: Room, row: number, col: number) {
   if (room === undefined) {
     return "     \n     \n     \n     ";
   } else if (playerX === room.position.x && playerY === room.position.y) {
-    symbol = chalk.bold.hex(getTheme().primaryColor)("@");
+    symbol = chalk.bold(primaryColor("@"));
   } else if (!room.discovered) {
     symbol = "?";
   } else {
@@ -169,9 +170,7 @@ function getMiniRoomVisual(room: Room, row: number, col: number) {
         : room.type.substring(0, 1);
   }
 
-  return `${chalk.hex(getTheme().secondaryColor)(
-    "╔═══╗ \n║ "
-  )}${symbol}${chalk.hex(getTheme().secondaryColor)(
+  return `${secondaryColor("╔═══╗ \n║ ")}${symbol}${secondaryColor(
     ` ║${eastHallway}\n╚═══╝ \n  ${southHallway}   `
   )}`;
 }
@@ -252,5 +251,3 @@ export function initiateDungeonMapWithHallways(
 
   return dungeon;
 }
-
-

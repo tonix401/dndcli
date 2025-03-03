@@ -1,4 +1,4 @@
-import { Language } from "../utilities/LanguageService";
+import { Language } from "@utilities/LanguageService";
 
 /**
  * Interface for app themes that can be saved

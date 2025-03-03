@@ -3,19 +3,17 @@ import {
   getTheme,
   setLanguage,
   setTheme,
-} from "../utilities/CacheService.js";
-import { getTerm, Language } from "../utilities/LanguageService.js";
-import { log, LogTypes } from "../utilities/LogService.js";
+} from "@utilities/CacheService.js";
+import { getTerm, Language } from "@utilities/LanguageService.js";
+import { log, LogTypes } from "@utilities/LogService.js";
 import {
   pressEnter,
   themedSelect,
   totalClear,
-} from "../utilities/ConsoleService.js";
-import {
-  getAllThemeOverrides,
-  standardTheme,
-} from "../utilities/ThemingService.js";
+} from "@utilities/ConsoleService.js";
+import { getAllThemeOverrides } from "@utilities/ThemingService.js";
 import chalk from "chalk";
+import Config from "@utilities/Config.js";
 
 export async function settingsMenu() {
   while (true) {
@@ -51,7 +49,6 @@ export async function settingsMenu() {
         log("Settings menu: Unexpected sub setting choice", LogTypes.ERROR);
         console.log(getTerm("invalid"));
         await pressEnter();
-        settingsMenu();
     }
   }
 }
@@ -86,14 +83,16 @@ async function changeLanguageMenu() {
 }
 
 async function changeThemeMenu() {
+  const themes = Object.values(getAllThemeOverrides())
+
   const themeChoice = await themedSelect({
     message: getTerm("theme"),
     choices: [
-      ...Object.values(getAllThemeOverrides()).map((theme) => {
+      ...themes.map((theme) => {
         return {
-          name: chalk.hex(theme.primaryColor || standardTheme.primaryColor)(
-            theme.name[getLanguage()]
-          ),
+          name: chalk.hex(
+            theme.primaryColor || Config.STANDARD_THEME.primaryColor
+          )(theme.name[getLanguage()]),
           value: theme.name.en,
         };
       }),
@@ -101,7 +100,7 @@ async function changeThemeMenu() {
     default: getTheme().name.en,
   });
 
-  const selectedTheme = Object.values(getAllThemeOverrides()).find(
+  const selectedTheme = themes.find(
     (theme) => theme.name.en === themeChoice
   );
 

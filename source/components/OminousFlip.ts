@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { pause, totalClear } from "../utilities/ConsoleService.js";
+import { pause, totalClear } from "@utilities/ConsoleService.js";
 
 const frames = [
   "\n(°□°)       ┬─┬      \n",

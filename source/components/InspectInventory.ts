@@ -1,14 +1,15 @@
-import ICharacterData from "../types/ICharacterData.js";
-import { getCharacterData } from "../utilities/CharacterService.js";
+import ICharacterData from "@utilities/ICharacterData.js";
+import { getCharacterData } from "@utilities/CharacterService.js";
 import chalk from "chalk";
-import { getTerm } from "../utilities/LanguageService.js";
-import { getTheme } from "../utilities/CacheService.js";
+import { getTerm } from "@utilities/LanguageService.js";
+import { getTheme } from "@utilities/CacheService.js";
 import {
   alignTextAsMultiTable,
   pressEnter,
+  secondaryColor,
   slowWrite,
   totalClear,
-} from "../utilities/ConsoleService.js";
+} from "@utilities/ConsoleService.js";
 
 export async function inspectInventory() {
   totalClear();
@@ -38,16 +39,8 @@ export async function inspectInventory() {
     "|"
   );
 
-  console.log(
-    chalk.hex(getTheme().secondaryColor)(
-      "/" + "‾".repeat(multiTable.width - 2) + "\\"
-    )
-  );
-  console.log(chalk.hex(getTheme().secondaryColor)(multiTable.text));
-  console.log(
-    chalk.hex(getTheme().secondaryColor)(
-      "\\" + "_".repeat(multiTable.width - 2) + "/"
-    )
-  );
+  console.log(secondaryColor("/" + "‾".repeat(multiTable.width - 2) + "\\"));
+  console.log(secondaryColor(multiTable.text));
+  console.log(secondaryColor("\\" + "_".repeat(multiTable.width - 2) + "/"));
   await pressEnter();
 }

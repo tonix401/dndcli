@@ -1,10 +1,10 @@
 import inquirer from "inquirer";
 import chalk from "chalk";
 import chalkAnimation from "chalk-animation";
-import { rollDice } from "../utilities/DiceService.js";
-import { inventoryMenu } from "../utilities/InventoryService.js";
-import { generateRandomItem } from "../utilities/ItemGenerator.js";
-import { saveCharacterData } from "../utilities/CharacterService.js";
+import { rollDice } from "@utilities/DiceService.js";
+import { inventoryMenu } from "@utilities/InventoryService.js";
+import { generateRandomItem } from "@utilities/ItemGenerator.js";
+import { saveCharacterData } from "@utilities/CharacterService.js";
 import readline from "readline";
 import fs from "fs/promises";
 import path from "path";

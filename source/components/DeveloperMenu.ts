@@ -1,35 +1,28 @@
-import { log, LogTypes } from "../utilities/LogService.js";
+import { log, LogTypes } from "@utilities/LogService.js";
 import {
-  alignTextAsMultiTable,
   pressEnter,
+  primaryColor,
   themedSelect,
   totalClear,
-} from "../utilities/ConsoleService.js";
-import { getTerm } from "../utilities/LanguageService.js";
-import {
-  getLanguage,
-  getPassword,
-  getTheme,
-} from "../utilities/CacheService.js";
+} from "@utilities/ConsoleService.js";
+import { getTerm } from "@utilities/LanguageService.js";
 import chalk from "chalk";
-import { exitProgram } from "../utilities/ErrorService.js";
-import {
-  getSettingsData,
-  saveSettingsData,
-} from "../utilities/SettingsService.js";
-import { flipATable } from "./OminousFlip.js";
+import { exitProgram } from "@utilities/ErrorService.js";
+import { flipATable } from "@components/OminousFlip.js";
 import {
   checkPasswordScreen,
   setPasswordScreen,
-} from "../utilities/PasswordService.js";
+} from "@utilities/PasswordService.js";
 import { runCombat } from "../src/combat.js";
 import {
   getCharacterData,
   saveCharacterData as saveCharData,
-} from "../utilities/CharacterService.js";
-import { getStartingItems } from "../utilities/InventoryService.js";
-import { showSettingsData } from "./ShowSettingsData.js";
-import { showLogsMenu } from "./ShowLogsMenu.js";
+} from "@utilities/CharacterService.js";
+import { getStartingItems } from "@utilities/InventoryService.js";
+import { showSettingsData } from "@components/ShowSettingsData.js";
+import { showLogsMenu } from "@components/ShowLogsMenu.js";
+import { showCharacterData } from "@components/ShowCharacterData.js";
+import { resetDataMenu } from "@components/ResetDataMenu.js";
 
 // ----------------- (Temporary) Test Combat Section -----------------
 
@@ -69,7 +62,7 @@ const testEnemy = {
 async function testCombat() {
   let character = getCharacterData();
   if (!character) {
-    console.log(chalk.hex(getTheme().primaryColor)(getTerm("noCharacter")));
+    console.log(primaryColor(getTerm("noCharacter")));
     await pressEnter();
     return;
   }
@@ -112,10 +105,10 @@ async function testCombat() {
   await pressEnter();
 }
 
-// ----------------- Old Developer Menu Section -----------------
+// ----------------- Developer Menu Section -----------------
 
 async function showWorkInProgress() {
-  console.log(chalk.hex(getTheme().primaryColor)(getTerm("currentlyInDev")));
+  console.log(primaryColor(getTerm("currentlyInDev")));
   await pressEnter();
 }
 
@@ -143,6 +136,10 @@ export async function secretDevMenu() {
       value: "setPassword",
     },
     {
+      name: getTerm("resetData"),
+      value: "resetData",
+    },
+    {
       name: getTerm("flip"),
       value: "flip",
     },
@@ -157,7 +154,7 @@ export async function secretDevMenu() {
   ];
 
   if (!(await checkPasswordScreen(3))) {
-    console.log(chalk.hex(getTheme().primaryColor)(getTerm("invalid")));
+    console.log(primaryColor(getTerm("invalid")));
     return;
   }
 
@@ -175,7 +172,7 @@ export async function secretDevMenu() {
           break;
         case "showCharacterData":
           log("Dev Menu: showing character data");
-          await showWorkInProgress();
+          await showCharacterData();
           break;
         case "showLogs":
           log("Dev Menu: showing log options");
@@ -183,6 +180,10 @@ export async function secretDevMenu() {
           break;
         case "setPassword":
           await setPasswordScreen();
+          break;
+        case "resetData":
+          log("Dev Menu: Showing reset Data Menu");
+          await resetDataMenu();
           break;
         case "flip":
           await flipATable();
@@ -193,7 +194,7 @@ export async function secretDevMenu() {
         case "goBack":
           return;
         default:
-          log("Secret Dev Menu: Unexpected menu choice", LogTypes.ERROR);
+          log("Dev Menu: Unexpected menu choice", LogTypes.ERROR);
           console.log(getTerm("invalid"));
           await pressEnter();
       }

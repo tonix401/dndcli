@@ -1,14 +1,15 @@
-import ICharacterData from "../types/ICharacterData.js";
-import { getCharacterData } from "../utilities/CharacterService.js";
+import ICharacterData from "@utilities/ICharacterData.js";
+import { getCharacterData } from "@utilities/CharacterService.js";
 import {
   alignText,
   alignTextAsTable,
   pressEnter,
+  primaryColor,
+  secondaryColor,
   totalClear,
-} from "../utilities/ConsoleService.js";
+} from "@utilities/ConsoleService.js";
 import chalk from "chalk";
-import { getTerm } from "../utilities/LanguageService.js";
-import { getTheme } from "../utilities/CacheService.js";
+import { getTerm } from "@utilities/LanguageService.js";
 
 export async function inspectCharacter() {
   totalClear();
@@ -56,7 +57,7 @@ export async function inspectCharacter() {
   const totalMaxWidth = Math.max(maxWidthOfBody, maxWidthOfTitle);
 
   // Format title and body
-  const formattedTitle = chalk.hex(getTheme().primaryColor)(
+  const formattedTitle = primaryColor(
     chalk.bold(alignText(title, "center", margin, totalMaxWidth))
   );
   const bodyTable = alignTextAsTable(
@@ -65,22 +66,12 @@ export async function inspectCharacter() {
     separator,
     totalMaxWidth
   ).text;
-  const formattedBodyTable = chalk.hex(getTheme().secondaryColor)(
-    alignText(bodyTable, "center")
-  );
+  const formattedBodyTable = secondaryColor(alignText(bodyTable, "center"));
 
   // Log out
-  console.log(
-    chalk.hex(getTheme().secondaryColor)(
-      "/" + "‾".repeat(totalMaxWidth - 2) + "\\"
-    )
-  );
+  console.log(secondaryColor("/" + "‾".repeat(totalMaxWidth - 2) + "\\"));
   console.log(formattedTitle + "\n" + formattedBodyTable);
-  console.log(
-    chalk.hex(getTheme().secondaryColor)(
-      "\\" + "_".repeat(totalMaxWidth - 2) + "/"
-    )
-  );
+  console.log(secondaryColor("\\" + "_".repeat(totalMaxWidth - 2) + "/"));
 
   await pressEnter();
 }

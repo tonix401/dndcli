@@ -1,5 +1,5 @@
-import package_json from "../../package.json" with {type: "json"};
-import { getTerm } from "../utilities/LanguageService.js";
+import package_json from "@root/package.json" with {type: "json"};
+import { getTerm } from "@utilities/LanguageService.js";
 
 export default `
  /$$$$$$$            /$$$$$$$           /$$$$$$  /$$       /$$$$$$

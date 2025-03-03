@@ -1,20 +1,22 @@
-import chalk from "chalk"; // added missing chalk import
-import type ICharacterData from "../types/ICharacterData.js";
-import { saveCharacterData } from "../utilities/CharacterService.js";
-import { input } from "@inquirer/prompts";
+import chalk from "chalk";
+import type ICharacterData from "@utilities/ICharacterData.js";
+import { saveCharacterData } from "@utilities/CharacterService.js";
 import {
   generateChatNarrative,
   ChatCompletionRequestMessage,
 } from "../src/aiAssistant.js";
-import { getStartingItems } from "../utilities/InventoryService.js";
-import { getTerm } from "../utilities/LanguageService.js";
-import { getClassChoices } from "../types/ClassChoices.js";
-import { log, LogTypes } from "../utilities/LogService.js";
-import { pressEnter, themedInput, themedSelect } from "../utilities/ConsoleService.js";
-import { standardTheme } from "../utilities/ThemingService.js";
-import { getDefaultAbilitiesForClass } from "../utilities/defaultAbilities.js";
-import { rollDiceTotal } from "../utilities/DiceService.js";
-import { ITheme } from "../types/ITheme.js";
+import { getStartingItems } from "@utilities/InventoryService.js";
+import { getTerm } from "@utilities/LanguageService.js";
+import { log, LogTypes } from "@utilities/LogService.js";
+import {
+  pressEnter,
+  themedInput,
+  themedSelect,
+} from "@utilities/ConsoleService.js";
+import { rollDiceTotal } from "@utilities/DiceService.js";
+import { ITheme } from "@utilities/ITheme.js";
+import Config from "@utilities/Config.js";
+import { getTheme } from "@utilities/CacheService.js";
 
 async function validateOrigin(origin: string): Promise<string> {
   const systemMessage =
@@ -39,8 +41,7 @@ async function validateOrigin(origin: string): Promise<string> {
 
 export async function createCharacterMenu(): Promise<void> {
   try {
-    // Get current theme (using standardTheme here; you could allow selection later)
-    const theme: ITheme = standardTheme;
+    const theme: ITheme = getTheme();
 
     const charData: ICharacterData = {
       name: "",
@@ -65,28 +66,17 @@ export async function createCharacterMenu(): Promise<void> {
 
     // Get character name using themed prompt
     const namePrompt = chalk.hex(theme.primaryColor)(getTerm("namePrompt"));
-    charData.name = await themedInput(
-      { message: namePrompt }
-    );
+    charData.name = await themedInput({ message: namePrompt });
     if (charData.name.toLowerCase() === "exit") return;
 
     // Get character class (the selection itself can be themed using your themedSelect helper)
     charData.class = await themedSelect({
       message: chalk.hex(theme.primaryColor)(getTerm("classPrompt")),
-      choices: getClassChoices(),
+      choices: Config.CHARACTER_CLASSES.map((cls) => ({
+        name: getTerm(cls),
+        value: cls,
+      })),
     });
-
-    // Map the selected class to the key used in defaultAbilities
-    // For example, if getClassChoices() returns "swordsman", we map it to "Warrior"
-    const classMapping: Record<string, string> = {
-      swordsman: "Warrior",
-      mage: "Mage",
-      rogue: "Rogue",
-    };
-    const normalizedClass =
-      classMapping[charData.class.toLowerCase()] || charData.class;
-    // Now assign default abilities
-    charData.abilitiesList = getDefaultAbilitiesForClass(normalizedClass);
 
     // Ask user if they want default stats or custom allocation
     const statMethod = await themedSelect({
@@ -99,37 +89,10 @@ export async function createCharacterMenu(): Promise<void> {
       ],
     });
 
-    // Define default stat mappings for example classes
-    const defaultStats: Record<string, typeof charData.abilities> = {
-      Warrior: {
-        maxhp: 20,
-        strength: 5,
-        mana: 2,
-        dexterity: 3,
-        charisma: 2,
-        luck: 3,
-      },
-      Mage: {
-        maxhp: 12,
-        strength: 2,
-        mana: 8,
-        dexterity: 3,
-        charisma: 3,
-        luck: 4,
-      },
-      Rogue: {
-        maxhp: 15,
-        strength: 3,
-        mana: 3,
-        dexterity: 7,
-        charisma: 2,
-        luck: 5,
-      },
-    };
-
     if (statMethod === "default") {
       // Map class to default stats if available
-      charData.abilities = defaultStats[normalizedClass] || charData.abilities;
+      charData.abilities =
+        Config.STANDARD_CHARACTER_STATS[charData.class] || charData.abilities;
     } else if (statMethod === "custom") {
       let pool = 20;
       console.log(
@@ -149,9 +112,7 @@ export async function createCharacterMenu(): Promise<void> {
         const promptMsg = chalk.hex(theme.primaryColor)(
           `Allocate points for ${stat} (points left: ${pool}): `
         );
-        let allocationStr = await themedInput(
-          { message: promptMsg }
-        );
+        let allocationStr = await themedInput({ message: promptMsg });
         let allocation = parseInt(allocationStr);
         if (isNaN(allocation) || allocation < 0) {
           allocation = 0;
@@ -171,9 +132,7 @@ export async function createCharacterMenu(): Promise<void> {
 
     // Get character origin
     const originPrompt = chalk.hex(theme.primaryColor)(getTerm("originPrompt"));
-    let originInput = await themedInput(
-      { message: originPrompt }
-    );
+    let originInput = await themedInput({ message: originPrompt });
     if (originInput.toLowerCase() === "exit") return;
 
     // If no origin is provided, default to "unknown"
@@ -187,9 +146,7 @@ export async function createCharacterMenu(): Promise<void> {
         const clarMsg = chalk.hex(theme.primaryColor)(
           getTerm("originClarification")
         );
-        originInput = await themedInput(
-          { message: clarMsg }
-        );
+        originInput = await themedInput({ message: clarMsg });
         if (originInput.toLowerCase() === "exit") return;
         // If the user clears the input on subsequent prompts, default to unknown
         if (!originInput.trim()) {

@@ -1,6 +1,6 @@
 import fs from "fs";
-import { LogTypes, log } from "./LogService.js";
-import { IContextData } from "../types/IContextData.js";
+import { LogTypes, log } from "@utilities/LogService.js";
+import { IContextData } from "@utilities/IContextData.js";
 
 const filename = "../dndcli/storage/context.json";
 

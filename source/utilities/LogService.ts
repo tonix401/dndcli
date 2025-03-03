@@ -1,5 +1,5 @@
 import { appendFileSync, readFileSync, writeFileSync } from "fs";
-import config from "../utilities/Config.js";
+import config from "@utilities/Config.js";
 
 const debuggingLogFile = config.LOG_FILE;
 

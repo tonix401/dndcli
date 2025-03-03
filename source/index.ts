@@ -1,22 +1,22 @@
-import { createCharacterMenu } from "./components/CreateCharacterMenu.js";
-import { inspectCharacter } from "./components/InspectCharacter.js";
+import { createCharacterMenu } from "@components/CreateCharacterMenu.js";
+import { inspectCharacter } from "@components/InspectCharacter.js";
 import { startCampaign } from "./src/campaign.js";
 import {
+  secondaryColor,
   skippableSlowWrite,
   themedSelect,
   totalClear,
-} from "./utilities/ConsoleService.js";
-import { log, LogTypes } from "./utilities/LogService.js";
-import { getSettingsData } from "./utilities/SettingsService.js";
-import { settingsMenu } from "./components/SettingsMenu.js";
-import { newPlayerScreen } from "./components/NewPlayerScreen.js";
-import { getTerm } from "./utilities/LanguageService.js";
-import { getTheme, setLanguage, setTheme } from "./utilities/CacheService.js";
-import { standardTheme } from "./utilities/ThemingService.js";
-import { secretDevMenu } from "./components/DeveloperMenu.js";
-import { inspectInventory } from "./components/InspectInventory.js";
-import { titleScreen } from "./components/TitleScreen.js";
-import chalk from "chalk";
+} from "@utilities/ConsoleService.js";
+import { log, LogTypes } from "@utilities/LogService.js";
+import { getSettingsData } from "@utilities/SettingsService.js";
+import { settingsMenu } from "@components/SettingsMenu.js";
+import { newPlayerScreen } from "@components/NewPlayerScreen.js";
+import { getTerm } from "@utilities/LanguageService.js";
+import { setLanguage, setTheme } from "@utilities/CacheService.js";
+import { secretDevMenu } from "@components/DeveloperMenu.js";
+import { inspectInventory } from "@components/InspectInventory.js";
+import { titleScreen } from "@components/TitleScreen.js";
+import Config from "@utilities/Config.js";
 
 const getMenuOptions = () => [
   { name: getTerm("createCharacter"), value: "1" },
@@ -84,12 +84,13 @@ async function main() {
 export async function exitProgram() {
   totalClear();
   log("Index: Program ended");
-  await skippableSlowWrite(getTerm("goodbye"));
+  await skippableSlowWrite(secondaryColor(getTerm("goodbye")));
+  process.exit(1);
 }
 
 process.on("uncaughtException", async (error) => {
   log("Index: " + error.message, LogTypes.ERROR);
-  await setTimeout(() => {},1000)
+  let choice = "exit";
   if (choice === "backToMainMenu") {
     await main();
   } else if (choice === "exit") {
@@ -99,11 +100,10 @@ process.on("uncaughtException", async (error) => {
 
 ///////////////////////////////////////////// MAIN PROGRAM /////////////////////////////////////////////////
 log("Index: Program started");
-// process.removeAllListeners("warning");
 
 const settings = getSettingsData();
 setLanguage(settings?.language || "de");
-setTheme(settings?.theme || standardTheme);
+setTheme(settings?.theme || Config.STANDARD_THEME);
 
 await titleScreen();
 await newPlayerScreen();
