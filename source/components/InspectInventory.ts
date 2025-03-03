@@ -1,8 +1,5 @@
 import ICharacter from "@utilities/ICharacter.js";
-import { getCharacterData } from "@utilities/CharacterService.js";
-import chalk from "chalk";
 import { getTerm } from "@utilities/LanguageService.js";
-import { getTheme } from "@utilities/CacheService.js";
 import {
   alignTextAsMultiTable,
   pressEnter,
@@ -10,6 +7,7 @@ import {
   slowWrite,
   totalClear,
 } from "@utilities/ConsoleService.js";
+import { getDataFromFile } from "@utilities/StorageService.js";
 
 export async function inspectInventory() {
   totalClear();

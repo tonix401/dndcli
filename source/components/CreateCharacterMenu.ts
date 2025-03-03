@@ -17,6 +17,18 @@ import { rollDiceTotal } from "@utilities/DiceService.js";
 import { ITheme } from "@utilities/ITheme.js";
 import Config from "@utilities/Config.js";
 import { getTheme } from "@utilities/CacheService.js";
+import { getStartingItems } from "@utilities/InventoryService.js";
+import { getTerm } from "@utilities/LanguageService.js";
+import { log, LogTypes } from "@utilities/LogService.js";
+import {
+  pressEnter,
+  themedInput,
+  themedSelect,
+} from "@utilities/ConsoleService.js";
+import { rollDiceTotal } from "@utilities/DiceService.js";
+import { ITheme } from "@utilities/ITheme.js";
+import Config from "@utilities/Config.js";
+import { getTheme } from "@utilities/CacheService.js";
 
 async function validateOrigin(origin: string): Promise<string> {
   const systemMessage =
@@ -41,6 +53,7 @@ async function validateOrigin(origin: string): Promise<string> {
 
 export async function createCharacterMenu(): Promise<void> {
   try {
+    const theme: ITheme = getTheme();
     const theme: ITheme = getTheme();
 
     const charData: ICharacter = {
@@ -67,11 +80,17 @@ export async function createCharacterMenu(): Promise<void> {
     // Get character name using themed prompt
     const namePrompt = chalk.hex(theme.primaryColor)(getTerm("namePrompt"));
     charData.name = await themedInput({ message: namePrompt });
+    charData.name = await themedInput({ message: namePrompt });
     if (charData.name.toLowerCase() === "exit") return;
 
     // Get character class (the selection itself can be themed using your themedSelect helper)
     charData.class = await themedSelect({
       message: chalk.hex(theme.primaryColor)(getTerm("classPrompt")),
+      choices: Config.CHARACTER_CLASSES.map((cls) => ({
+        name: getTerm(cls),
+        value: cls,
+      })),
+    });
       choices: Config.CHARACTER_CLASSES.map((cls) => ({
         name: getTerm(cls),
         value: cls,
@@ -113,6 +132,7 @@ export async function createCharacterMenu(): Promise<void> {
           `Allocate points for ${stat} (points left: ${pool}): `
         );
         let allocationStr = await themedInput({ message: promptMsg });
+        let allocationStr = await themedInput({ message: promptMsg });
         let allocation = parseInt(allocationStr);
         if (isNaN(allocation) || allocation < 0) {
           allocation = 0;
@@ -133,6 +153,7 @@ export async function createCharacterMenu(): Promise<void> {
     // Get character origin
     const originPrompt = chalk.hex(theme.primaryColor)(getTerm("originPrompt"));
     let originInput = await themedInput({ message: originPrompt });
+    let originInput = await themedInput({ message: originPrompt });
     if (originInput.toLowerCase() === "exit") return;
 
     // If no origin is provided, default to "unknown"
@@ -146,6 +167,7 @@ export async function createCharacterMenu(): Promise<void> {
         const clarMsg = chalk.hex(theme.primaryColor)(
           getTerm("originClarification")
         );
+        originInput = await themedInput({ message: clarMsg });
         originInput = await themedInput({ message: clarMsg });
         if (originInput.toLowerCase() === "exit") return;
         // If the user clears the input on subsequent prompts, default to unknown

@@ -1,5 +1,4 @@
 import {
-  getCharacterData,
   saveCharacterData,
 } from "@utilities/CharacterService.js";
 import { getTerm } from "@utilities/LanguageService.js";
@@ -16,6 +15,7 @@ import fs from "fs-extra";
 import dotenv from "dotenv";
 import config from "@utilities/Config.js";
 import Config from "@utilities/Config.js";
+import { getDataFromFile } from "@utilities/StorageService.js";
 
 /**
  * Initializes the settings and a character in case there is none yet
