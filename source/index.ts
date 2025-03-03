@@ -101,7 +101,7 @@ process.on("uncaughtException", async (error) => {
 ///////////////////////////////////////////// MAIN PROGRAM /////////////////////////////////////////////////
 log("Index: Program started");
 
-const settings = getSettingsData();
+const settings = getDataFromFile("settings");
 setLanguage(settings?.language || "de");
 setTheme(settings?.theme || Config.STANDARD_THEME);
 

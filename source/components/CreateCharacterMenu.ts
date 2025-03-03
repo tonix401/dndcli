@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import type ICharacterData from "@utilities/ICharacterData.js";
+import type ICharacter from "@utilities/ICharacter.js";
 import { saveCharacterData } from "@utilities/CharacterService.js";
 import {
   generateChatNarrative,
@@ -43,7 +43,7 @@ export async function createCharacterMenu(): Promise<void> {
   try {
     const theme: ITheme = getTheme();
 
-    const charData: ICharacterData = {
+    const charData: ICharacter = {
       name: "",
       class: "",
       origin: "",
@@ -92,7 +92,7 @@ export async function createCharacterMenu(): Promise<void> {
     if (statMethod === "default") {
       // Map class to default stats if available
       charData.abilities =
-        Config.STANDARD_CHARACTER_STATS[charData.class] || charData.abilities;
+        Config.START_CHARACTER_STATS[charData.class] || charData.abilities;
     } else if (statMethod === "custom") {
       let pool = 20;
       console.log(

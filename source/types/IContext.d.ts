@@ -4,7 +4,7 @@
  * @property {string} story - The current story or narrative content.
  * @property {string} lastPrompt - The most recent prompt or input provided.
  */
-export interface IContextData {
+export interface IContext {
   story: string;
   lastPrompt: string;
 }

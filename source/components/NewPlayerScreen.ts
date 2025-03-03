@@ -26,13 +26,13 @@ export async function newPlayerScreen(): Promise<boolean> {
   await ensureFilesExist();
 
   let isNew = false;
-  const charData = getCharacterData();
+  const charData = getDataFromFile("character");
   isNew = !charData;
 
   if (isNew) {
     totalClear();
     log("New Player Screen: New Player detected");
-    saveCharacterData(Config.STANDARD_CHARACTER);
+    saveCharacterData(Config.START_CHARACTER);
     await skippableSlowWrite(secondaryColor(getTerm("helloNewPlayer")));
     await pause(500);
     await pressEnter();

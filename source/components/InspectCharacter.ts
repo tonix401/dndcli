@@ -1,5 +1,4 @@
-import ICharacterData from "@utilities/ICharacterData.js";
-import { getCharacterData } from "@utilities/CharacterService.js";
+import ICharacter from "@utilities/ICharacter.js";
 import {
   alignText,
   alignTextAsTable,
@@ -10,10 +9,11 @@ import {
 } from "@utilities/ConsoleService.js";
 import chalk from "chalk";
 import { getTerm } from "@utilities/LanguageService.js";
+import { getDataFromFile } from "@utilities/StorageService.js";
 
 export async function inspectCharacter() {
   totalClear();
-  const charData: ICharacterData | null = getCharacterData();
+  const charData: ICharacter | null = getDataFromFile("character");
 
   if (!charData) {
     console.log(getTerm("noCharacter"));

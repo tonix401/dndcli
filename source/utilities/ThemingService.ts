@@ -1,10 +1,14 @@
 import chalk from "chalk";
-import { IThemeOverride } from "@utilities/IThemeOverides.js";
+import { IThemeOverride } from "@utilities/IThemeOveride.js";
 
 export function getAllThemeOverrides(): Record<string, IThemeOverride> {
   return getThemes();
 }
 
+/**
+ * Gets all theme overrides
+ * @returns A record of theme overrides
+ */
 const getThemes = (): Record<string, IThemeOverride> => {
   return {
     pirate: {

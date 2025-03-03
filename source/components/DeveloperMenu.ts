@@ -14,15 +14,13 @@ import {
   setPasswordScreen,
 } from "@utilities/PasswordService.js";
 import { runCombat } from "../src/combat.js";
-import {
-  getCharacterData,
-  saveCharacterData as saveCharData,
-} from "@utilities/CharacterService.js";
 import { getStartingItems } from "@utilities/InventoryService.js";
 import { showSettingsData } from "@components/ShowSettingsData.js";
 import { showLogsMenu } from "@components/ShowLogsMenu.js";
 import { showCharacterData } from "@components/ShowCharacterData.js";
 import { resetDataMenu } from "@components/ResetDataMenu.js";
+import { getDataFromFile, saveDataToFile } from "@utilities/StorageService.js";
+import ICharacter from "@utilities/ICharacter.js";
 
 // ----------------- (Temporary) Test Combat Section -----------------
 
@@ -60,7 +58,7 @@ const testEnemy = {
 };
 
 async function testCombat() {
-  let character = getCharacterData();
+  let character: ICharacter = getDataFromFile("character");
   if (!character) {
     console.log(primaryColor(getTerm("noCharacter")));
     await pressEnter();
@@ -93,8 +91,8 @@ async function testCombat() {
     if (result.success) {
       console.log(chalk.greenBright("\nCombat test completed successfully!"));
       console.log(chalk.greenBright(`XP gained: ${testEnemy.xpReward}`));
-      character.xp = Number(character.xp) + testEnemy.xpReward;
-      saveCharData(character);
+      character.xp = character.xp + testEnemy.xpReward;
+      saveDataToFile("character", character);
     } else if (result.fled) {
       console.log(chalk.yellowBright("\nYou fled from combat!"));
     } else {

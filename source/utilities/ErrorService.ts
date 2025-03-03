@@ -7,7 +7,7 @@ import { saveSettingsData } from "@utilities/SettingsService.js";
 export async function exitProgram() {
   totalClear();
   log("Index: Program ended");
-  saveSettingsData({
+  saveDataToFile("settings", {
     language: getLanguage(),
     theme: getTheme(),
     password: getPassword(),

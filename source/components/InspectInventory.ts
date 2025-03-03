@@ -1,4 +1,4 @@
-import ICharacterData from "@utilities/ICharacterData.js";
+import ICharacter from "@utilities/ICharacter.js";
 import { getCharacterData } from "@utilities/CharacterService.js";
 import chalk from "chalk";
 import { getTerm } from "@utilities/LanguageService.js";
@@ -13,7 +13,7 @@ import {
 
 export async function inspectInventory() {
   totalClear();
-  const charData: ICharacterData | null = getCharacterData();
+  const charData: ICharacter | null = getDataFromFile("character");
 
   if (!charData) {
     console.log(getTerm("noCharacter"));

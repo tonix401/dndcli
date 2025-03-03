@@ -10,7 +10,7 @@ import {
   getCharacterData,
   saveCharacterData,
 } from "@utilities/CharacterService.js";
-import ICharacterData from "@utilities/ICharacterData.js";
+import ICharacter from "@utilities/ICharacter.js";
 import Config from "@utilities/Config.js";
 
 const validators = {
@@ -43,7 +43,7 @@ const validators = {
   },
 };
 
-const getCharacterOptions = (character: ICharacterData) => {
+const getCharacterOptions = (character: ICharacter) => {
   // Calculate inventory sum
   const inventorySum: number = character.inventory.reduce(
     (sum: number, item: { quantity: number }): number => sum + item.quantity,
@@ -107,7 +107,7 @@ const getCharacterOptions = (character: ICharacterData) => {
 };
 
 export async function showCharacterData() {
-  const character = getCharacterData() || config.STANDARD_CHARACTER;
+  const character = getDataFromFile("character") || config.START_CHARACTER;
 
   while (true) {
     const choice = await themedSelect({

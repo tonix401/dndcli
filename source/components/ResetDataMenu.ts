@@ -37,7 +37,7 @@ export async function resetDataMenu(): Promise<void> {
 
   if (choice.includes("cancel")) return;
   if (choice.includes("character")) {
-    saveCharacterData(Config.STANDARD_CHARACTER);
+    saveCharacterData(Config.START_CHARACTER);
   }
   if (choice.includes("settings")) {
     setLanguage("de");
