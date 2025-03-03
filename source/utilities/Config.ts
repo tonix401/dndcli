@@ -1,7 +1,9 @@
 import chalk from "chalk";
 import path from "path";
+import crypto from "crypto";
 import { ITheme } from "@utilities/ITheme.js";
 import ICharacterData from "@utilities/ICharacterData.js";
+import { Language } from "./LanguageService.js";
 
 // #region Paths
 // Base directory (assumes process.cwd() is the project root)
@@ -95,11 +97,16 @@ const STANDARD_CHARACTER_STATS: Record<string, ICharacterData["abilities"]> = {
     luck: 8,
   },
 };
+const STANDARD_LANGUAGE: Language = "de";
+const STANDARD_PASSWORD: string = crypto
+  .createHash("sha256")
+  .update("123")
+  .digest("hex");
 // #endregion
 
 // #region Choices
 const CHARACTER_CLASSES = ["swordsman", "mage", "archer", "thief"];
-//#endregion
+// #endregion
 
 export default {
   ROOT_DIR,
@@ -114,4 +121,6 @@ export default {
   STANDARD_CHARACTER,
   CHARACTER_CLASSES,
   STANDARD_CHARACTER_STATS,
+  STANDARD_LANGUAGE,
+  STANDARD_PASSWORD,
 };

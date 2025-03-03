@@ -83,10 +83,12 @@ async function changeLanguageMenu() {
 }
 
 async function changeThemeMenu() {
+  const themes = Object.values(getAllThemeOverrides())
+
   const themeChoice = await themedSelect({
     message: getTerm("theme"),
     choices: [
-      ...Object.values(getAllThemeOverrides()).map((theme) => {
+      ...themes.map((theme) => {
         return {
           name: chalk.hex(
             theme.primaryColor || Config.STANDARD_THEME.primaryColor
@@ -98,7 +100,7 @@ async function changeThemeMenu() {
     default: getTheme().name.en,
   });
 
-  const selectedTheme = Object.values(getAllThemeOverrides()).find(
+  const selectedTheme = themes.find(
     (theme) => theme.name.en === themeChoice
   );
 

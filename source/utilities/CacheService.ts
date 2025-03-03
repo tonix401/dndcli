@@ -13,12 +13,15 @@ import {
 } from "@utilities/SettingsService.js";
 
 const standardTheme = Config.STANDARD_THEME;
+const standardLanguage = Config.STANDARD_LANGUAGE;
+const standardPassword = Config.STANDARD_PASSWORD;
+
 let cachedDungeon: Dungeon = initiateDungeonMapWithHallways();
 let cachedLanguage: Language;
 let cachedTheme: ITheme;
 let cachedPassword: string;
 
-sync();
+load();
 
 // #region Getters
 export function getDungeon() {
@@ -41,18 +44,20 @@ export function getTheme() {
 // #region Setters
 export function renewDungeon() {
   cachedDungeon = initiateDungeonMapWithHallways();
+  log("Cache Service: Dungeon renewed");
+  save();
 }
 
 export function setDungeon(dungeon: Dungeon) {
   cachedDungeon = dungeon;
-  sync();
   log("Cache Service: Dungeon updated");
+  save();
 }
 
 export function setLanguage(language: Language): void {
   cachedLanguage = language;
   log("Cache service: Language set to " + getTerm(language));
-  sync();
+  save();
 }
 
 export function setTheme(theme: IThemeOverride) {
@@ -68,34 +73,33 @@ export function setTheme(theme: IThemeOverride) {
     backgroundColor: theme.backgroundColor || standardTheme.backgroundColor,
     errorColor: theme.errorColor || standardTheme.errorColor,
   };
-  sync();
+  save();
 }
 
 export function setPassword(password: string) {
   cachedPassword = password;
-  sync();
   log("Cache Service: Password updated");
+  save();
 }
 
 // #endregion
-
-export function sync() {
-  saveSettingsData({
-    language: cachedLanguage,
-    theme: cachedTheme,
-    password: cachedPassword,
-  });
-  log("Cache Service: Settings synced");
-
+function load() {
   let settings = null;
   try {
     settings = getSettingsData();
   } catch (error) {
     log("Cache Service: " + error);
   }
-  cachedLanguage = settings?.language || "de";
+  cachedLanguage = settings?.language || standardLanguage;
   cachedTheme = settings?.theme || standardTheme;
-  cachedPassword =
-    settings?.password ||
-    "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3";
+  cachedPassword = settings?.password || standardPassword;
+}
+
+function save() {
+  saveSettingsData({
+    language: cachedLanguage,
+    theme: cachedTheme,
+    password: cachedPassword,
+  });
+  log("Cache Service: Settings synced");
 }

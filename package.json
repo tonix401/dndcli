@@ -8,9 +8,9 @@
   "scripts": {
     "build": "tsc && tsc-alias",
     "setup": "npm install --silent && npm run build",
-    "start": "node --no-deprecation js/index.js",
-    "test": "node --no-deprecation js/testing.js",
-    "reset": "node --no-deprecation js/reset.js"
+    "start": "npm run build && node --no-deprecation js/index.js",
+    "test": "npm run build && node --no-deprecation js/testing.js",
+    "reset": "npm run build && node --no-deprecation js/reset.js"
   },
   "dependencies": {
     "@inquirer/prompts": "^7.3.1",

@@ -8,7 +8,6 @@ import {
   themedSelect,
   totalClear,
 } from "@utilities/ConsoleService.js";
-import { getSettingsData } from "@utilities/SettingsService.js";
 
 /**
  * A Screen to check for a password
