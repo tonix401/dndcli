@@ -4,20 +4,14 @@ import chalkAnimation from "chalk-animation";
 import { rollDice } from "@utilities/DiceService.js";
 import { inventoryMenu } from "@utilities/InventoryService.js";
 import { generateRandomItem } from "@utilities/ItemGenerator.js";
-import { saveCharacterData } from "@utilities/CharacterService.js";
 import readline from "readline";
 import fs from "fs/promises";
 import path from "path";
-
-interface Ability {
-  name: string;
-  manaCost: number;
-  type: "attack" | "heal" | "buff";
-  multiplier?: number;
-  healAmount?: number;
-  buffAmount?: number;
-  description: string;
-}
+import ICharacter from "@utilities/ICharacter.js";
+import { IEnemy } from "@utilities/IEnemy.js";
+import { IAbility } from "@utilities/IAbility.js";
+import { totalClear } from "@utilities/ConsoleService.js";
+import { saveDataToFile } from "@utilities/StorageService.js";
 
 interface CombatResult {
   success: boolean;
@@ -32,7 +26,11 @@ function renderHealthBar(current: number, max: number): string {
   return `[${"█".repeat(filledLength)}${" ".repeat(emptyLength)}]`;
 }
 
-function displayCombatStatus(character: any, enemy: any, round: number): void {
+function displayCombatStatus(
+  character: ICharacter,
+  enemy: IEnemy,
+  round: number
+): void {
   console.clear();
   console.log(
     chalk.bgBlackBright.white.bold(`=== Battle Status (Round ${round}) ===`)
@@ -49,7 +47,7 @@ function displayCombatStatus(character: any, enemy: any, round: number): void {
   );
   console.log(
     chalk.whiteBright(
-      `${enemy.name} | HP: ${renderHealthBar(enemy.hp, enemy.maxhp)} (${
+      `${enemy.name} | HP: ${renderHealthBar(enemy.hp, enemy.maxhp || 10)} (${
         enemy.hp
       }/${enemy.maxhp})`
     )
@@ -118,7 +116,7 @@ export async function playAttackAnimation() {
       for (let i = 0; i < framesData.length; i++) {
         if (stop) break;
         // Clear the console using ANSI escape codes:
-        process.stdout.write("\x1B[2J\x1B[0f");
+        totalClear();
         const frame = framesData[i];
         const frameArt = Array.isArray(frame) ? frame.join("\n") : frame;
         console.log(chalk.green(frameArt));
@@ -126,13 +124,13 @@ export async function playAttackAnimation() {
       }
     }
     // Final clear after animation stops.
-    process.stdout.write("\x1B[2J\x1B[0f");
+    totalClear();
   } catch (error) {
     console.error(chalk.red("Error loading attack animation frames:"), error);
   }
 }
 
-function getStrengthBonus(character: any): number {
+function getStrengthBonus(character: ICharacter): number {
   let bonus = 0;
   if (character.inventory && Array.isArray(character.inventory)) {
     for (const item of character.inventory) {
@@ -144,14 +142,14 @@ function getStrengthBonus(character: any): number {
   return bonus;
 }
 
-async function useAbility(character: any, enemy: any): Promise<void> {
+async function useAbility(character: ICharacter, enemy: IEnemy): Promise<void> {
   if (!character.abilitiesList || character.abilitiesList.length === 0) {
     console.log(chalk.yellow("You have no abilities available!"));
     await pause(1000);
     return;
   }
   const choices = character.abilitiesList.map(
-    (ability: Ability, index: number) => ({
+    (ability: IAbility, index: number) => ({
       name: `${ability.name} (Cost: ${ability.manaCost} mana) - ${ability.description}`,
       value: index,
     })
@@ -164,7 +162,7 @@ async function useAbility(character: any, enemy: any): Promise<void> {
       choices: choices,
     },
   ]);
-  const chosenAbility: Ability = character.abilitiesList[abilityIndex];
+  const chosenAbility: IAbility = character.abilitiesList[abilityIndex];
   if (character.abilities.mana < chosenAbility.manaCost) {
     console.log(chalk.red("Not enough mana!"));
     await pause(1000);
@@ -177,10 +175,7 @@ async function useAbility(character: any, enemy: any): Promise<void> {
     const tempBuff = character.tempStrengthBuff || 0;
     character.tempStrengthBuff = 0;
     const baseDamage =
-      Number(character.abilities.strength) +
-      playerRoll +
-      strengthBonus +
-      tempBuff;
+      character.abilities.strength + playerRoll + strengthBonus + tempBuff;
     const damage = Math.floor(baseDamage * (chosenAbility.multiplier || 1));
     console.log(
       chalk.greenBright(
@@ -191,8 +186,8 @@ async function useAbility(character: any, enemy: any): Promise<void> {
   } else if (chosenAbility.type === "heal") {
     const healAmount = chosenAbility.healAmount || 0;
     character.hp = Math.min(
-      Number(character.hp) + healAmount,
-      Number(character.abilities.maxhp)
+      character.hp + healAmount,
+      character.abilities.maxhp
     );
     console.log(
       chalk.greenBright(
@@ -211,7 +206,7 @@ async function useAbility(character: any, enemy: any): Promise<void> {
   await pause(1000);
 }
 
-async function enemyTurn(enemy: any, character: any): Promise<void> {
+async function enemyTurn(enemy: IEnemy, character: ICharacter): Promise<void> {
   let move;
   if (enemy.moves && enemy.moves.length > 0) {
     const index = Math.floor(Math.random() * enemy.moves.length);
@@ -234,11 +229,11 @@ async function enemyTurn(enemy: any, character: any): Promise<void> {
   if (move.type === "attack") {
     const [enemyRoll] = rollDice(6, 1);
     let damage = Math.max(
-      enemy.attack + enemyRoll - Number(character.abilities.strength),
+      enemy.attack + enemyRoll - character.abilities.strength,
       1
     );
     damage = Math.floor(damage * (move.multiplier || 1));
-    character.hp = Math.max(Number(character.hp) - damage, 0);
+    character.hp = Math.max(character.hp - damage, 0);
     console.log(
       chalk.redBright(
         `\n${enemy.name}'s ${move.name} deals ${damage} damage to you!`
@@ -269,7 +264,7 @@ async function enemyTurn(enemy: any, character: any): Promise<void> {
     }
   } else if (move.type === "heal") {
     const healAmount = move.healAmount || 10;
-    enemy.hp = Math.min(enemy.hp + healAmount, enemy.maxhp);
+    enemy.hp = Math.min(enemy.hp + healAmount, enemy.maxhp || 10);
     console.log(
       chalk.greenBright(`\n${enemy.name} heals for ${healAmount} HP!`)
     );
@@ -278,7 +273,7 @@ async function enemyTurn(enemy: any, character: any): Promise<void> {
 }
 
 export async function runCombat(
-  character: any,
+  character: ICharacter,
   enemy: {
     name: string;
     hp: number;
@@ -306,7 +301,7 @@ export async function runCombat(
   await pause(1000);
 
   let round = 1;
-  while (enemy.hp > 0 && Number(character.hp) > 0) {
+  while (enemy.hp > 0 && character.hp > 0) {
     displayCombatStatus(character, enemy, round);
 
     if (character.losesTurn) {
@@ -317,7 +312,7 @@ export async function runCombat(
       await pause(1000);
       if (enemy.hp > 0) {
         await enemyTurn(enemy, character);
-        if (Number(character.hp) <= 0) {
+        if (character.hp <= 0) {
           console.log(chalk.redBright("\n💀 You have been defeated!"));
           await pause(1500);
           return { success: false, fled: false };
@@ -357,10 +352,7 @@ export async function runCombat(
       const tempBuff = character.tempStrengthBuff || 0;
       character.tempStrengthBuff = 0;
       const baseDamage =
-        Number(character.abilities.strength) +
-        playerRoll +
-        strengthBonus +
-        tempBuff;
+        character.abilities.strength + playerRoll + strengthBonus + tempBuff;
       const damage = Math.floor(baseDamage * critMultiplier);
       console.log(chalk.greenBright(`\nYou attack and deal ${damage} damage.`));
       enemy.hp -= damage;
@@ -376,7 +368,7 @@ export async function runCombat(
       await inventoryMenu(character);
     } else if (combatAction.includes("Run Away")) {
       const [runRoll] = rollDice(20, 1);
-      const escapeChance = runRoll + Number(character.abilities.dexterity);
+      const escapeChance = runRoll + character.abilities.dexterity;
       if (escapeChance > 15) {
         console.log(chalk.yellowBright("\nYou manage to escape from combat!"));
         await pause(1000);
@@ -388,7 +380,7 @@ export async function runCombat(
 
     if (enemy.hp > 0) {
       await enemyTurn(enemy, character);
-      if (Number(character.hp) <= 0) {
+      if (character.hp <= 0) {
         console.log(chalk.redBright("\n💀 You have been defeated!"));
         await pause(1500);
         return { success: false, fled: false };
@@ -403,12 +395,12 @@ export async function runCombat(
 
   // Award XP and process level-up.
   const xpReward = enemy.xpReward;
-  character.xp = Number(character.xp) + xpReward;
+  character.xp = character.xp + xpReward;
   console.log(chalk.greenBright(`Victory! You gained ${xpReward} XP.`));
 
-  const xpThreshold = Number(character.level) * 100;
-  if (Number(character.xp) >= xpThreshold) {
-    character.level = Number(character.level) + 1;
+  const xpThreshold = character.level * 100;
+  if (character.xp >= xpThreshold) {
+    character.level = character.level + 1;
     character.abilities.maxhp += 5;
     character.abilities.strength += 1;
     character.abilities.mana += 1;
@@ -420,12 +412,12 @@ export async function runCombat(
         `\n✨ Level Up! You are now level ${character.level}! Your stats have increased.`
       )
     );
-    character.xp = Number(character.xp) - xpThreshold;
+    character.xp = character.xp - xpThreshold;
   }
 
   // Award an item reward with a 50% chance.
   if (Math.random() < 0.5) {
-    const newItem = generateRandomItem(Number(character.level));
+    const newItem = generateRandomItem(character.level);
     console.log(
       chalk.magentaBright(
         `\nYou found a new item: ${newItem.name} (Rarity: ${newItem.rarity}).`
@@ -435,7 +427,7 @@ export async function runCombat(
   }
 
   // Save updated character data.
-  saveCharacterData(character);
+  saveDataToFile("character", character);
 
   await promptContinue();
   return { success: true, fled: false };

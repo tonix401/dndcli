@@ -1,7 +1,3 @@
-import {
-  getCharacterData,
-  saveCharacterData,
-} from "@utilities/CharacterService.js";
 import { getTerm } from "@utilities/LanguageService.js";
 import {
   pause,
@@ -14,8 +10,8 @@ import {
 import { log, LogTypes } from "@utilities/LogService.js";
 import fs from "fs-extra";
 import dotenv from "dotenv";
-import config from "@utilities/Config.js";
 import Config from "@utilities/Config.js";
+import { getDataFromFile, saveDataToFile } from "@utilities/StorageService.js";
 
 /**
  * Initializes the settings and a character in case there is none yet
@@ -26,13 +22,13 @@ export async function newPlayerScreen(): Promise<boolean> {
   await ensureFilesExist();
 
   let isNew = false;
-  const charData = getCharacterData();
+  const charData = getDataFromFile("character");
   isNew = !charData;
 
   if (isNew) {
     totalClear();
     log("New Player Screen: New Player detected");
-    saveCharacterData(Config.STANDARD_CHARACTER);
+    saveDataToFile("character", Config.START_CHARACTER);
     await skippableSlowWrite(secondaryColor(getTerm("helloNewPlayer")));
     await pause(500);
     await pressEnter();
@@ -45,10 +41,10 @@ async function ensureFilesExist() {
 
   // Use the file paths defined in Config.ts
   const filePathsToCheck = {
-    env: config.ENV_FILE,
-    log: config.LOG_FILE,
-    settings: config.SETTINGS_FILE,
-    character: config.CHARACTER_FILE,
+    env: Config.ENV_FILE,
+    log: Config.LOG_FILE,
+    settings: Config.SETTINGS_FILE,
+    character: Config.CHARACTER_FILE,
   };
 
   Object.values(filePathsToCheck).forEach((filePath) => {

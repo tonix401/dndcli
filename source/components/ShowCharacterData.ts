@@ -6,12 +6,9 @@ import {
 import { getTerm } from "@utilities/LanguageService.js";
 import { Separator } from "@inquirer/prompts";
 import config from "@utilities/Config.js";
-import {
-  getCharacterData,
-  saveCharacterData,
-} from "@utilities/CharacterService.js";
-import ICharacterData from "@utilities/ICharacterData.js";
+import ICharacter from "@utilities/ICharacter.js";
 import Config from "@utilities/Config.js";
+import { getDataFromFile, saveDataToFile } from "@utilities/StorageService.js";
 
 const validators = {
   name: (input: string) => (input.length > 0 ? true : getTerm("nameRequired")),
@@ -43,7 +40,7 @@ const validators = {
   },
 };
 
-const getCharacterOptions = (character: ICharacterData) => {
+const getCharacterOptions = (character: ICharacter) => {
   // Calculate inventory sum
   const inventorySum: number = character.inventory.reduce(
     (sum: number, item: { quantity: number }): number => sum + item.quantity,
@@ -107,7 +104,7 @@ const getCharacterOptions = (character: ICharacterData) => {
 };
 
 export async function showCharacterData() {
-  const character = getCharacterData() || config.STANDARD_CHARACTER;
+  const character = getDataFromFile("character") || config.START_CHARACTER;
 
   while (true) {
     const choice = await themedSelect({
@@ -116,7 +113,7 @@ export async function showCharacterData() {
     });
 
     if (choice === "goBack") {
-      saveCharacterData(character);
+      saveDataToFile("character", character);
       return;
     }
 

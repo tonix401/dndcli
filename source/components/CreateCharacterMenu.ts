@@ -1,10 +1,4 @@
 import chalk from "chalk";
-import type ICharacterData from "@utilities/ICharacterData.js";
-import { saveCharacterData } from "@utilities/CharacterService.js";
-import {
-  generateChatNarrative,
-  ChatCompletionRequestMessage,
-} from "../src/aiAssistant.js";
 import { getStartingItems } from "@utilities/InventoryService.js";
 import { getTerm } from "@utilities/LanguageService.js";
 import { log, LogTypes } from "@utilities/LogService.js";
@@ -17,6 +11,9 @@ import { rollDiceTotal } from "@utilities/DiceService.js";
 import { ITheme } from "@utilities/ITheme.js";
 import Config from "@utilities/Config.js";
 import { getTheme } from "@utilities/CacheService.js";
+import { ChatCompletionRequestMessage, generateChatNarrative } from "@utilities/AIService.js";
+import ICharacter from "@utilities/ICharacter.js";
+import { saveDataToFile } from "@utilities/StorageService.js";
 
 async function validateOrigin(origin: string): Promise<string> {
   const systemMessage =
@@ -43,7 +40,7 @@ export async function createCharacterMenu(): Promise<void> {
   try {
     const theme: ITheme = getTheme();
 
-    const charData: ICharacterData = {
+    const charData: ICharacter = {
       name: "",
       class: "",
       origin: "",
@@ -66,6 +63,7 @@ export async function createCharacterMenu(): Promise<void> {
 
     // Get character name using themed prompt
     const namePrompt = chalk.hex(theme.primaryColor)(getTerm("namePrompt"));
+    charData.name = await themedInput({ message: namePrompt });
     charData.name = await themedInput({ message: namePrompt });
     if (charData.name.toLowerCase() === "exit") return;
 
@@ -92,7 +90,7 @@ export async function createCharacterMenu(): Promise<void> {
     if (statMethod === "default") {
       // Map class to default stats if available
       charData.abilities =
-        Config.STANDARD_CHARACTER_STATS[charData.class] || charData.abilities;
+        Config.START_CHARACTER_STATS[charData.class] || charData.abilities;
     } else if (statMethod === "custom") {
       let pool = 20;
       console.log(
@@ -147,6 +145,7 @@ export async function createCharacterMenu(): Promise<void> {
           getTerm("originClarification")
         );
         originInput = await themedInput({ message: clarMsg });
+        originInput = await themedInput({ message: clarMsg });
         if (originInput.toLowerCase() === "exit") return;
         // If the user clears the input on subsequent prompts, default to unknown
         if (!originInput.trim()) {
@@ -167,7 +166,7 @@ export async function createCharacterMenu(): Promise<void> {
     charData.currency = rollDiceTotal(6, 2) * 10;
 
     // Save character
-    saveCharacterData(charData);
+    saveDataToFile("character", charData);
 
     console.log(
       chalk.hex(theme.primaryColor)(

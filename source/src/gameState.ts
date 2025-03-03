@@ -4,6 +4,7 @@ export interface ConversationMessage {
   timestamp?: string;
 }
 
+/// TODO: MIGRATION TO CACHE SERVICE ///
 export class GameState {
   private theme: string | null;
   private narrativeHistory: string[];
@@ -74,30 +75,9 @@ export class GameState {
     return this.plotSummary;
   }
 
-  // Reset game state histories and plot info if needed.
-  resetState(): void {
-    this.narrativeHistory = [];
-    this.conversationHistory = [];
-    this.choices = [];
-    this.plotStage = 1;
-    this.plotSummary = "";
-  }
-
   // Optionally, generate a summary from the last few narrative entries.
   summarizeHistory(): string {
     const summaryCount = 3;
     return this.narrativeHistory.slice(-summaryCount).join("\n");
-  }
-
-  // Export the state as a plain object for saving.
-  toJSON(): object {
-    return {
-      theme: this.theme,
-      narrativeHistory: this.narrativeHistory,
-      conversationHistory: this.conversationHistory,
-      choices: this.choices,
-      plotStage: this.plotStage,
-      plotSummary: this.plotSummary,
-    };
   }
 }
