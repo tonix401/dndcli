@@ -6,12 +6,9 @@ import {
 import { getTerm } from "@utilities/LanguageService.js";
 import { Separator } from "@inquirer/prompts";
 import config from "@utilities/Config.js";
-import {
-  saveCharacterData,
-} from "@utilities/CharacterService.js";
 import ICharacter from "@utilities/ICharacter.js";
 import Config from "@utilities/Config.js";
-import { getDataFromFile } from "@utilities/StorageService.js";
+import { getDataFromFile, saveDataToFile } from "@utilities/StorageService.js";
 
 const validators = {
   name: (input: string) => (input.length > 0 ? true : getTerm("nameRequired")),
@@ -116,7 +113,7 @@ export async function showCharacterData() {
     });
 
     if (choice === "goBack") {
-      saveCharacterData(character);
+      saveDataToFile("character", character);
       return;
     }
 

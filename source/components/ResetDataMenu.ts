@@ -2,9 +2,9 @@ import { checkbox } from "@inquirer/prompts";
 import { getTerm } from "@utilities/LanguageService.js";
 import { getTheme, setLanguage, setTheme } from "@utilities/CacheService.js";
 import Config from "@utilities/Config.js";
-import { saveCharacterData } from "@utilities/CharacterService.js";
 import { clearLogs } from "@utilities/LogService.js";
 import { primaryColor } from "@utilities/ConsoleService.js";
+import { saveDataToFile } from "@utilities/StorageService.js";
 
 /**
  * Menu component that handles resetting different types of data
@@ -37,7 +37,7 @@ export async function resetDataMenu(): Promise<void> {
 
   if (choice.includes("cancel")) return;
   if (choice.includes("character")) {
-    saveCharacterData(Config.START_CHARACTER);
+    saveDataToFile("character", Config.START_CHARACTER);
   }
   if (choice.includes("settings")) {
     setLanguage("de");

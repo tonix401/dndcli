@@ -1,10 +1,4 @@
 import chalk from "chalk";
-import type ICharacter from "@utilities/ICharacter.js";
-import { saveCharacterData } from "@utilities/CharacterService.js";
-import {
-  generateChatNarrative,
-  ChatCompletionRequestMessage,
-} from "../src/aiAssistant.js";
 import { getStartingItems } from "@utilities/InventoryService.js";
 import { getTerm } from "@utilities/LanguageService.js";
 import { log, LogTypes } from "@utilities/LogService.js";
@@ -17,18 +11,9 @@ import { rollDiceTotal } from "@utilities/DiceService.js";
 import { ITheme } from "@utilities/ITheme.js";
 import Config from "@utilities/Config.js";
 import { getTheme } from "@utilities/CacheService.js";
-import { getStartingItems } from "@utilities/InventoryService.js";
-import { getTerm } from "@utilities/LanguageService.js";
-import { log, LogTypes } from "@utilities/LogService.js";
-import {
-  pressEnter,
-  themedInput,
-  themedSelect,
-} from "@utilities/ConsoleService.js";
-import { rollDiceTotal } from "@utilities/DiceService.js";
-import { ITheme } from "@utilities/ITheme.js";
-import Config from "@utilities/Config.js";
-import { getTheme } from "@utilities/CacheService.js";
+import { ChatCompletionRequestMessage, generateChatNarrative } from "@utilities/AIService.js";
+import ICharacter from "@utilities/ICharacter.js";
+import { saveDataToFile } from "@utilities/StorageService.js";
 
 async function validateOrigin(origin: string): Promise<string> {
   const systemMessage =
@@ -53,7 +38,6 @@ async function validateOrigin(origin: string): Promise<string> {
 
 export async function createCharacterMenu(): Promise<void> {
   try {
-    const theme: ITheme = getTheme();
     const theme: ITheme = getTheme();
 
     const charData: ICharacter = {
@@ -86,11 +70,6 @@ export async function createCharacterMenu(): Promise<void> {
     // Get character class (the selection itself can be themed using your themedSelect helper)
     charData.class = await themedSelect({
       message: chalk.hex(theme.primaryColor)(getTerm("classPrompt")),
-      choices: Config.CHARACTER_CLASSES.map((cls) => ({
-        name: getTerm(cls),
-        value: cls,
-      })),
-    });
       choices: Config.CHARACTER_CLASSES.map((cls) => ({
         name: getTerm(cls),
         value: cls,
@@ -132,7 +111,6 @@ export async function createCharacterMenu(): Promise<void> {
           `Allocate points for ${stat} (points left: ${pool}): `
         );
         let allocationStr = await themedInput({ message: promptMsg });
-        let allocationStr = await themedInput({ message: promptMsg });
         let allocation = parseInt(allocationStr);
         if (isNaN(allocation) || allocation < 0) {
           allocation = 0;
@@ -152,7 +130,6 @@ export async function createCharacterMenu(): Promise<void> {
 
     // Get character origin
     const originPrompt = chalk.hex(theme.primaryColor)(getTerm("originPrompt"));
-    let originInput = await themedInput({ message: originPrompt });
     let originInput = await themedInput({ message: originPrompt });
     if (originInput.toLowerCase() === "exit") return;
 
@@ -189,7 +166,7 @@ export async function createCharacterMenu(): Promise<void> {
     charData.currency = rollDiceTotal(6, 2) * 10;
 
     // Save character
-    saveCharacterData(charData);
+    saveDataToFile("character", charData);
 
     console.log(
       chalk.hex(theme.primaryColor)(
