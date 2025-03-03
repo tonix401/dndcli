@@ -12,13 +12,14 @@ const files = {
 export function getDataFromFile(
   file: "character" | "context" | "settings" | "gameState"
 ): any {
+  const sourceFile = files[file];
   try {
-    const data = fs.readFileSync(file, "utf-8");
+    const data = fs.readFileSync(sourceFile, "utf-8");
     return JSON.parse(data);
   } catch (error) {
     if (error instanceof Error) {
       log(
-        `Storage Service: Error while loading ${file}: ${error.message}`,
+        `Storage Service: Error while loading ${sourceFile}: ${error.message}`,
         LogTypes.ERROR
       );
     }

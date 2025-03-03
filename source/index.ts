@@ -1,6 +1,5 @@
 import { createCharacterMenu } from "@components/CreateCharacterMenu.js";
 import { inspectCharacter } from "@components/InspectCharacter.js";
-import { startCampaign } from "./src/campaign.js";
 import {
   secondaryColor,
   skippableSlowWrite,
@@ -8,7 +7,6 @@ import {
   totalClear,
 } from "@utilities/ConsoleService.js";
 import { log, LogTypes } from "@utilities/LogService.js";
-import { getSettingsData } from "@utilities/SettingsService.js";
 import { settingsMenu } from "@components/SettingsMenu.js";
 import { newPlayerScreen } from "@components/NewPlayerScreen.js";
 import { getTerm } from "@utilities/LanguageService.js";
@@ -17,6 +15,8 @@ import { secretDevMenu } from "@components/DeveloperMenu.js";
 import { inspectInventory } from "@components/InspectInventory.js";
 import { titleScreen } from "@components/TitleScreen.js";
 import Config from "@utilities/Config.js";
+import { getDataFromFile } from "@utilities/StorageService.js";
+import { startCampaign } from "@utilities/GameService.js";
 
 const getMenuOptions = () => [
   { name: getTerm("createCharacter"), value: "1" },
