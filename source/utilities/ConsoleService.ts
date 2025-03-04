@@ -5,6 +5,10 @@ import chalk from "chalk";
 import { getTerm } from "@utilities/LanguageService.js";
 import { getTheme } from "@utilities/CacheService.js";
 import ansiRegex from "ansi-regex";
+import getTemplateRoomAscii from "@resources/templates.js";
+import util from "util";
+import boxen from "boxen";
+import getEmptyAscii from "@resources/rooms/emptyAscii.js";
 
 /**
  * Clears the console completely, without leaving any annoying scroll-up buffer behind
@@ -17,9 +21,8 @@ export function totalClear(): void {
  * Pauses for a given number of milliseconds
  * @example
  * await pause(2000);
- * -> pauses the app for 2 seconds
  */
-export async function pause(time: number) {
+export async function pause(time: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, time));
 }
 
@@ -182,6 +185,11 @@ export async function themedSelect(config: any): Promise<string> {
   );
 }
 
+/**
+ * A version of the input from inquirer that used the custom theme and current colors
+ * @param config The same config input from inquirer/prompt uses
+ * @returns The value of the input the user entered
+ */
 export async function themedInput(config: {
   message: string;
   default?: string;
@@ -198,6 +206,11 @@ export async function themedInput(config: {
   return await input({ ...config, theme }, { clearPromptOnDone: true });
 }
 
+/**
+ * A version of the password from inquirer that used the custom theme and current colors
+ * @param config The same config password from inquirer/prompt uses
+ * @returns The value of the password the user entered
+ */
 export function themedPassword(config: { message: string }): Promise<string> {
   const theme = {
     prefix: getTheme().prefix,
@@ -231,7 +244,7 @@ export function secondaryColor(text: string) {
  * Prompt the user to press enter to continue
  */
 export async function pressEnter() {
-  await input({
+  return await input({
     message: getTerm("pressEnter"),
     theme: {
       style: {
@@ -385,4 +398,137 @@ export function alignTextAsMultiTable(
     width: resultWidth,
     height: height,
   };
+}
+
+/**
+ * Overlays the given text over the template room ascii, the room is colored in the secondary color and the text in the primary color
+ * @param text The text to display
+ * @returns The text in the room ascii
+ * @example
+ * getTextInRoomAsciiIfNotTooLong(characterDataTable)
+ * ->
+ * *******************************************************************************
+ *           |                   |                  |                  |
+ *  _________|___________________|__________________|__________________|__________
+ * |                   |                   |                   |
+ * |___________________|___________________|___________________|__________________
+ *           |                   |                  |                   |
+ *  _________|___________________|__________________|___________________|_________
+ * |                   |  | XP:                        21 |    |
+ * |___________________|__| Stärke:                     0 |____|__________________
+ *           |            | Mana:                       0 |               |
+ *  _________|____________| Geschicklichkeit:           0 |_______________|_______
+ * |                   |  | Charisma:                  10 |   |
+ * |___________________|__| Glück:                      7 |___|___________________
+ * ____/______/______/____| Items:                      0 |____/______/______/____
+ * /______/______/______/_| Zuletzt gespielt:    3.3.2025 |/______/______/______/_
+ * ____/______/______/______/______/______/______/______/______/______/______/____
+ * /______/______/______/______/______/______/______/______/______/______/______/_
+ * ____/______/______/______/______/______/______/______/______/______/______/____
+ * /______/______/______/______/______/______/______/______/______/______/______/_
+ * *******************************************************************************
+ */
+export function getTextInRoomAsciiIfNotTooLong(text: string): string {
+  const room = getEmptyAscii();
+  const roomLines = room.split("\n").filter((line) => line.length > 0);
+  const textLines = text.split("\n").filter((line) => line.length > 0);
+  const margin = Math.round((roomLines.length - textLines.length) / 2);
+
+  if (margin < 3) {
+    return text;
+  }
+
+  return roomLines
+    .map((line, index) =>
+      overlayTextOnLine(line, textLines[index - margin] || "")
+    )
+    .join("\n");
+}
+
+/**
+ * Overlays the given text over the template room ascii, the room is colored in the secondary color and the text in the primary color
+ * @param text The text to display
+ * @param x The x position of the text relative to the left
+ * @param y The y position of the text relative to the top
+ * @returns
+ */
+export function getTextInRoomAsciiAtIndexIfNotTooLong(
+  text: string,
+  x: number,
+  y: number
+): string {
+  const room = getTemplateRoomAscii();
+  const roomLines = room.split("\n").filter((line) => line.length > 0);
+  const textLines = text.split("\n").filter((line) => line.length > 0);
+  // Add padding lines if needed
+  for (let i = 0; i < x; i++) {
+    textLines.push("");
+  }
+
+  if (y < 0) {
+    return text;
+  }
+
+  return roomLines
+    .map((line, index) => overlayTextOnLine(line, textLines[index - y] || ""))
+    .join("\n");
+}
+
+/**
+ * Overlays text on the middle of a different line, the resulting line will be the same length as the first one
+ * @param emptyLine The empty line to overlay on
+ * @param text The text to overlay
+ * @returns The text on the line
+ * @example
+ * overlayTextOnLine("//////////////////////", "Hello")
+ * -> "////////Hello/////////"
+ */
+export function overlayTextOnLine(emptyLine: string, text: string): string {
+  emptyLine = removeFormatting(emptyLine);
+  text = removeFormatting(text);
+
+  if (text.length > emptyLine.length) {
+    return text;
+  }
+
+  const middlePosition = Math.floor(emptyLine.length / 2);
+  const startPosition = middlePosition - Math.floor(text.length / 2);
+  const firstPart = emptyLine.substring(0, startPosition);
+  const lastPart = emptyLine.substring(startPosition + text.length);
+  const authorLine =
+    secondaryColor(firstPart) + primaryColor(text) + secondaryColor(lastPart);
+
+  return authorLine;
+}
+
+/**
+ * Removes all formatting from a string
+ * @param text The text to remove formatting from
+ * @returns Text without formatting
+ */
+export function removeFormatting(text: string): string {
+  return util.stripVTControlCharacters(text);
+}
+
+export function boxItUp(text: string): string {
+  return boxen(text, {
+    padding: {
+      top: 0,
+      bottom: 0,
+      left: 1,
+      right: 1,
+    },
+    borderStyle: {
+      topLeft: "/",
+      topRight: "\\",
+      bottomLeft: "\\",
+      bottomRight: "/",
+      top: "‾",
+      bottom: "_",
+      left: "⎸",
+      right: "⎹",
+    },
+    borderColor: getTheme().secondaryColor,
+    textAlignment: "center",
+  });
 }

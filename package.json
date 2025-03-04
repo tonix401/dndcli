@@ -15,6 +15,7 @@
   "dependencies": {
     "@inquirer/prompts": "^7.3.1",
     "ansi-regex": "^6.1.0",
+    "boxen": "^8.0.1",
     "chalk": "^5.4.1",
     "chalk-animation": "^2.0.3",
     "dotenv": "^16.4.7",
