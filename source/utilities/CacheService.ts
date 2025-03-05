@@ -1,3 +1,4 @@
+import { getTerm, Language } from "@utilities/LanguageService.js";
 import { ITheme } from "@utilities/ITheme.js";
 import { IThemeOverride } from "@utilities/IThemeOveride.js";
 import Config from "@utilities/Config.js";
@@ -5,7 +6,6 @@ import {
   Dungeon,
   initiateDungeonMapWithHallways,
 } from "@utilities/DungeonService.js";
-import { getTerm, Language } from "@utilities/LanguageService.js";
 import { log } from "@utilities/LogService.js";
 import { getDataFromFile, saveDataToFile } from "./StorageService.js";
 import { IGameState } from "@utilities/IGameState.js";

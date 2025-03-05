@@ -1,39 +1,10 @@
 import { LogTypes, log } from "@utilities/LogService.js";
-import { getLanguage } from "@utilities/CacheService.js";
+import { getLanguage } from "./CacheService.js";
 
 export type ITerm = Record<Language, string>;
 export type IColorTerm = Record<Language | "hex", string>;
 export type Language = "de" | "en";
 
-export function getAllEnglishTermsLength(): number {
-  const allEnglish = Object.values(terms)
-    .map((term) => term.en)
-    .join("");
-  return allEnglish.length;
-}
-
-/**
- * Takes a term key and returns the term translated and formatted depending on parameters
- * @param key Defines the key of the term
- * @param indented Defines whether or not two spaces get added at the front of the returned term, to align normal output with inquirer prompts
- * @returns The term in the given language and format as a string
- *
- * @example
- * key = "pressEnter",
- * indented = true,
- * returns "  Drücke [Enter], um ins Menü zu kommen",
- */
-export function getTerm(key: string, indented: boolean = false): string {
-  const term = terms[key];
-  if (!term) {
-    log(`Language Service: Term not found: ${key}`, LogTypes.ERROR);
-    return "NO TERM";
-  }
-
-  const translation = term[getLanguage()];
-
-  return (indented ? "  " : "") + translation;
-}
 const terms: Record<string, ITerm> = {
   // #region Welcome Sequence and Menu
   welcome: {
@@ -474,3 +445,26 @@ const terms: Record<string, ITerm> = {
   },
   // #endregion
 };
+
+/**
+ * Takes a term key and returns the term translated and formatted depending on parameters
+ * @param key Defines the key of the term
+ * @param indented Defines whether or not two spaces get added at the front of the returned term, to align normal output with inquirer prompts
+ * @returns The term in the given language and format as a string
+ *
+ * @example
+ * key = "pressEnter",
+ * indented = true,
+ * returns "  Drücke [Enter], um ins Menü zu kommen",
+ */
+export function getTerm(key: string, indented: boolean = false): string {
+  const term = terms[key];
+  if (!term) {
+    log(`Language Service: Term not found: ${key}`, LogTypes.ERROR);
+    return "NO TERM";
+  }
+
+  const translation = term[getLanguage()];
+
+  return (indented ? "  " : "") + translation;
+}

@@ -5,7 +5,7 @@ import chalk from "chalk";
 import { getTerm } from "@utilities/LanguageService.js";
 import { getTheme } from "@utilities/CacheService.js";
 import ansiRegex from "ansi-regex";
-import getTemplateRoomAscii from "@resources/templates.js";
+import getTemplateRoomAscii from "@resources/templates/templates.js";
 import util from "util";
 import boxen from "boxen";
 import getEmptyAscii from "@resources/rooms/emptyAscii.js";

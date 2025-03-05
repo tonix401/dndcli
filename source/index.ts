@@ -1,3 +1,4 @@
+import { getTerm } from "@utilities/LanguageService.js";
 import { createCharacterMenu } from "@components/CreateCharacterMenu.js";
 import { inspectCharacter } from "@components/InspectCharacter.js";
 import {
@@ -9,7 +10,6 @@ import {
 import { log, LogTypes } from "@utilities/LogService.js";
 import { settingsMenu } from "@components/SettingsMenu.js";
 import { newPlayerScreen } from "@components/NewPlayerScreen.js";
-import { getTerm } from "@utilities/LanguageService.js";
 import { setLanguage, setTheme } from "@utilities/CacheService.js";
 import { secretDevMenu } from "@components/DeveloperMenu.js";
 import { inspectInventory } from "@components/InspectInventory.js";
