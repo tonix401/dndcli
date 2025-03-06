@@ -1,9 +1,7 @@
-import { getTheme } from "@utilities/CacheService.js";
-import { secondaryColor } from "@utilities/ConsoleService.js";
-import chalk from "chalk";
+import { errorColor, secondaryColor } from "@utilities/ConsoleService.js";
 
 export function getErrorScreen() {
-  const e = (text: string) => chalk.hex(getTheme().errorColor)(text);
+  const e = (text: string) => errorColor(text);
   const s = (text: string) => secondaryColor(text);
   return s(`*******************************************************************************
           |                   |                  |             \\_______/

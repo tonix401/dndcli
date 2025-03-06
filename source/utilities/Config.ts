@@ -16,7 +16,11 @@ const ENV_FILE = path.join(ROOT_DIR, ".env");
 // Directory for storing logs, settings, characters, animations etc.
 const STORAGE_DIR = path.join(ROOT_DIR, "storage");
 
-const RESOURCES_DIR = path.join(ROOT_DIR, "resources");
+// Directory of main source files
+const SOURCE_DIR = path.join(ROOT_DIR, "source");
+
+// Directory for storing resources like images, sounds, etc.
+const RESOURCES_DIR = path.join(SOURCE_DIR, "resources");
 
 // Log file path
 const LOG_FILE = path.join(STORAGE_DIR, "log.txt");
@@ -195,6 +199,8 @@ export default {
   CONTEXT_FILE,
   GAME_STATE_FILE,
   ATTACK_FRAMES_FILE,
+  SOURCE_DIR,
+  RESOURCES_DIR,
 
   // Strings
   SELECT_SEPARATOR,

@@ -4,7 +4,7 @@ import {
   alignTextAsMultiTable,
   pressEnter,
   secondaryColor,
-  slowWrite,
+  skippableSlowWrite,
   totalClear,
 } from "@utilities/ConsoleService.js";
 import { getDataFromFile } from "@utilities/StorageService.js";
@@ -20,7 +20,7 @@ export async function inspectInventory() {
   }
 
   if (charData.inventory.length === 0) {
-    await slowWrite(getTerm("empty"));
+    await skippableSlowWrite(getTerm("empty"));
     await pressEnter();
     return;
   }

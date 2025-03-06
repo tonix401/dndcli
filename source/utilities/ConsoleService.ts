@@ -9,6 +9,10 @@ import getTemplateRoomAscii from "@resources/templates/templates.js";
 import util from "util";
 import boxen from "boxen";
 import getEmptyAscii from "@resources/rooms/emptyAscii.js";
+import fs from "fs-extra";
+import Config from "./Config.js";
+import path from "path";
+import exp from "constants";
 
 /**
  * Clears the console completely, without leaving any annoying scroll-up buffer behind
@@ -24,32 +28,6 @@ export function totalClear(): void {
  */
 export async function pause(time: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, time));
-}
-
-/**
- * The coolest console writing ever
- * @param message The message to print
- * @param charDelay The delay between characters
- * @param lineDelay The delay between lines
- * @param formatting A formatting function
- * @example slowWrite("Some text", 40, 500, false, (char) => chalk.bold(chalk.cyan(char)));
- */
-export async function slowWrite(
-  message: string,
-  charDelay: number = 40,
-  lineDelay: number = 500,
-  formatting = (char: string) => char
-) {
-  const lines = message.split("\n");
-  for (let i in lines) {
-    const line = lines[i].split("");
-    for (let j in line) {
-      process.stdout.write(formatting(line[j]));
-      await pause(charDelay);
-    }
-    process.stdout.write("\n");
-    await pause(lineDelay);
-  }
 }
 
 /**
@@ -175,7 +153,7 @@ export async function themedSelect(config: any): Promise<string> {
       highlight: (text: string) => chalk.bold(secondaryColor(text)),
       disabled: (text: string) =>
         chalk.hex(getTheme().secondaryColor).dim("  " + text),
-      error: (text: string) => chalk.hex(getTheme().errorColor)(text),
+      error: (text: string) => errorColor(text),
     },
     helpMode: "never",
   };
@@ -222,22 +200,17 @@ export function themedPassword(config: { message: string }): Promise<string> {
   return password({ ...config, theme, mask: "*" }, { clearPromptOnDone: true });
 }
 
-/**
- * Formats text with the primary color
- * @param text The text to format
- * @returns Formatted string
- */
 export function primaryColor(text: string) {
   return chalk.hex(getTheme().primaryColor)(text);
 }
-
-/**
- * Formats text with the secondary color
- * @param text The text to format
- * @returns Formatted string
- */
 export function secondaryColor(text: string) {
   return chalk.hex(getTheme().secondaryColor)(text);
+}
+export function accentColor(text: string) {
+  return chalk.hex(getTheme().accentColor)(text);
+}
+export function errorColor(text: string) {
+  return errorColor(text);
 }
 
 /**
@@ -532,3 +505,54 @@ export function boxItUp(text: string): string {
     textAlignment: "center",
   });
 }
+
+/**
+ * Plays an animation from the frames in the given file
+ * @param file A file name in the resources/animations folder
+ * @param loops How often the animation should be played
+ */
+export async function playAnimation(
+  file: string,
+  loops: number = 1
+): Promise<void> {
+  const filePath = path.join(Config.RESOURCES_DIR, "animations", file);
+
+  totalClear();
+  const data = await fs.readFile(filePath, "utf-8");
+
+  if (!data) {
+    throw new Error("No data found in file");
+  }
+
+  const parsed = JSON.parse(data);
+
+  if (
+    !parsed.frames ||
+    !parsed.frameTime ||
+    !Array.isArray(parsed.frames)
+  ) {
+    throw new Error(
+      "File is missing some required properties: frames or frameTime"
+    );
+  }
+
+  parsed.frames = parsed.frames.map((frame: string[]) =>
+    frame.map((line: string) => line.replaceAll(".", " "))
+  );
+
+  for (let index = 0; index < loops; index++) {
+    for (const frameIndex in parsed.frames) {
+      totalClear();
+      // escape character to try and hide the cursor
+      console.log(
+        "\u001B[?25l" + secondaryColor(parsed.frames[frameIndex].join("\n"))
+      );
+      await pause(parsed.frameTime);
+    }
+  }
+
+  totalClear();
+}
+
+
+

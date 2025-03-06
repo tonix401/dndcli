@@ -5,15 +5,17 @@ import { rollDice } from "@utilities/DiceService.js";
 import { inventoryMenu } from "@utilities/InventoryService.js";
 import { generateRandomItem } from "@utilities/ItemGenerator.js";
 import readline from "readline";
-import fs from "fs/promises";
-import path from "path";
 import ICharacter from "@utilities/ICharacter.js";
 import { IEnemy } from "@utilities/IEnemy.js";
 import { IAbility } from "@utilities/IAbility.js";
-import { primaryColor, secondaryColor, totalClear } from "@utilities/ConsoleService.js";
+import {
+  playAnimation,
+  primaryColor,
+  secondaryColor,
+} from "@utilities/ConsoleService.js";
 import { saveDataToFile } from "@utilities/StorageService.js";
 import { getTheme } from "@utilities/CacheService.js";
-import Config from "@utilities/Config.js";
+import { log, LogTypes } from "@utilities/LogService.js";
 
 interface CombatResult {
   success: boolean;
@@ -50,9 +52,7 @@ function displayCombatStatus(
       enemy.hp
     }/${enemy.maxhp})`
   );
-  console.log(
-    chalk.bold(secondaryColor("=============================\n"))
-  );
+  console.log(chalk.bold(secondaryColor("=============================\n")));
 }
 
 async function pause(duration: number): Promise<void> {
@@ -63,30 +63,6 @@ async function promptContinue(): Promise<void> {
   await inquirer.prompt([
     { type: "input", name: "continue", message: "Press ENTER to continue..." },
   ]);
-}
-
-async function loadAttackFrames(): Promise<string[][]> {
-  const filePath = Config.ATTACK_FRAMES_FILE;
-
-  try {
-    const data = await fs.readFile(filePath, "utf-8");
-    const parsed = JSON.parse(data);
-
-    // Check if the JSON has the expected structure
-    if (!parsed.frames || !Array.isArray(parsed.frames)) {
-      throw new Error("Animation JSON must contain a 'frames' array.");
-    }
-
-    return parsed.frames;
-  } catch (error) {
-    console.error(chalk.hex(getTheme().errorColor)(`Failed to load animation from: ${filePath}`));
-    console.error(
-      chalk.hex(getTheme().errorColor)(
-        `Make sure the file exists at: ${filePath}`
-      )
-    );
-    throw error;
-  }
 }
 
 /**
@@ -108,32 +84,9 @@ export async function playAttackAnimation() {
   });
 
   try {
-    const framesData = await loadAttackFrames();
-    if (!Array.isArray(framesData)) {
-      throw new Error("Animation JSON does not contain an array of frames.");
-    }
-
-    // Animation loop: continuously loop through the frames
-    while (!stop) {
-      for (let i = 0; i < framesData.length; i++) {
-        if (stop) break;
-        // Clear the console using ANSI escape codes:
-        totalClear();
-        const frame = framesData[i];
-        const frameArt = Array.isArray(frame) ? frame.join("\n") : frame;
-        console.log(secondaryColor(frameArt));
-        await pause(frameTime);
-      }
-    }
-    // Final clear after animation stops.
-    totalClear();
+    await playAnimation("attack.json");
   } catch (error) {
-    console.error(
-      chalk.hex(getTheme().accentColor)(
-        "Error loading attack animation frames:"
-      ),
-      error
-    );
+    log(error as string, LogTypes.ERROR)
   }
 }
 

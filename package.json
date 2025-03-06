@@ -7,7 +7,8 @@
   ],
   "scripts": {
     "setup": "npm install --silent && npm run build",
-    "start": "npm run build && node --no-deprecation js/index.js",
+    "start": "node --no-deprecation js/index.js",
+    "dev": "npm run build && node --no-deprecation js/index.js",
     "test": "npm run build && node --no-deprecation js/testing.js",
     "reset": "npm run build && node --no-deprecation js/reset.js",
     "build": "tsc && tsc-alias"
