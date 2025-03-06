@@ -1,33 +1,23 @@
+import { loadPlayerData, savePlayerData } from "@utilities/CloudService.js";
 import { totalClear } from "@utilities/ConsoleService.js";
-import { log } from "@utilities/LogService.js";
-import dotenv from "dotenv";
-import fetch from "node-fetch";
-import inquirer from "inquirer";
-import ora from "ora";
+import { IApiPlayer } from "@utilities/IApiPlayer.js";
+import { getDataFromFile } from "@utilities/StorageService.js";
 
 totalClear();
 /////////////////////////
 
+const sampleChar: IApiPlayer = {
+  id: "1",
+  name: "twe",
+  settings: getDataFromFile("settings"),
+  gameState: getDataFromFile("gameState"),
+  characters: getDataFromFile("character"),
+};
 
+await savePlayerData(sampleChar);
 
-
-async function main() {
-  
-
-  // Ask for input using inquirer
-  const { userInput } = await inquirer.prompt([
-    {
-      type: 'input',
-      name: 'userInput',
-      message: 'Enter some text:',
-    }
-  ]);
-
-  console.log(`You entered: ${userInput}`);
-}
-
-main().catch(error => {
-  console.error('An unexpected error occurred:', error);
-});
+const data = await loadPlayerData("1");
+console.log(data);
 
 /////////////////////////
+console.log("End of test!");

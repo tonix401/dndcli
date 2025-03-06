@@ -3,7 +3,7 @@ import path from "path";
 import crypto from "crypto";
 import { ITheme } from "@utilities/ITheme.js";
 import ICharacter from "@utilities/ICharacter.js";
-import { Language } from "./LanguageService.js";
+import { Language } from "@utilities/LanguageService.js";
 import { IAbility } from "@utilities/IAbility.js";
 
 // #region Paths
@@ -15,6 +15,8 @@ const ENV_FILE = path.join(ROOT_DIR, ".env");
 
 // Directory for storing logs, settings, characters, animations etc.
 const STORAGE_DIR = path.join(ROOT_DIR, "storage");
+
+const RESOURCES_DIR = path.join(ROOT_DIR, "resources");
 
 // Log file path
 const LOG_FILE = path.join(STORAGE_DIR, "log.txt");
@@ -32,7 +34,7 @@ const CONTEXT_FILE = path.join(STORAGE_DIR, "context.json");
 const GAME_STATE_FILE = path.join(STORAGE_DIR, "gamestate.json");
 
 // Animation frames file path (e.g., for attack animations)
-const ATTACK_FRAMES_FILE = path.join(STORAGE_DIR, "attackframes.json");
+const ATTACK_FRAMES_FILE = path.join(RESOURCES_DIR, "animations/attackframes.json");
 // #endregion
 
 // #region Strings
@@ -69,8 +71,8 @@ const CHARACTER_CLASSES = ["swordsman", "mage", "archer", "thief"];
 const START_CHARACTER: ICharacter = {
   name: "Hans",
   class: "swordsman",
-  level: 4,
-  xp: 21,
+  level: 1,
+  xp: 0,
   hp: 3,
   origin: "unknown",
   currency: 0,

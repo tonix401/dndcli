@@ -105,8 +105,8 @@ const settings = getDataFromFile("settings");
 setLanguage(settings?.language || "de");
 setTheme(settings?.theme || Config.STANDARD_THEME);
 
-await titleScreen();
-await newPlayerScreen();
-await main();
+await titleScreen().catch((error) => {log(error)});
+await newPlayerScreen().catch((error) => {log(error)});
+await main().catch((error) => {log(error)});
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////

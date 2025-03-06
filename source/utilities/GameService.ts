@@ -11,10 +11,12 @@ import { log, LogTypes } from "@utilities/LogService.js";
 import { generateRandomItem } from "@utilities/ItemGenerator.js";
 import { saveGameState, loadGameState } from "@utilities/SaveLoadService.js";
 import { getStartingItems } from "@utilities/InventoryService.js";
-import { getLanguage } from "@utilities/CacheService.js";
+import { getLanguage, getTheme } from "@utilities/CacheService.js";
 import { getDataFromFile, saveDataToFile } from "@utilities/StorageService.js";
 import { GameState } from "src/gameState.js";
 import { runCombat } from "src/combat.js";
+import { getTerm } from "./LanguageService.js";
+import { pause, primaryColor, secondaryColor, themedSelect } from "./ConsoleService.js";
 
 /**
  * Displays a persistent status bar showing key character stats.
@@ -47,13 +49,10 @@ async function pauseForReflection(
   await inquirer.prompt({
     type: "input",
     name: "pause",
-    message: chalk.yellowBright.bold(message),
+    message: primaryColor(message),
   });
 }
 
-async function pause(duration: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, duration));
-}
 
 /**
  * Displays a recap of the previous narrative.
@@ -62,8 +61,8 @@ async function displayRecap(gameState: GameState): Promise<void> {
   const narrativeHistory = gameState.getNarrativeHistory();
   if (narrativeHistory.length > 0) {
     const recap = narrativeHistory[narrativeHistory.length - 1];
-    console.log(chalk.blueBright.bold("\n🔄 Recap of your previous session:"));
-    console.log(chalk.blueBright(recap));
+    console.log(chalk.bold(primaryColor("\n🔄 Recap of your previous session:")));
+    console.log(secondaryColor(recap));
     await pauseForReflection(
       "Review the recap, then press Enter to continue..."
     );
@@ -81,7 +80,7 @@ export async function campaignLoop(
   const loadedState = await loadGameState();
   if (loadedState) {
     Object.assign(gameState, loadedState);
-    console.log(chalk.greenBright.bold("✅ Loaded saved campaign state."));
+    console.log(chalk.hex(getTheme().accentColor).bold("✅ Loaded saved campaign state."));
     await displayRecap(gameState);
   }
 
@@ -168,7 +167,7 @@ Starting Instructions:
       ],
       { maxTokens: 500, temperature: 0.8 }
     );
-    console.log("\n" + chalk.cyanBright(introNarrative) + "\n");
+    console.log("\n" + secondaryColor(introNarrative) + "\n");
     await pauseForReflection(
       "Reflect on the introduction and then choose your first action..."
     );
@@ -177,7 +176,7 @@ Starting Instructions:
       initialChoice.toLowerCase().includes("return to main menu") ||
       initialChoice.toLowerCase() === "exit"
     ) {
-      console.log(chalk.blueBright("Returning to main menu..."));
+      console.log(secondaryColor("Returning to main menu..."));
       return;
     }
     gameState.addNarrative(introNarrative);
@@ -233,7 +232,7 @@ ${contextSummary}
 4. For non-combat scenes, end with exactly three numbered in-game choices followed by "Return to main menu."
 5. After any special encounter (combat or dungeon), the narrative should transition seamlessly into the next scene.
 
-Please respond in clear, concise ${getLanguage}.
+Please respond in clear, concise ${getTerm(getLanguage())}.
     `,
       };
       const messages: ChatCompletionRequestMessage[] = [
@@ -247,18 +246,18 @@ Please respond in clear, concise ${getLanguage}.
           })),
       ];
 
-      const spinner = ora(chalk.cyan("Generating next scene...")).start();
+      const spinner = ora(chalk.hex(getTheme().accentColor)("Generating next scene...")).start();
       const narrative = await generateChatNarrative(messages, {
         maxTokens: 500,
         temperature: 0.7,
       });
-      spinner.succeed(chalk.greenBright("Scene generated."));
+      spinner.succeed(chalk.hex(getTheme().accentColor)("Scene generated."));
       gameState.addConversation({
         role: "assistant",
         content: narrative,
       });
       gameState.addNarrative(narrative);
-      console.log("\n" + chalk.cyanBright(narrative) + "\n");
+      console.log("\n" + secondaryColor(narrative) + "\n");
 
       if (narrative.toLowerCase().includes("combat encounter:")) {
         await pauseForReflection("Press Enter when you're ready for combat...");
@@ -266,24 +265,26 @@ Please respond in clear, concise ${getLanguage}.
           narrative,
           characterData
         );
-        console.log(chalk.redBright(`\n⚔️ Combat encounter triggered!`));
-        console.log(chalk.yellow(`A ${enemy.name} appears before you...`));
+        console.log(
+          chalk.hex(getTheme().accentColor)(`\n⚔️ Combat encounter triggered!`)
+        );
+        console.log(secondaryColor(`A ${enemy.name} appears before you...`));
         await pause(1500);
         const combatResult = await runCombat(characterData, enemy);
         if (!combatResult) {
           console.log(
-            chalk.redBright("You have been defeated or fled. Game over.")
+            secondaryColor("You have been defeated or fled. Game over.")
           );
           return;
         } else {
           characterData.xp = String(Number(characterData.xp) + enemy.xpReward);
           console.log(
-            chalk.greenBright(`Victory! You gained ${enemy.xpReward} XP.`)
+            primaryColor(`Victory! You gained ${enemy.xpReward} XP.`)
           );
           if (Math.random() < 0.5) {
             const newItem = generateRandomItem(Number(characterData.level));
             console.log(
-              chalk.magentaBright(
+              primaryColor(
                 `You found a new item: ${newItem.name} (Rarity: ${newItem.rarity}).`
               )
             );
@@ -293,9 +294,9 @@ Please respond in clear, concise ${getLanguage}.
           await pauseForReflection("Press Enter to continue your journey...");
         }
       } else if (narrative.toLowerCase().includes("roll a d20")) {
-        console.log(chalk.yellowBright("A dice roll is required..."));
+        console.log(secondaryColor("A dice roll is required..."));
         const [rollResult] = rollDice(20, 1);
-        console.log(chalk.yellowBright(`You rolled: ${rollResult}`));
+        console.log(secondaryColor(`You rolled: ${rollResult}`));
         gameState.addConversation({
           role: "user",
           content: `I rolled a ${rollResult} on a d20.`,
@@ -310,11 +311,13 @@ Please respond in clear, concise ${getLanguage}.
         choice.toLowerCase().includes("return to main menu") ||
         choice.toLowerCase() === "exit"
       ) {
-        console.log(chalk.blueBright("Returning to main menu..."));
+        console.log(
+          chalk.hex(getTheme().accentColor)("Returning to main menu...")
+        );
         await saveGameState(gameState);
         return;
       }
-      console.log(chalk.greenBright(`You chose: ${choice}`));
+      console.log(secondaryColor(`You chose: ${choice}`));
       gameState.addConversation({
         role: "user",
         content: `Player choice: ${choice}`,
@@ -385,13 +388,10 @@ export async function promptForChoice(narrative: string): Promise<string> {
     options.push("🔙 Return to main menu");
   }
 
-  const { selectedOption } = await inquirer.prompt([
-    {
-      type: "list",
-      name: "selectedOption",
-      message: "👉 Choose an option:",
-      choices: options,
-    },
-  ]);
+  const selectedOption = themedSelect({
+    message: `👉 Choose an option:`,
+    choices: options,
+  });
+  
   return selectedOption;
 }

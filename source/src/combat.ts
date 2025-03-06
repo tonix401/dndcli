@@ -10,8 +10,10 @@ import path from "path";
 import ICharacter from "@utilities/ICharacter.js";
 import { IEnemy } from "@utilities/IEnemy.js";
 import { IAbility } from "@utilities/IAbility.js";
-import { totalClear } from "@utilities/ConsoleService.js";
+import { primaryColor, secondaryColor, totalClear } from "@utilities/ConsoleService.js";
 import { saveDataToFile } from "@utilities/StorageService.js";
+import { getTheme } from "@utilities/CacheService.js";
+import Config from "@utilities/Config.js";
 
 interface CombatResult {
   success: boolean;
@@ -33,27 +35,23 @@ function displayCombatStatus(
 ): void {
   console.clear();
   console.log(
-    chalk.bgBlackBright.white.bold(`=== Battle Status (Round ${round}) ===`)
+    chalk.bold(secondaryColor(`=== Battle Status (Round ${round}) ===`))
   );
   console.log(
-    chalk.whiteBright(
-      `Hero: ${character.name} | HP: ${renderHealthBar(
-        character.hp,
-        character.abilities.maxhp
-      )} (${character.hp}/${character.abilities.maxhp}) | Mana: ${
-        character.abilities.mana
-      } | XP: ${character.xp || 0}`
-    )
+    `Hero: ${character.name} | HP: ${renderHealthBar(
+      character.hp,
+      character.abilities.maxhp
+    )} (${character.hp}/${character.abilities.maxhp}) | Mana: ${
+      character.abilities.mana
+    } | XP: ${character.xp || 0}`
   );
   console.log(
-    chalk.whiteBright(
-      `${enemy.name} | HP: ${renderHealthBar(enemy.hp, enemy.maxhp || 10)} (${
-        enemy.hp
-      }/${enemy.maxhp})`
-    )
+    `${enemy.name} | HP: ${renderHealthBar(enemy.hp, enemy.maxhp || 10)} (${
+      enemy.hp
+    }/${enemy.maxhp})`
   );
   console.log(
-    chalk.bgBlackBright.white.bold("=============================\n")
+    chalk.bold(secondaryColor("=============================\n"))
   );
 }
 
@@ -68,7 +66,7 @@ async function promptContinue(): Promise<void> {
 }
 
 async function loadAttackFrames(): Promise<string[][]> {
-  const filePath = path.join(process.cwd(), "storage", "attackframes.json");
+  const filePath = Config.ATTACK_FRAMES_FILE;
 
   try {
     const data = await fs.readFile(filePath, "utf-8");
@@ -81,8 +79,12 @@ async function loadAttackFrames(): Promise<string[][]> {
 
     return parsed.frames;
   } catch (error) {
-    console.error(chalk.red(`Failed to load animation from: ${filePath}`));
-    console.error(chalk.red(`Make sure the file exists at: ${filePath}`));
+    console.error(chalk.hex(getTheme().errorColor)(`Failed to load animation from: ${filePath}`));
+    console.error(
+      chalk.hex(getTheme().errorColor)(
+        `Make sure the file exists at: ${filePath}`
+      )
+    );
     throw error;
   }
 }
@@ -119,14 +121,19 @@ export async function playAttackAnimation() {
         totalClear();
         const frame = framesData[i];
         const frameArt = Array.isArray(frame) ? frame.join("\n") : frame;
-        console.log(chalk.green(frameArt));
+        console.log(secondaryColor(frameArt));
         await pause(frameTime);
       }
     }
     // Final clear after animation stops.
     totalClear();
   } catch (error) {
-    console.error(chalk.red("Error loading attack animation frames:"), error);
+    console.error(
+      chalk.hex(getTheme().accentColor)(
+        "Error loading attack animation frames:"
+      ),
+      error
+    );
   }
 }
 
@@ -144,7 +151,7 @@ function getStrengthBonus(character: ICharacter): number {
 
 async function useAbility(character: ICharacter, enemy: IEnemy): Promise<void> {
   if (!character.abilitiesList || character.abilitiesList.length === 0) {
-    console.log(chalk.yellow("You have no abilities available!"));
+    console.log(primaryColor("You have no abilities available!"));
     await pause(1000);
     return;
   }
@@ -164,7 +171,7 @@ async function useAbility(character: ICharacter, enemy: IEnemy): Promise<void> {
   ]);
   const chosenAbility: IAbility = character.abilitiesList[abilityIndex];
   if (character.abilities.mana < chosenAbility.manaCost) {
-    console.log(chalk.red("Not enough mana!"));
+    console.log(chalk.hex(getTheme().accentColor)("Not enough mana!"));
     await pause(1000);
     return;
   }
@@ -178,7 +185,7 @@ async function useAbility(character: ICharacter, enemy: IEnemy): Promise<void> {
       character.abilities.strength + playerRoll + strengthBonus + tempBuff;
     const damage = Math.floor(baseDamage * (chosenAbility.multiplier || 1));
     console.log(
-      chalk.greenBright(
+      chalk.hex(getTheme().accentColor)(
         `\nYou use ${chosenAbility.name} and deal ${damage} damage.`
       )
     );
@@ -190,14 +197,14 @@ async function useAbility(character: ICharacter, enemy: IEnemy): Promise<void> {
       character.abilities.maxhp
     );
     console.log(
-      chalk.greenBright(
+      chalk.hex(getTheme().accentColor)(
         `\nYou use ${chosenAbility.name} and restore ${healAmount} HP.`
       )
     );
   } else if (chosenAbility.type === "buff") {
     const buff = chosenAbility.buffAmount || 0;
     console.log(
-      chalk.greenBright(
+      chalk.hex(getTheme().accentColor)(
         `\nYou use ${chosenAbility.name} and gain a temporary +${buff} strength boost for your next attack.`
       )
     );
@@ -219,7 +226,9 @@ async function enemyTurn(enemy: IEnemy, character: ICharacter): Promise<void> {
       description: "A standard attack",
     };
   }
-  console.log(chalk.redBright(`\n${enemy.name} uses ${move.name}!`));
+  console.log(
+    chalk.hex(getTheme().accentColor)(`\n${enemy.name} uses ${move.name}!`)
+  );
   const enemyAnim = chalkAnimation.karaoke(
     `${enemy.name} is executing ${move.name}...`
   );
@@ -235,14 +244,14 @@ async function enemyTurn(enemy: IEnemy, character: ICharacter): Promise<void> {
     damage = Math.floor(damage * (move.multiplier || 1));
     character.hp = Math.max(character.hp - damage, 0);
     console.log(
-      chalk.redBright(
+      chalk.hex(getTheme().accentColor)(
         `\n${enemy.name}'s ${move.name} deals ${damage} damage to you!`
       )
     );
   } else if (move.type === "defend") {
     enemy.isDefending = true;
     console.log(
-      chalk.blueBright(
+      chalk.hex(getTheme().accentColor)(
         `\n${enemy.name} is defending, reducing incoming damage this turn!`
       )
     );
@@ -250,14 +259,14 @@ async function enemyTurn(enemy: IEnemy, character: ICharacter): Promise<void> {
     const scareChance = Math.random();
     if (scareChance > 0.7) {
       console.log(
-        chalk.yellowBright(
+        chalk.hex(getTheme().accentColor)(
           `\n${enemy.name}'s taunt terrifies you! You lose your next turn!`
         )
       );
       character.losesTurn = true;
     } else {
       console.log(
-        chalk.yellowBright(
+        chalk.hex(getTheme().accentColor)(
           `\n${enemy.name} tries to scare you, but you remain unfazed!`
         )
       );
@@ -266,7 +275,9 @@ async function enemyTurn(enemy: IEnemy, character: ICharacter): Promise<void> {
     const healAmount = move.healAmount || 10;
     enemy.hp = Math.min(enemy.hp + healAmount, enemy.maxhp || 10);
     console.log(
-      chalk.greenBright(`\n${enemy.name} heals for ${healAmount} HP!`)
+      chalk.hex(getTheme().accentColor)(
+        `\n${enemy.name} heals for ${healAmount} HP!`
+      )
     );
   }
   await promptContinue();
@@ -296,7 +307,9 @@ export async function runCombat(
 
   console.clear();
   console.log(
-    chalk.redBright(`\n⚔️  A wild ${enemy.name} appears with ${enemy.hp} HP!`)
+    chalk.hex(getTheme().accentColor)(
+      `\n⚔️  A wild ${enemy.name} appears with ${enemy.hp} HP!`
+    )
   );
   await pause(1000);
 
@@ -306,14 +319,18 @@ export async function runCombat(
 
     if (character.losesTurn) {
       console.log(
-        chalk.yellowBright("\nYou are too frightened to act this turn!")
+        chalk.hex(getTheme().accentColor)(
+          "\nYou are too frightened to act this turn!"
+        )
       );
       character.losesTurn = false;
       await pause(1000);
       if (enemy.hp > 0) {
         await enemyTurn(enemy, character);
         if (character.hp <= 0) {
-          console.log(chalk.redBright("\n💀 You have been defeated!"));
+          console.log(
+            chalk.hex(getTheme().accentColor)("\n💀 You have been defeated!")
+          );
           await pause(1500);
           return { success: false, fled: false };
         }
@@ -323,7 +340,7 @@ export async function runCombat(
       continue;
     }
 
-    console.log(chalk.redBright("\nYour turn!"));
+    console.log(chalk.hex(getTheme().accentColor)("\nYour turn!"));
     await pause(800);
 
     const { combatAction } = await inquirer.prompt([
@@ -354,11 +371,17 @@ export async function runCombat(
       const baseDamage =
         character.abilities.strength + playerRoll + strengthBonus + tempBuff;
       const damage = Math.floor(baseDamage * critMultiplier);
-      console.log(chalk.greenBright(`\nYou attack and deal ${damage} damage.`));
+      console.log(
+        chalk.hex(getTheme().accentColor)(
+          `\nYou attack and deal ${damage} damage.`
+        )
+      );
       enemy.hp -= damage;
     } else if (combatAction.includes("Defend")) {
       console.log(
-        chalk.blueBright("\nYou brace for the enemy's attack, reducing damage.")
+        chalk.hex(getTheme().accentColor)(
+          "\nYou brace for the enemy's attack, reducing damage."
+        )
       );
       character.isDefending = true;
     } else if (combatAction.includes("Use Ability")) {
@@ -370,18 +393,24 @@ export async function runCombat(
       const [runRoll] = rollDice(20, 1);
       const escapeChance = runRoll + character.abilities.dexterity;
       if (escapeChance > 15) {
-        console.log(chalk.yellowBright("\nYou manage to escape from combat!"));
+        console.log(
+          chalk.hex(getTheme().accentColor)(
+            "\nYou manage to escape from combat!"
+          )
+        );
         await pause(1000);
         return { success: false, fled: true };
       } else {
-        console.log(chalk.yellowBright("\nYou fail to escape!"));
+        console.log(chalk.hex(getTheme().accentColor)("\nYou fail to escape!"));
       }
     }
 
     if (enemy.hp > 0) {
       await enemyTurn(enemy, character);
       if (character.hp <= 0) {
-        console.log(chalk.redBright("\n💀 You have been defeated!"));
+        console.log(
+          chalk.hex(getTheme().accentColor)("\n💀 You have been defeated!")
+        );
         await pause(1500);
         return { success: false, fled: false };
       }
@@ -390,13 +419,17 @@ export async function runCombat(
     round++;
   }
 
-  console.log(chalk.greenBright(`\n🎉 You have defeated ${enemy.name}!`));
+  console.log(
+    chalk.hex(getTheme().accentColor)(`\n🎉 You have defeated ${enemy.name}!`)
+  );
   await pause(1500);
 
   // Award XP and process level-up.
   const xpReward = enemy.xpReward;
   character.xp = character.xp + xpReward;
-  console.log(chalk.greenBright(`Victory! You gained ${xpReward} XP.`));
+  console.log(
+    chalk.hex(getTheme().accentColor)(`Victory! You gained ${xpReward} XP.`)
+  );
 
   const xpThreshold = character.level * 100;
   if (character.xp >= xpThreshold) {
@@ -419,7 +452,7 @@ export async function runCombat(
   if (Math.random() < 0.5) {
     const newItem = generateRandomItem(character.level);
     console.log(
-      chalk.magentaBright(
+      chalk.hex(getTheme().accentColor)(
         `\nYou found a new item: ${newItem.name} (Rarity: ${newItem.rarity}).`
       )
     );
