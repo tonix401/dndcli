@@ -104,11 +104,11 @@ const getCharacterOptions = (character: ICharacter) => {
 };
 
 export async function showCharacterData() {
-  const character = getDataFromFile("character") || config.START_CHARACTER;
+  const character: ICharacter = getDataFromFile("character") || config.START_CHARACTER;
 
   while (true) {
     const choice = await themedSelect({
-      message: primaryColor(getTerm("showCharacterData")),
+      message: primaryColor(getTerm("characterData")),
       choices: getCharacterOptions(character),
     });
 

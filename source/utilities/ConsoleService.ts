@@ -12,7 +12,6 @@ import getEmptyAscii from "@resources/rooms/emptyAscii.js";
 import fs from "fs-extra";
 import Config from "./Config.js";
 import path from "path";
-import exp from "constants";
 
 /**
  * Clears the console completely, without leaving any annoying scroll-up buffer behind
@@ -300,7 +299,7 @@ export function alignTextAsTable(
     margin.split("").reverse().join("")
   );
 
-  let width = Math.max(...rows.map((row) => row.join("").length));
+  let width = Math.max(...rows.map((row) => removeFormatting(row.join("")).string.length));
   width = width >= internalMinWidth ? width : internalMinWidth;
 
   const result = rows.map(
@@ -308,7 +307,7 @@ export function alignTextAsTable(
       formattedMargin +
       row[0] +
       separator +
-      " ".repeat(width - row.join("").length) +
+      " ".repeat(width - removeFormatting(row.join("")).string.length) +
       row[1] +
       reverseformattedMargin
   );
@@ -413,7 +412,7 @@ export function getTextInRoomAsciiIfNotTooLong(text: string): string {
 
   return roomLines
     .map((line, index) =>
-      overlayTextOnLine(line, textLines[index - margin] || "")
+      overlayTextOnLineAndFormat(line, textLines[index - margin] || "")
     )
     .join("\n");
 }
@@ -443,12 +442,15 @@ export function getTextInRoomAsciiAtIndexIfNotTooLong(
   }
 
   return roomLines
-    .map((line, index) => overlayTextOnLine(line, textLines[index - y] || ""))
+    .map((line, index) =>
+      overlayTextOnLineAndFormat(line, textLines[index - y] || "")
+    )
     .join("\n");
 }
 
 /**
  * Overlays text on the middle of a different line, the resulting line will be the same length as the first one
+ * @note THE EMPTY LINE WILL BE REFORMATTED WITH THE SECONDARY COLOR
  * @param emptyLine The empty line to overlay on
  * @param text The text to overlay
  * @returns The text on the line
@@ -456,22 +458,27 @@ export function getTextInRoomAsciiAtIndexIfNotTooLong(
  * overlayTextOnLine("//////////////////////", "Hello")
  * -> "////////Hello/////////"
  */
-export function overlayTextOnLine(emptyLine: string, text: string): string {
-  emptyLine = removeFormatting(emptyLine);
-  text = removeFormatting(text);
+export function overlayTextOnLineAndFormat(
+  emptyLine: string,
+  text: string
+): string {
+  const noFormatEmptyLine = removeFormatting(emptyLine).string;
+  const { string, hadFormatting } = removeFormatting(text);
+  const noFormatText = string;
 
-  if (text.length > emptyLine.length) {
+  if (noFormatText.length > noFormatEmptyLine.length) {
     return text;
   }
 
-  const middlePosition = Math.floor(emptyLine.length / 2);
-  const startPosition = middlePosition - Math.floor(text.length / 2);
-  const firstPart = emptyLine.substring(0, startPosition);
-  const lastPart = emptyLine.substring(startPosition + text.length);
-  const authorLine =
-    secondaryColor(firstPart) + primaryColor(text) + secondaryColor(lastPart);
+  const middlePosition = Math.floor(noFormatEmptyLine.length / 2);
+  const startPosition = middlePosition - Math.floor(noFormatText.length / 2);
 
-  return authorLine;
+  const firstPart = noFormatEmptyLine.substring(0, startPosition);
+  const lastPart = noFormatEmptyLine.substring(startPosition + noFormatText.length);
+
+  const resultLine =
+    secondaryColor(firstPart) + (hadFormatting ? text : primaryColor(text)) + secondaryColor(lastPart);
+  return resultLine;
 }
 
 /**
@@ -479,8 +486,12 @@ export function overlayTextOnLine(emptyLine: string, text: string): string {
  * @param text The text to remove formatting from
  * @returns Text without formatting
  */
-export function removeFormatting(text: string): string {
-  return util.stripVTControlCharacters(text);
+export function removeFormatting(text: string): {
+  string: string;
+  hadFormatting: boolean;
+} {
+  const result = util.stripVTControlCharacters(text);
+  return { string: result, hadFormatting: result.length !== text.length };
 }
 
 export function boxItUp(text: string): string {
@@ -526,11 +537,7 @@ export async function playAnimation(
 
   const parsed = JSON.parse(data);
 
-  if (
-    !parsed.frames ||
-    !parsed.frameTime ||
-    !Array.isArray(parsed.frames)
-  ) {
+  if (!parsed.frames || !parsed.frameTime || !Array.isArray(parsed.frames)) {
     throw new Error(
       "File is missing some required properties: frames or frameTime"
     );
@@ -550,9 +557,5 @@ export async function playAnimation(
       await pause(parsed.frameTime);
     }
   }
-
   totalClear();
 }
-
-
-

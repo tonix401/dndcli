@@ -92,6 +92,7 @@ export async function generateEnemyFromNarrative(
 ): Promise<{
   name: string;
   hp: number;
+  maxhp: number;
   attack: number;
   defense: number;
   xpReward: number;
@@ -146,16 +147,19 @@ export async function generateEnemyFromNarrative(
     });
     const enemy = JSON.parse(response);
 
+    const hp = Math.min(
+      Math.max(
+        Math.floor(Number(characterData.abilities.maxhp) * 0.5),
+        enemy.hp
+      ),
+      Math.floor(Number(characterData.abilities.maxhp) * 1.5)
+    );
+
     // Validate and adjust enemy stats if necessary
     return {
       name: enemy.name,
-      hp: Math.min(
-        Math.max(
-          Math.floor(Number(characterData.abilities.maxhp) * 0.5),
-          enemy.hp
-        ),
-        Math.floor(Number(characterData.abilities.maxhp) * 1.5)
-      ),
+      hp: hp,
+      maxhp: hp,
       attack: Math.min(
         Math.max(
           Math.max(1, Number(characterData.abilities.strength) - 2),
@@ -173,10 +177,13 @@ export async function generateEnemyFromNarrative(
       ),
     };
   } catch (error) {
+    const hp = Math.floor(Number(characterData.abilities.maxhp) * 0.75);
+
     // Fallback enemy with balanced stats based on player
     return {
       name: "Mysterious Creature",
-      hp: Math.floor(Number(characterData.abilities.maxhp) * 0.75),
+      hp: hp,
+      maxhp: hp,
       attack: Math.max(1, Number(characterData.abilities.strength) - 1),
       defense: Math.max(
         1,

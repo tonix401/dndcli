@@ -111,6 +111,7 @@ function getRandomEnemies(amount: number = Math.floor(Math.random() * 4) + 1) {
     enemies.push({
       name: "Goblin",
       hp: 10,
+      maxhp: 10,
       attack: 3,
       defense: 1,
       xpReward: 20,

@@ -244,7 +244,7 @@ export async function runCombat(
     attack: number;
     defense: number;
     xpReward: number;
-    maxhp?: number;
+    maxhp: number;
     moves?: Array<{
       name: string;
       type: "attack" | "defend" | "scare" | "heal";

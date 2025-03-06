@@ -14,7 +14,7 @@ export interface IEnemy {
   attack: number;
   defense: number;
   xpReward: number;
-  maxhp?: number;
+  maxhp: number;
   moves?: EnemyMove[];
   isDefending?: boolean;
 }
