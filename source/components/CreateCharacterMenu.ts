@@ -11,7 +11,10 @@ import { rollDiceTotal } from "@utilities/DiceService.js";
 import { ITheme } from "@utilities/ITheme.js";
 import Config from "@utilities/Config.js";
 import { getTheme } from "@utilities/CacheService.js";
-import { ChatCompletionRequestMessage, generateChatNarrative } from "@utilities/AIService.js";
+import {
+  ChatCompletionRequestMessage,
+  generateChatNarrative,
+} from "@utilities/AIService.js";
 import ICharacter from "@utilities/ICharacter.js";
 import { saveDataToFile } from "@utilities/StorageService.js";
 
@@ -178,7 +181,7 @@ export async function createCharacterMenu(): Promise<void> {
     await pressEnter();
   } catch (error) {
     if (error instanceof Error) {
-      log("Create Character Menu: " + error.message, LogTypes.ERROR);
+      log("Create Character Menu: " + error.message, "Error");
     }
   }
 }

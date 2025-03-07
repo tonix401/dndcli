@@ -192,13 +192,13 @@ export async function secretDevMenu() {
         case "goBack":
           return;
         default:
-          log("Dev Menu: Unexpected menu choice", LogTypes.ERROR);
+          log("Dev Menu: Unexpected menu choice", "Error");
           console.log(getTerm("invalid"));
           await pressEnter();
       }
     } catch (error) {
       await exitProgram();
-      log("Dev menu: User force closed the prompt", LogTypes.WARNING);
+      log("Dev menu: User force closed the prompt", "Warn ");
     }
   }
 }

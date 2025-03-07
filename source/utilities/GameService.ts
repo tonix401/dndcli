@@ -16,7 +16,12 @@ import { getDataFromFile, saveDataToFile } from "@utilities/StorageService.js";
 import { GameState } from "src/gameState.js";
 import { runCombat } from "src/combat.js";
 import { getTerm } from "./LanguageService.js";
-import { pause, primaryColor, secondaryColor, themedSelect } from "./ConsoleService.js";
+import {
+  pause,
+  primaryColor,
+  secondaryColor,
+  themedSelect,
+} from "./ConsoleService.js";
 
 /**
  * Displays a persistent status bar showing key character stats.
@@ -53,7 +58,6 @@ async function pauseForReflection(
   });
 }
 
-
 /**
  * Displays a recap of the previous narrative.
  */
@@ -61,7 +65,9 @@ async function displayRecap(gameState: GameState): Promise<void> {
   const narrativeHistory = gameState.getNarrativeHistory();
   if (narrativeHistory.length > 0) {
     const recap = narrativeHistory[narrativeHistory.length - 1];
-    console.log(chalk.bold(primaryColor("\n🔄 Recap of your previous session:")));
+    console.log(
+      chalk.bold(primaryColor("\n🔄 Recap of your previous session:"))
+    );
     console.log(secondaryColor(recap));
     await pauseForReflection(
       "Review the recap, then press Enter to continue..."
@@ -80,7 +86,9 @@ export async function campaignLoop(
   const loadedState = await loadGameState();
   if (loadedState) {
     Object.assign(gameState, loadedState);
-    console.log(chalk.hex(getTheme().accentColor).bold("✅ Loaded saved campaign state."));
+    console.log(
+      chalk.hex(getTheme().accentColor).bold("✅ Loaded saved campaign state.")
+    );
     await displayRecap(gameState);
   }
 
@@ -246,7 +254,9 @@ Please respond in clear, concise ${getTerm(getLanguage())}.
           })),
       ];
 
-      const spinner = ora(chalk.hex(getTheme().accentColor)("Generating next scene...")).start();
+      const spinner = ora(
+        chalk.hex(getTheme().accentColor)("Generating next scene...")
+      ).start();
       const narrative = await generateChatNarrative(messages, {
         maxTokens: 500,
         temperature: 0.7,
@@ -325,7 +335,7 @@ Please respond in clear, concise ${getTerm(getLanguage())}.
       gameState.addNarrative(`Player choice: ${choice}`);
       await saveGameState(gameState);
     } catch (error: any) {
-      log("Campaign loop error: " + error.message, LogTypes.ERROR);
+      log("Campaign loop error: " + error.message, "Error");
       return;
     }
   }
@@ -338,10 +348,7 @@ Please respond in clear, concise ${getTerm(getLanguage())}.
 export async function startCampaign(): Promise<void> {
   const characterData = getDataFromFile("character");
   if (!characterData) {
-    log(
-      "No character data found. Please create a character first.",
-      LogTypes.ERROR
-    );
+    log("No character data found. Please create a character first.", "Error");
     return;
   }
   if (
@@ -392,6 +399,6 @@ export async function promptForChoice(narrative: string): Promise<string> {
     message: `👉 Choose an option:`,
     choices: options,
   });
-  
+
   return selectedOption;
 }

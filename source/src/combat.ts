@@ -16,47 +16,12 @@ import {
 import { saveDataToFile } from "@utilities/StorageService.js";
 import { getTheme } from "@utilities/CacheService.js";
 import { log, LogTypes } from "@utilities/LogService.js";
+import { getCombatStatusBar } from "@resources/generalScreens/combatStatusBar.js";
+import { pause } from "@utilities/ConsoleService.js";
 
 interface CombatResult {
   success: boolean;
   fled: boolean;
-}
-
-function renderHealthBar(current: number, max: number): string {
-  const barLength = 20;
-  const rawFilled = Math.round((current / max) * barLength);
-  const filledLength = Math.min(rawFilled, barLength);
-  const emptyLength = Math.max(barLength - filledLength, 0);
-  return `[${"█".repeat(filledLength)}${" ".repeat(emptyLength)}]`;
-}
-
-function displayCombatStatus(
-  character: ICharacter,
-  enemy: IEnemy,
-  round: number
-): void {
-  console.clear();
-  console.log(
-    chalk.bold(secondaryColor(`=== Battle Status (Round ${round}) ===`))
-  );
-  console.log(
-    `Hero: ${character.name} | HP: ${renderHealthBar(
-      character.hp,
-      character.abilities.maxhp
-    )} (${character.hp}/${character.abilities.maxhp}) | Mana: ${
-      character.abilities.mana
-    } | XP: ${character.xp || 0}`
-  );
-  console.log(
-    `${enemy.name} | HP: ${renderHealthBar(enemy.hp, enemy.maxhp || 10)} (${
-      enemy.hp
-    }/${enemy.maxhp})`
-  );
-  console.log(chalk.bold(secondaryColor("=============================\n")));
-}
-
-async function pause(duration: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, duration));
 }
 
 async function promptContinue(): Promise<void> {
@@ -86,7 +51,7 @@ export async function playAttackAnimation() {
   try {
     await playAnimation("attack.json");
   } catch (error) {
-    log(error as string, LogTypes.ERROR)
+    log(error as string, "Error");
   }
 }
 
@@ -268,7 +233,7 @@ export async function runCombat(
 
   let round = 1;
   while (enemy.hp > 0 && character.hp > 0) {
-    displayCombatStatus(character, enemy, round);
+    getCombatStatusBar(character, enemy, round);
 
     if (character.losesTurn) {
       console.log(

@@ -1,4 +1,5 @@
 import {
+  alignText,
   alignTextAsTable,
   boxItUp,
   overlayTextOnLineAndFormat,
@@ -10,7 +11,23 @@ import ICharacter from "@utilities/ICharacter.js";
 import { IEnemy } from "@utilities/IEnemy.js";
 import chalk from "chalk";
 
-export function getCombatStatusBar(character: ICharacter, enemy: IEnemy) {
+/**
+ * The status bar during combat, showing the health of the hero and the enemy.
+ * @param character The character object
+ * @param enemy The enemy object
+ * @returns a formatted string with the hero and enemy health bars
+ * @example
+ * ```txt
+ * *******************************************************************************
+ *           |                   |                  |                  |
+ *  _________|_________/‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\_________|__________
+ * |                   ⎸ Gilbert      [■■■■■■■■■■■■■■■■■···] ⎹ |
+ * |___________________⎸ Test Dummy   [■■■■■■■■■■■■■■■■■■■■] ⎹_|__________________
+ *           |         \_____________________________________/          |
+ *  _________|___________________|__________________|___________________|_________
+ * ```
+ */
+export function getCombatStatusBar(character: ICharacter, enemy: IEnemy, _round: number = 0) {
   const background =
     secondaryColor(`*******************************************************************************
           |                   |                  |                  |          
@@ -21,21 +38,31 @@ export function getCombatStatusBar(character: ICharacter, enemy: IEnemy) {
  _________|___________________|__________________|___________________|_________`);
 
   const backgroundLines = background.split("\n");
+  const heroBar: [string, string] = [
+    getHealthBar(character.hp, character.abilities.maxhp),
+    character.hp + "/" + character.abilities.maxhp,
+  ];
+  const enemyBar: [string, string] = [
+    getHealthBar(enemy.hp, enemy.maxhp),
+    enemy.hp + "/" + enemy.maxhp,
+  ];
+
+  const healthBarMinLength = Math.max(
+    removeFormatting(heroBar.join()).string.length,
+    removeFormatting(enemyBar.join()).string.length
+  );
+
   const heroArr: [string, string] = [
     character.name,
-    getHealthBar(character.hp, character.abilities.maxhp),
+    alignTextAsTable([heroBar], "", " ", healthBarMinLength).text,
   ];
   const enemyArr: [string, string] = [
     enemy.name,
-    getHealthBar(enemy.hp, enemy.maxhp),
+    alignTextAsTable([enemyBar], "", " ", healthBarMinLength).text,
   ];
+  const titleArr: [string, string] = ["Combat", ""];
 
-  const maxLength = Math.max(
-    removeFormatting(heroArr.join("")).string.length,
-    removeFormatting(enemyArr.join("")).string.length
-  );
-
-  const table = alignTextAsTable([heroArr, enemyArr], "", "   ", maxLength);
+  const table = alignTextAsTable([heroArr, enemyArr], "", "   ");
 
   const boxLines = boxItUp(table.text).split("\n");
 
@@ -51,6 +78,15 @@ export function getCombatStatusBar(character: ICharacter, enemy: IEnemy) {
   return backgroundLines.join("\n");
 }
 
+/**
+ * Generates a health bar string representation.
+ * @param current - The current health value.
+ * @param max - The maximum health value.
+ * @param fullColor - The color for full health (default: green).
+ * @param emptyColor - The color for empty health (default: red).
+ * @param barLength - The length of the health bar (default: 20).
+ * @returns The formatted health bar string.
+ */
 export function getHealthBar(
   current: number,
   max: number,

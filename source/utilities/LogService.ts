@@ -1,5 +1,6 @@
 import { appendFileSync, readFileSync, writeFileSync } from "fs";
 import config from "@utilities/Config.js";
+import Config from "@utilities/Config.js";
 
 const debuggingLogFile = config.LOG_FILE;
 
@@ -7,11 +8,7 @@ const debuggingLogFile = config.LOG_FILE;
  * These have nothing to do with wood
  * @options INFO, WARNING, ERROR
  */
-export enum LogTypes {
-  INFO = "Info ",
-  ERROR = "Error",
-  WARNING = "Warn ",
-}
+export type LogTypes = "Info " | "Warn " | "Error";
 
 /**
  * Logs a formatted message to the log.txt file
@@ -21,10 +18,15 @@ export enum LogTypes {
  *
  * @example
  * message = "Wer das liest, gibt gute Noten"
- * logType = LogTypes.INFO
+ * logType = "Info "
  * -> "12:34:56 | Info  | Wer das liest, gibt gute Noten"
  */
-export function log(message: string, logType = LogTypes.INFO): void {
+export function log(message: string, logType: LogTypes = "Info "): void {
+  if (!Config.LOG_LEVELS.includes(logType)) {
+    console.log("falscher log type: " + logType);
+    return;
+  }
+
   let log = `${new Date().toLocaleTimeString(
     "de-DE"
   )} | ${logType} | ${message}\n`;
@@ -44,7 +46,7 @@ export function getLogData(): string | null {
     if (error instanceof Error) {
       log(
         `Log Service: Error while loading ${debuggingLogFile}: ${error.message}`,
-        LogTypes.ERROR
+        "Error"
       );
     }
     return null;

@@ -19,7 +19,7 @@ export type Language = "de" | "en";
 export function getTerm(key: string, indented: boolean = false): string {
   const term = terms[key];
   if (!term) {
-    log(`Language Service: Term not found: ${key}`, LogTypes.ERROR);
+    log(`Language Service: Term not found: ${key}`, "Error");
     return "NO TERM";
   }
 

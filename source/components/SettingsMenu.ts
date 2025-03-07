@@ -46,7 +46,7 @@ export async function settingsMenu() {
       case "goBack":
         return;
       default:
-        log("Settings menu: Unexpected sub setting choice", LogTypes.ERROR);
+        log("Settings menu: Unexpected sub setting choice", "Error");
         console.log(getTerm("invalid"));
         await pressEnter();
     }
@@ -83,7 +83,7 @@ async function changeLanguageMenu() {
 }
 
 async function changeThemeMenu() {
-  const themes = Object.values(getAllThemeOverrides())
+  const themes = Object.values(getAllThemeOverrides());
 
   const themeChoice = await themedSelect({
     message: getTerm("theme"),
@@ -100,13 +100,11 @@ async function changeThemeMenu() {
     default: getTheme().name.en,
   });
 
-  const selectedTheme = themes.find(
-    (theme) => theme.name.en === themeChoice
-  );
+  const selectedTheme = themes.find((theme) => theme.name.en === themeChoice);
 
   if (selectedTheme) {
     setTheme(selectedTheme);
   } else {
-    log("Setting Menu: Theme selection failed", LogTypes.ERROR);
+    log("Setting Menu: Theme selection failed", "Error");
   }
 }

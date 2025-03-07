@@ -5,6 +5,7 @@ import { ITheme } from "@utilities/ITheme.js";
 import ICharacter from "@utilities/ICharacter.js";
 import { Language } from "@utilities/LanguageService.js";
 import { IAbility } from "@utilities/IAbility.js";
+import { LogTypes } from "./LogService.js";
 
 // #region Paths
 // Base directory (assumes process.cwd() is the project root)
@@ -38,7 +39,10 @@ const CONTEXT_FILE = path.join(STORAGE_DIR, "context.json");
 const GAME_STATE_FILE = path.join(STORAGE_DIR, "gamestate.json");
 
 // Animation frames file path (e.g., for attack animations)
-const ATTACK_FRAMES_FILE = path.join(RESOURCES_DIR, "animations/attackframes.json");
+const ATTACK_FRAMES_FILE = path.join(
+  RESOURCES_DIR,
+  "animations/attackframes.json"
+);
 // #endregion
 
 // #region Strings
@@ -47,6 +51,12 @@ const SELECT_SEPARATOR = chalk.dim(" ──────────");
 // #endregion
 
 // #region Standard Settings
+const LOG_LEVELS: LogTypes[] = [
+  "Info ",
+  "Warn ",
+  "Error",
+]
+
 const STANDARD_THEME: ITheme = {
   name: { de: "Standard", en: "Standard" },
   prefix: " ",
@@ -206,6 +216,7 @@ export default {
   SELECT_SEPARATOR,
 
   // Standard Settings
+  LOG_LEVELS,
   STANDARD_THEME,
   STANDARD_LANGUAGE,
   STANDARD_PASSWORD,

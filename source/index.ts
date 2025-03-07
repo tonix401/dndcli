@@ -56,14 +56,11 @@ async function handleMenuChoice(choice: string) {
       case "9":
         await exitProgram();
       default:
-        log("Index: Unexpected menu choice", LogTypes.ERROR);
+        log("Index: Unexpected menu choice", "Error");
     }
   } catch (error) {
     await exitProgram();
-    log(
-      "Index/handleMenuChoices: User force closed the prompt",
-      LogTypes.WARNING
-    );
+    log("Index/handleMenuChoices: User force closed the prompt", "Warn ");
   }
 }
 
@@ -89,7 +86,7 @@ export async function exitProgram() {
 }
 
 process.on("uncaughtException", async (error) => {
-  log("Index: " + error.message, LogTypes.ERROR);
+  log("Index: " + error.message, "Error");
   let choice = "exit";
   if (choice === "backToMainMenu") {
     await main();
@@ -105,8 +102,14 @@ const settings = getDataFromFile("settings");
 setLanguage(settings?.language || "de");
 setTheme(settings?.theme || Config.STANDARD_THEME);
 
-await titleScreen().catch((error) => {log(error)});
-await newPlayerScreen().catch((error) => {log(error)});
-await main().catch((error) => {log(error)});
+await titleScreen().catch((error) => {
+  log(error);
+});
+await newPlayerScreen().catch((error) => {
+  log(error);
+});
+await main().catch((error) => {
+  log(error);
+});
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////

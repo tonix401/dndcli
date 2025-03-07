@@ -20,7 +20,7 @@ export function getDataFromFile(
     if (error instanceof Error) {
       log(
         `Storage Service: Error while loading ${sourceFile}: ${error.message}`,
-        LogTypes.ERROR
+        "Error"
       );
     }
     return null;
@@ -38,7 +38,7 @@ export function saveDataToFile(
     if (error instanceof Error) {
       log(
         `Storage Service: Error while saving ${destinationFile}: ${error.message}`,
-        LogTypes.ERROR
+        "Error"
       );
     }
   }

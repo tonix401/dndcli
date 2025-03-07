@@ -51,7 +51,7 @@ async function ensureFilesExist() {
     try {
       fs.ensureFileSync(filePath);
     } catch (error) {
-      log("New Player Screen: " + error, LogTypes.ERROR);
+      log("New Player Screen: " + error, "Error");
     }
   });
 
