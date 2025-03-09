@@ -5,21 +5,22 @@ import {
   setTheme,
 } from "@utilities/CacheService.js";
 import { getTerm, Language } from "@utilities/LanguageService.js";
-import { log, LogTypes } from "@utilities/LogService.js";
+import { log } from "@utilities/LogService.js";
 import {
   pressEnter,
-  themedSelect,
   totalClear,
 } from "@utilities/ConsoleService.js";
 import { getAllThemeOverrides } from "@utilities/ThemingService.js";
 import chalk from "chalk";
 import Config from "@utilities/Config.js";
+import { themedSelect } from "@utilities/MenuService.js";
 
 export async function settingsMenu() {
   while (true) {
     totalClear();
     const subSettingChoice = await themedSelect({
       message: getTerm("settings"),
+      canGoBack: true,
       choices: [
         {
           name: getTerm("language") + ": " + getTerm(getLanguage()),
@@ -73,11 +74,15 @@ async function changeLanguageMenu() {
       value: "en",
     },
   ];
-  const chosenLang = await themedSelect({
+  const chosenLang: Language | string = await themedSelect({
     message: `${getTerm("language")}`,
+    canGoBack: true,
     choices: langChoices,
     default: getLanguage(),
   });
+  if (chosenLang === "goBack") {
+    return;
+  }
   setLanguage(chosenLang as Language);
   log("Settings Menu: Switched language to: " + getTerm(chosenLang));
 }
@@ -86,6 +91,7 @@ async function changeThemeMenu() {
   const themes = Object.values(getAllThemeOverrides());
 
   const themeChoice = await themedSelect({
+    canGoBack: true,
     message: getTerm("theme"),
     choices: [
       ...themes.map((theme) => {
@@ -101,6 +107,9 @@ async function changeThemeMenu() {
   });
 
   const selectedTheme = themes.find((theme) => theme.name.en === themeChoice);
+  if (themeChoice === "goBack") {
+    return;
+  }
 
   if (selectedTheme) {
     setTheme(selectedTheme);

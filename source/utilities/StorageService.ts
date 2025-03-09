@@ -1,5 +1,5 @@
 import Config from "./Config.js";
-import { log, LogTypes } from "./LogService.js";
+import { log } from "./LogService.js";
 import fs from "fs-extra";
 
 const files = {

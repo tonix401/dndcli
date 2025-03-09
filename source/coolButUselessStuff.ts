@@ -1,12 +1,12 @@
 import {
   boxItUp,
   getTextInRoomAsciiIfNotTooLong,
-  themedInput,
 } from "@utilities/ConsoleService.js";
 import dotenv from "dotenv";
 import ora from "ora";
 import fetch from "node-fetch";
 import { log } from "@utilities/LogService.js";
+import { themedInput } from "@utilities/MenuService.js";
 
 try {
   const text = (await themedInput({ message: "Text eingeben: " })).trim();

@@ -7,7 +7,7 @@ import {
   ChatCompletionRequestMessage,
 } from "@utilities/AIService.js";
 import { rollDice } from "@utilities/DiceService.js";
-import { log, LogTypes } from "@utilities/LogService.js";
+import { log } from "@utilities/LogService.js";
 import { generateRandomItem } from "@utilities/ItemGenerator.js";
 import { saveGameState, loadGameState } from "@utilities/SaveLoadService.js";
 import { getStartingItems } from "@utilities/InventoryService.js";
@@ -15,35 +15,13 @@ import { getLanguage, getTheme } from "@utilities/CacheService.js";
 import { getDataFromFile, saveDataToFile } from "@utilities/StorageService.js";
 import { GameState } from "src/gameState.js";
 import { runCombat } from "src/combat.js";
-import { getTerm } from "./LanguageService.js";
+import { getTerm } from "@utilities/LanguageService.js";
 import {
   pause,
   primaryColor,
   secondaryColor,
-  themedSelect,
-} from "./ConsoleService.js";
-
-/**
- * Displays a persistent status bar showing key character stats.
- */
-/* function displayStatusBar(character: any): void {
-  console.clear();
-  console.log(chalk.bgBlueBright.black.bold("=== Status ==="));
-  const inventorySummary =
-    character.inventory &&
-    Array.isArray(character.inventory) &&
-    character.inventory.length > 0
-      ? character.inventory.map((item: any) => item.name).join(", ")
-      : "None";
-  console.log(
-    chalk.blueBright(
-      `Name: ${character.name} | HP: ${Number(character.hp)}/${Number(
-        character.abilities.maxhp
-      )} | XP: ${character.xp || 0} | Inventory: ${inventorySummary}`
-    )
-  );
-  console.log(chalk.bgBlueBright.black.bold("===============\n"));
-} */
+} from "@utilities/ConsoleService.js";
+import { themedSelect } from "@utilities/MenuService.js";
 
 /**
  * Pauses until user input.

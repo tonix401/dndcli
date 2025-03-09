@@ -1,44 +1,15 @@
-import {
-  themedSelect,
-  themedInput,
-  primaryColor,
-} from "@utilities/ConsoleService.js";
+import { primaryColor } from "@utilities/ConsoleService.js";
 import { getTerm } from "@utilities/LanguageService.js";
 import { Separator } from "@inquirer/prompts";
 import config from "@utilities/Config.js";
 import ICharacter from "@utilities/ICharacter.js";
 import Config from "@utilities/Config.js";
 import { getDataFromFile, saveDataToFile } from "@utilities/StorageService.js";
-
-const validators = {
-  name: (input: string) => (input.length > 0 ? true : getTerm("nameRequired")),
-  class: (input: string) =>
-    input.length > 0 ? true : getTerm("classRequired"),
-  level: (input: string) => {
-    const num = parseInt(input);
-    if (isNaN(num)) return getTerm("mustBeNumber");
-    if (num < 1 || num > 20) return getTerm("levelRange");
-    return true;
-  },
-  hp: (input: string) => {
-    const num = parseInt(input);
-    if (isNaN(num)) return getTerm("mustBeNumber");
-    if (num < 0) return getTerm("cantBeNegative");
-    return true;
-  },
-  xp: (input: string) => {
-    const num = parseInt(input);
-    if (isNaN(num)) return getTerm("mustBeNumber");
-    if (num < 0) return getTerm("cantBeNegative");
-    return true;
-  },
-  numericAbility: (input: string) => {
-    const num = parseInt(input);
-    if (isNaN(num)) return getTerm("mustBeNumber");
-    if (num < 0) return getTerm("cantBeNegative");
-    return true;
-  },
-};
+import {
+  inputValidators,
+  themedInput,
+  themedSelect,
+} from "@utilities/MenuService.js";
 
 const getCharacterOptions = (character: ICharacter) => {
   // Calculate inventory sum
@@ -99,17 +70,19 @@ const getCharacterOptions = (character: ICharacter) => {
     new Separator(` ${getTerm("items")}: ${inventorySum}`),
     new Separator(` ${getTerm("lastPlayed")}: ${character.lastPlayed}`),
     new Separator(config.SELECT_SEPARATOR),
-    { name: getTerm("goBack"), value: "goBack" },
+    { name: getTerm("saveAndGoBack"), value: "goBack" },
   ];
 };
 
 export async function showCharacterData() {
-  const character: ICharacter = getDataFromFile("character") || config.START_CHARACTER;
+  const character: ICharacter =
+    getDataFromFile("character") || config.START_CHARACTER;
 
   while (true) {
     const choice = await themedSelect({
       message: primaryColor(getTerm("characterData")),
       choices: getCharacterOptions(character),
+      canGoBack: true,
     });
 
     if (choice === "goBack") {
@@ -122,16 +95,18 @@ export async function showCharacterData() {
         character.name = await themedInput({
           message: primaryColor(getTerm("name")),
           default: character.name,
-          validate: validators.name,
+          validate: inputValidators.name,
         });
         break;
 
       case "class":
         character.class = await themedSelect({
+          canGoBack: true,
           message: primaryColor(getTerm("class")),
-          choices: Config.CHARACTER_CLASSES.map((className) => ({
-            name: getTerm(className),
-            value: className,
+          default: character.class,
+          choices: Config.CHARACTER_CLASSES.map((cls) => ({
+            name: getTerm(cls),
+            value: cls,
           })),
         });
         break;
@@ -140,7 +115,7 @@ export async function showCharacterData() {
         const newLevel = await themedInput({
           message: primaryColor(getTerm("level")),
           default: character.level.toString(),
-          validate: validators.level,
+          validate: inputValidators.level,
         });
         character.level = parseInt(newLevel);
         break;
@@ -149,14 +124,14 @@ export async function showCharacterData() {
         const newCurrentHp = await themedInput({
           message: primaryColor(getTerm("hp")),
           default: character.hp.toString(),
-          validate: validators.hp,
+          validate: inputValidators.hp,
         });
         character.hp = parseInt(newCurrentHp);
       case "maxhp":
         const newMaxHp = await themedInput({
           message: primaryColor(getTerm("maxhp")),
           default: character.abilities.maxhp.toString(),
-          validate: validators.hp,
+          validate: (value) => inputValidators.maxhp(value, character),
         });
         character.abilities.maxhp = parseInt(newMaxHp);
         break;
@@ -165,7 +140,7 @@ export async function showCharacterData() {
         const newXp = await themedInput({
           message: primaryColor(getTerm("xp")),
           default: character.xp.toString(),
-          validate: validators.xp,
+          validate: inputValidators.xp,
         });
         character.xp = parseInt(newXp);
         break;
@@ -178,7 +153,7 @@ export async function showCharacterData() {
         const newValue = await themedInput({
           message: primaryColor(getTerm(choice)),
           default: character.abilities[choice].toString(),
-          validate: validators.numericAbility,
+          validate: inputValidators.numericAbility,
         });
         character.abilities[choice] = parseInt(newValue);
         break;

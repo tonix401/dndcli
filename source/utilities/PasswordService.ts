@@ -3,11 +3,9 @@ import { getTerm } from "@utilities/LanguageService.js";
 import { getPassword, setPassword } from "@utilities/CacheService.js";
 import {
   primaryColor,
-  themedInput,
-  themedPassword,
-  themedSelect,
   totalClear,
 } from "@utilities/ConsoleService.js";
+import { themedInput, themedPassword, themedSelect } from "@utilities/MenuService.js";
 
 /**
  * A Screen to check for a password
@@ -62,12 +60,13 @@ export async function setPasswordScreen() {
       console.log(primaryColor(getTerm("notTheSame", true)));
       if (
         (await themedSelect({
+          canGoBack: true,
           message: getTerm("tryAgain"),
           choices: [
             { name: getTerm("yes"), value: "yes" },
-            { name: getTerm("no"), value: "no" },
+            { name: getTerm("no"), value: "goBack" },
           ],
-        })) === "no"
+        })) === "goBack"
       ) {
         return;
       }

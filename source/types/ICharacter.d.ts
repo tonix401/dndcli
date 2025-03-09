@@ -8,7 +8,7 @@ export default interface ICharacter {
   level: number;
   xp: number;
   hp: number;
-  currency: number;
+  currency: number = 0;
   abilities: {
     maxhp: number;
     strength: number;

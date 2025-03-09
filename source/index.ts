@@ -4,12 +4,11 @@ import { inspectCharacter } from "@components/InspectCharacter.js";
 import {
   secondaryColor,
   skippableSlowWrite,
-  themedSelect,
   totalClear,
 } from "@utilities/ConsoleService.js";
-import { log, LogTypes } from "@utilities/LogService.js";
+import { log } from "@utilities/LogService.js";
 import { settingsMenu } from "@components/SettingsMenu.js";
-import { newPlayerScreen } from "@components/NewPlayerScreen.js";
+import { newPlayerScreen, tutorial } from "@components/NewPlayerIntro.js";
 import { setLanguage, setTheme } from "@utilities/CacheService.js";
 import { secretDevMenu } from "@components/DeveloperMenu.js";
 import { inspectInventory } from "@components/InspectInventory.js";
@@ -17,6 +16,7 @@ import { titleScreen } from "@components/TitleScreen.js";
 import Config from "@utilities/Config.js";
 import { getDataFromFile } from "@utilities/StorageService.js";
 import { startCampaign } from "@utilities/GameService.js";
+import { themedSelect } from "@utilities/MenuService.js";
 
 const getMenuOptions = () => [
   { name: getTerm("createCharacter"), value: "1" },
@@ -25,7 +25,8 @@ const getMenuOptions = () => [
   { name: getTerm("startCampaign"), value: "3" },
   { name: getTerm("settings"), value: "4" },
   { name: getTerm("devMenu"), value: "5" },
-  { name: getTerm("exit"), value: "9" },
+  { name: getTerm("tutorial"), value: "tutorial" },
+  { name: getTerm("exit"), value: "goBack" },
 ];
 
 async function handleMenuChoice(choice: string) {
@@ -53,8 +54,21 @@ async function handleMenuChoice(choice: string) {
       case "6":
         await inspectInventory();
         break;
-      case "9":
-        await exitProgram();
+      case "tutorial":
+        await tutorial(false);
+      case "goBack":
+        const isSure = await themedSelect({
+          message: getTerm("confirmExit"),
+          choices: [
+            { name: getTerm("yes"), value: "yes" },
+            { name: getTerm("no"), value: "goBack" },
+          ],
+          canGoBack: true,
+          default: "goBack",
+        });
+        if (isSure === "yes") {
+          await exitProgram();
+        }
       default:
         log("Index: Unexpected menu choice", "Error");
     }
@@ -73,6 +87,7 @@ async function main() {
     const choice = await themedSelect({
       message: getTerm("mainMenu"),
       choices: getMenuOptions(),
+      canGoBack: true,
     });
     await handleMenuChoice(choice);
   }
@@ -90,7 +105,7 @@ process.on("uncaughtException", async (error) => {
   let choice = "exit";
   if (choice === "backToMainMenu") {
     await main();
-  } else if (choice === "exit") {
+  } else if (choice === "goBack") {
     await exitProgram();
   }
 });

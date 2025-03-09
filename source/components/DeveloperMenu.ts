@@ -1,8 +1,7 @@
-import { log, LogTypes } from "@utilities/LogService.js";
+import { log } from "@utilities/LogService.js";
 import {
   pressEnter,
   primaryColor,
-  themedSelect,
   totalClear,
 } from "@utilities/ConsoleService.js";
 import { getTerm } from "@utilities/LanguageService.js";
@@ -21,6 +20,7 @@ import { showCharacterData } from "@components/ShowCharacterData.js";
 import { resetDataMenu } from "@components/ResetDataMenu.js";
 import { getDataFromFile, saveDataToFile } from "@utilities/StorageService.js";
 import ICharacter from "@utilities/ICharacter.js";
+import { themedSelect } from "@utilities/MenuService.js";
 
 // ----------------- (Temporary) Test Combat Section -----------------
 
@@ -162,6 +162,7 @@ export async function secretDevMenu() {
       const chosenOption = await themedSelect({
         message: getTerm("devMenu"),
         choices: devMenuOptions,
+        canGoBack: true,
       });
       switch (chosenOption) {
         case "settings":

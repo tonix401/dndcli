@@ -1,9 +1,16 @@
-import { LogTypes, log } from "@utilities/LogService.js";
+import { log } from "@utilities/LogService.js";
 import { getLanguage } from "./CacheService.js";
+import chalk from "chalk";
+import { tutorial } from "@components/NewPlayerIntro.js";
 
 export type ITerm = Record<Language, string>;
 export type IColorTerm = Record<Language | "hex", string>;
 export type Language = "de" | "en";
+
+const arrowUp = chalk.bold("▲");
+const arrowDown = chalk.bold("▼");
+const arrowRight = chalk.bold("►");
+const arrowLeft = chalk.bold("◄");
 
 /**
  * Takes a term key and returns the term translated and formatted depending on parameters
@@ -29,7 +36,7 @@ export function getTerm(key: string, indented: boolean = false): string {
 }
 
 const terms: Record<string, ITerm> = {
-  // #region Welcome Sequence and Menu
+  // #region Main
   welcome: {
     de: "Von Julian Thäsler und Tom Weise",
     en: "By Julian Thaesler and Tom Weise",
@@ -39,12 +46,8 @@ const terms: Record<string, ITerm> = {
     en: "We shall meet again!",
   },
   pressEnter: {
-    de: "Drücke [Enter]",
-    en: "Press [Enter]",
-  },
-  helloNewPlayer: {
-    de: "Es sieht aus, als wärst Du zum ersten Mal hier.\nWir haben Dir schon einmal einen Charakter vorbereitet, damit Du gleich loslegen kannst.\nErstelle Dir aber gerne auch einen eigenen.\nGenieß die Show!",
-    en: "It looks like it's your first time around here.\nWe've prepared a character for you, so you can get right into the game.\nFeel free to make yourself a custom one though.\nEnjoy the show!",
+    de: `Drücke [${arrowRight}] oder [Enter]`,
+    en: `Press [${arrowRight}] or [Enter]`,
   },
   enlargeWindowPrompt: {
     de: "Oh, dein Fenster ist etwas zu klein. Bitte vergrößere das Fenster auf mindestens 100 x 35 Zeichen. Aktuell: ",
@@ -58,7 +61,104 @@ const terms: Record<string, ITerm> = {
     de: "Zurück",
     en: "Go back",
   },
+  saveAndGoBack: {
+    de: "Speichern und zurück",
+    en: "Save and go back",
+  },
   // #endregion
+
+  // #region Setup + Tutorial
+  enterApiKey: {
+    de: "Bitte OPENAI_API_KEY eingeben",
+    en: "Please enter your OPENAI_API_KEY",
+  },
+  apiKeyRequired: {
+    de: "OPENAI_API_KEY ist erforderlich",
+    en: "OPENAI_API_KEY is required",
+  },
+  wrongFormat: {
+    de: "Das scheint nicht das richtige Format zu sein. Bitte versuche es nochmal",
+    en: "That doesn't seem to be the right format, please try again",
+  },
+  helloNewPlayer: {
+    de:
+      "Es sieht aus, als wärst Du zum ersten Mal hier.\n" +
+      "Lass mich Dir kurz erklären wir alles funktioniert.",
+    en:
+      "It looks like it's your first time around here.\n" +
+      "Let me explain how everything works.",
+  },
+  tutorial: {
+    de: "Tutorial",
+    en: "Tutorial",
+  },
+  tutorialMenu: {
+    de:
+      "Du wirst einige Menüs sehen, die Du mit den Pfeiltasten navigieren kannst.\n" +
+      `Drücke [${arrowUp}] oder [${arrowDown}] um die Auswahl zu ändern,\n` +
+      `[${arrowRight}] oder [Enter], um die Auswahl zu bestätigen,\n` +
+      `[${arrowLeft}], um zurück zu gehen.`,
+    en:
+      "You will see some menus that you can navigate with the arrow keys.\n" +
+      `Press [${arrowUp}] or [${arrowDown}] to change the selection,\n` +
+      `[${arrowRight}] or [Enter] to confirm the selection,\n` +
+      `[${arrowLeft}] to go back.`,
+  },
+  tutorialPremise: {
+    de:
+      "Dieses Spiel ist hauptsächlich ein Open World Role Playing Game.\n" +
+      "Du kannst einen Charakter erstellen und mit ihm die Welt erkunden.\n" +
+      "Es gibt viel zu entdecken: \n" +
+      "Gegner, Schätze, unerforschte Dungeons und vieles mehr wartet auf Dich.",
+    en:
+      "This game is mainly an Open World Role Playing Game.\n" +
+      "You can create a character and explore the world with it.\n" +
+      "There is a lot to discover: \n" +
+      "Enemies, treasures, unexplored dungeons and much more awaits you."
+  },
+  tutorialCharacter: {
+    de:
+      "Lass uns zuerst über Deinen Charakter reden.\n" +
+      "Du kannst ihm einen Namen, eine Klasse und eine Herkunft geben.\n" +
+      "Du kannst Deinen Charakter und sein Inventar später im Hauptmenü ansehen\n" +
+      "Wenn Du es eilig hast kannst Du auch mit dem Standardcharakter anfangen.",
+    en:
+      "First let's talk about your character.\n" +
+      "You can give them a name, a class and also an origin story.\n" +
+      "You can inspect your character and their inventory through the main menu\n" +
+      "If you're in a hurry, you can also start with our default character.",
+  },
+  tutorialSettings: {
+    de:
+      "In den Einstellungen kannst Du die Sprache und das Farbschema ändern.\n" +
+      "Das Farbschema bestimmt das Design des Spiels.\n\n" +
+      "Das Entwicklermenü ist auch sehr spanned, aber mit Magie versiegelt.\n" +
+      "Es gibt Gerüchte unter den Zwergen in den hohen Bergen.\n" +
+      "Es heißt um den Zauber zu lösen muss man 123 eingeben, aber wer weiß?",
+    en:
+      "In the settings you can change the language and the color scheme.\n" +
+      "The color scheme determines the design of the game.\n\n" +
+      "The developer menu is also very interesting, but sealed with magic.\n" +
+      "There are rumors among the high mountain dwarves.\n" +
+      "They say to release the spell you need to enter 123, but who knows?",
+  },
+  tutorialCampaign: {
+    de:
+      "Und schließlich kannst Du die Kampagne starten.\n" +
+      "Hier kannst Du die Welt erkunden,\n" +
+      "Dungeons betreten und gegen Monster kämpfen.\n" +
+      "Das ist das Herzstück des Spiels.\n\n" +
+      "Das ist alles, was Du wissen musst, um zu starten.\n" +
+      "Viel Spaß beim Spielen!",
+    en:
+      "And finally you can start the campaign.\n" +
+      "Here you can explore the world, enter dungeons and fight monsters.\n" +
+      "This is the heart of the game.\n\n" +
+      "That's all you need to know to get started.\n" +
+      "Have fun playing!",
+  },
+
+  //#endregion
 
   // #region Character Classes
   swordsman: {
@@ -347,6 +447,10 @@ const terms: Record<string, ITerm> = {
     de: "Bist Du dir sicher?",
     en: "Are you sure?",
   },
+  confirmExit: {
+    de: "Bist Du dir sicher, dass Du das Spiel beenden willst?",
+    en: "Are you sure you want to exit the game?",
+  },
   cancel: {
     de: "Abbrechen",
     en: "Cancel",
@@ -371,18 +475,6 @@ const terms: Record<string, ITerm> = {
     de: "Fehlerfarbe",
     en: "Error color",
   },
-  invalidColor: {
-    de: "Das ist keine gültige Farbe, denk an das #HexFormat",
-    en: "That is not a valid color, remember the #HexFormat",
-  },
-  invalidLanguage: {
-    de: "Das ist keine gültige Sprache: 'de' oder 'en'",
-    en: "That is not a valid language: 'de' or 'en'",
-  },
-  tooLong: {
-    de: "Das ist zu lang: maximal ",
-    en: "That is too long: maximum ",
-  },
   cacheData: {
     de: "Cache Daten",
     en: "Cache Data",
@@ -404,16 +496,52 @@ const terms: Record<string, ITerm> = {
     de: "undefined",
     en: "undefined",
   },
-  // #endregion
+  //#endregion
 
-  // #region Setup
-  enterApiKey: {
-    de: "Bitte OPENAI_API_KEY eingeben",
-    en: "Please enter your OPENAI_API_KEY",
+  //#region Validation
+  characters: {
+    de: " Zeichen",
+    en: " characters",
   },
-  wrongFormat: {
-    de: "Das scheint nicht das richtige Format zu sein. Bitte versuche es nochmal",
-    en: "That doesn't seem to be the right format, please try again",
+  invalidColor: {
+    de: "Das ist keine gültige Farbe, denk an das #HexFormat",
+    en: "That is not a valid color, remember the #HexFormat",
+  },
+  invalidLanguage: {
+    de: "Das ist keine gültige Sprache: 'de' oder 'en'",
+    en: "That is not a valid language: 'de' or 'en'",
+  },
+  nameRequired: {
+    de: "Name ist erforderlich",
+    en: "Name is required",
+  },
+  tooLong: {
+    de: "Das ist zu lang, maximal ",
+    en: "That is too long, maximum ",
+  },
+  tooShort: {
+    de: "Das ist zu kurz, mindestens ",
+    en: "It is too short, minimum ",
+  },
+  cantBeNumber: {
+    de: "Das darf keine Zahl sein",
+    en: "It can't be a number",
+  },
+  mustBeNumber: {
+    de: "Es muss eine Zahl sein",
+    en: "It must be a number",
+  },
+  cantBeNegative: {
+    de: "Das kann nicht negativ sein",
+    en: "That can't be negative",
+  },
+  tooHigh: {
+    de: "Das ist zu hoch, maximal ",
+    en: "That is too high, maximum ",
+  },
+  mustBeHigherThanCurrentHp: {
+    de: "Das muss höher sein als die aktuelle HP",
+    en: "That must be higher than the current HP",
   },
   //#endregion
 

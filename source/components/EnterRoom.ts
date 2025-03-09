@@ -2,8 +2,6 @@ import {
   pressEnter,
   primaryColor,
   secondaryColor,
-  themedInput,
-  themedSelect,
   totalClear,
 } from "@utilities/ConsoleService.js";
 import { Room, RoomTypes } from "@utilities/DungeonService.js";
@@ -14,6 +12,7 @@ import getEmptyAscii from "../resources/rooms/emptyAscii.js";
 import getTrapAscii from "../resources/rooms/trapAscii.js";
 import getEnemyAscii from "../resources/rooms/enemyAscii.js";
 import getBossAscii from "../resources/rooms/bossAscii.js";
+import { themedInput, themedSelect } from "@utilities/MenuService.js";
 
 const yesno = [
   { name: getTerm("yes"), value: true },

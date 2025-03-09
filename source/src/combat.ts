@@ -1,5 +1,3 @@
-import chalk from "chalk";
-import chalkAnimation from "chalk-animation";
 import { rollDice } from "@utilities/DiceService.js";
 import { inventoryMenu } from "@utilities/InventoryService.js";
 import { generateRandomItem } from "@utilities/ItemGenerator.js";
@@ -11,14 +9,12 @@ import {
   playAnimation,
   pressEnter,
   primaryColor,
-  themedSelect,
   totalClear,
 } from "@utilities/ConsoleService.js";
 import { saveDataToFile } from "@utilities/StorageService.js";
-import { getTheme } from "@utilities/CacheService.js";
 import { getCombatStatusBar } from "@resources/generalScreens/combatStatusBar.js";
 import { pause } from "@utilities/ConsoleService.js";
-import { get } from "node:https";
+import { themedSelect } from "@utilities/MenuService.js";
 
 interface CombatResult {
   success: boolean;
@@ -38,7 +34,7 @@ function getStrengthBonus(character: ICharacter): number {
 }
 
 async function enemyTurn(enemy: IEnemy, character: ICharacter): Promise<void> {
-  totalClear()
+  totalClear();
   console.log(getCombatStatusBar(character, enemy));
   let move;
   if (enemy.moves && enemy.moves.length > 0) {
@@ -259,7 +255,7 @@ async function doDefend(character: ICharacter): Promise<void> {
 async function useAbility(character: ICharacter, enemy: IEnemy): Promise<void> {
   if (!character.abilitiesList || character.abilitiesList.length === 0) {
     console.log(primaryColor("You have no abilities available!"));
-    await pause(1000);
+    await pressEnter();
     return;
   }
   const choices = character.abilitiesList.map(
@@ -268,14 +264,22 @@ async function useAbility(character: ICharacter, enemy: IEnemy): Promise<void> {
       value: index,
     })
   );
-  const abilityIndex = await themedSelect({
-    message: "Choose an ability to use:",
-    choices: choices,
-  });
-  const chosenAbility: IAbility = character.abilitiesList[Number(abilityIndex)];
+  const abilityIndexOrGoBack: string = (
+    await themedSelect({
+      canGoBack: true,
+      message: "Choose an ability to use:",
+      choices: choices,
+    })
+  ).toString();
+
+  if (abilityIndexOrGoBack === "goBack") {
+    return;
+  }
+
+  const chosenAbility: IAbility = character.abilitiesList[Number(abilityIndexOrGoBack)];
   if (character.abilities.mana < chosenAbility.manaCost) {
     console.log(accentColor("Not enough mana!"));
-    await pause(1000);
+    await pressEnter();
     return;
   }
   character.abilities.mana -= chosenAbility.manaCost;
@@ -320,7 +324,7 @@ async function tryToRunAway(character: ICharacter) {
   const escapeChance = runRoll + character.abilities.dexterity;
   if (escapeChance > 15) {
     console.log(accentColor("\nYou manage to escape from combat!"));
-    await pause(1000);
+    await pressEnter();
     return { success: false, fled: true };
   } else {
     console.log(accentColor("\nYou fail to escape!"));

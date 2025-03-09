@@ -1,78 +1,33 @@
-import chalk from "chalk";
 import { getStartingItems } from "@utilities/InventoryService.js";
 import { getTerm } from "@utilities/LanguageService.js";
-import { log, LogTypes } from "@utilities/LogService.js";
+import { log } from "@utilities/LogService.js";
 import {
   pressEnter,
-  themedInput,
-  themedSelect,
+  primaryColor,
+  secondaryColor
 } from "@utilities/ConsoleService.js";
 import { rollDiceTotal } from "@utilities/DiceService.js";
-import { ITheme } from "@utilities/ITheme.js";
 import Config from "@utilities/Config.js";
-import { getTheme } from "@utilities/CacheService.js";
 import {
   ChatCompletionRequestMessage,
   generateChatNarrative,
 } from "@utilities/AIService.js";
 import ICharacter from "@utilities/ICharacter.js";
 import { saveDataToFile } from "@utilities/StorageService.js";
-
-async function validateOrigin(origin: string): Promise<string> {
-  const systemMessage =
-    "You are an expert storyteller and narrative validator for a Dungeons & Dragons adventure. " +
-    "Evaluate the following character origin for plausibility and appropriateness in a realistic fantasy backstory. " +
-    "If the origin is acceptable, respond with 'Valid'. Otherwise, provide a clarification request.";
-  const messages: ChatCompletionRequestMessage[] = [
-    { role: "system", content: systemMessage },
-    { role: "user", content: origin },
-  ];
-  try {
-    const response = await generateChatNarrative(messages, {
-      maxTokens: 50,
-      temperature: 0.3,
-    });
-    return response.trim();
-  } catch (error) {
-    console.error("Error validating origin:", error);
-    return "Valid"; // Fallback in case of AI service failure
-  }
-}
+import { getLanguage } from "@utilities/CacheService.js";
+import { inputValidators, themedInput, themedSelect } from "@utilities/MenuService.js";
 
 export async function createCharacterMenu(): Promise<void> {
   try {
-    const theme: ITheme = getTheme();
-
-    const charData: ICharacter = {
-      name: "",
-      class: "",
-      origin: "",
-      level: 1,
-      xp: 0,
-      hp: 10,
-      abilities: {
-        maxhp: 10,
-        strength: 1,
-        mana: 1,
-        dexterity: 1,
-        charisma: 1,
-        luck: 1,
-      },
-      inventory: [],
-      lastPlayed: "",
-      abilitiesList: [],
-      currency: 0, // Added new property for starting currency
-    };
+    const charData: ICharacter = Config.START_CHARACTER;
 
     // Get character name using themed prompt
-    const namePrompt = chalk.hex(theme.primaryColor)(getTerm("namePrompt"));
-    charData.name = await themedInput({ message: namePrompt });
-    charData.name = await themedInput({ message: namePrompt });
-    if (charData.name.toLowerCase() === "exit") return;
+    const namePrompt = primaryColor(getTerm("namePrompt"));
+    charData.name = await themedInput({ message: namePrompt,  validate: inputValidators.name });
 
-    // Get character class (the selection itself can be themed using your themedSelect helper)
+    // Get character class
     charData.class = await themedSelect({
-      message: chalk.hex(theme.primaryColor)(getTerm("classPrompt")),
+      message: primaryColor(getTerm("classPrompt")),
       choices: Config.CHARACTER_CLASSES.map((cls) => ({
         name: getTerm(cls),
         value: cls,
@@ -81,7 +36,7 @@ export async function createCharacterMenu(): Promise<void> {
 
     // Ask user if they want default stats or custom allocation
     const statMethod = await themedSelect({
-      message: chalk.hex(theme.primaryColor)(
+      message: primaryColor(
         "Do you want the default stat distribution or allocate custom points?"
       ),
       choices: [
@@ -97,7 +52,7 @@ export async function createCharacterMenu(): Promise<void> {
     } else if (statMethod === "custom") {
       let pool = 20;
       console.log(
-        chalk.hex(theme.secondaryColor)(
+        secondaryColor(
           `You have ${pool} points to distribute among your stats.`
         )
       );
@@ -110,7 +65,7 @@ export async function createCharacterMenu(): Promise<void> {
         "luck",
       ];
       for (const stat of stats) {
-        const promptMsg = chalk.hex(theme.primaryColor)(
+        const promptMsg = primaryColor(
           `Allocate points for ${stat} (points left: ${pool}): `
         );
         let allocationStr = await themedInput({ message: promptMsg });
@@ -132,7 +87,7 @@ export async function createCharacterMenu(): Promise<void> {
     }
 
     // Get character origin
-    const originPrompt = chalk.hex(theme.primaryColor)(getTerm("originPrompt"));
+    const originPrompt = primaryColor(getTerm("originPrompt"));
     let originInput = await themedInput({ message: originPrompt });
     if (originInput.toLowerCase() === "exit") return;
 
@@ -143,11 +98,8 @@ export async function createCharacterMenu(): Promise<void> {
       // Validate origin only if provided
       let validationResponse = await validateOrigin(originInput);
       while (!validationResponse.toLowerCase().includes("valid")) {
-        console.log(chalk.hex(theme.secondaryColor)(validationResponse));
-        const clarMsg = chalk.hex(theme.primaryColor)(
-          getTerm("originClarification")
-        );
-        originInput = await themedInput({ message: clarMsg });
+        console.log(secondaryColor(validationResponse));
+        const clarMsg = primaryColor(getTerm("originClarification"));
         originInput = await themedInput({ message: clarMsg });
         if (originInput.toLowerCase() === "exit") return;
         // If the user clears the input on subsequent prompts, default to unknown
@@ -172,7 +124,7 @@ export async function createCharacterMenu(): Promise<void> {
     saveDataToFile("character", charData);
 
     console.log(
-      chalk.hex(theme.primaryColor)(
+      primaryColor(
         `${getTerm("characterSuccess")} You start with ${
           charData.currency
         } gold coins!`
@@ -183,5 +135,36 @@ export async function createCharacterMenu(): Promise<void> {
     if (error instanceof Error) {
       log("Create Character Menu: " + error.message, "Error");
     }
+  }
+}
+
+export async function validateOrigin(origin: string): Promise<string> {
+  const systemMessage =
+    "You are a game master of a text based rpg fantasy game.\n" +
+    "You are given a character origin and you have to validate it.\n" +
+    "Make sure the origin is not too long and fits the fantasy theme.\n" +
+    "If the story is longer then a sentence and fantasy related it is automatically valid.\n" +
+    "If the origin is valid, return only the word 'Valid'.\n" +
+    "If the origin is invalid, return 'Invalid. This origin story is <reason why it's invalid>'.\n" +
+    "You should make jokes and be witty, but dont say more than one or two short sentences\n" +
+    "IT IS REALLY IMPORTANT THAT YOU RESPOND IN " +
+    getTerm(getLanguage()) +
+    "\nIf the origin story is non existent or giberish do not create your own but explain it in your answer.\n" +
+    "The origin to validate is:";
+
+  const messages: ChatCompletionRequestMessage[] = [
+    { role: "system", content: systemMessage },
+    { role: "user", content: "'" + origin + "'" },
+  ];
+
+  try {
+    const response = await generateChatNarrative(messages, {
+      maxTokens: 80,
+      temperature: 0.3,
+    });
+    return response.trim();
+  } catch (err) {
+    log("Create Character Menu: " + err, "Error");
+    return "Valid"; // Fallback in case of AI service failure
   }
 }

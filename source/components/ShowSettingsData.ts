@@ -7,12 +7,11 @@ import {
 } from "@utilities/CacheService.js";
 import {
   primaryColor,
-  themedInput,
-  themedSelect,
 } from "@utilities/ConsoleService.js";
 import { getTerm, Language } from "@utilities/LanguageService.js";
 import { Separator } from "@inquirer/prompts";
 import config from "@utilities/Config.js";
+import { themedInput, themedSelect } from "@utilities/MenuService.js";
 
 const getSettingsOptions = () => {
   const theme = getTheme();
@@ -72,13 +71,14 @@ const getSettingsOptions = () => {
       value: "errorColor",
     },
     new Separator(config.SELECT_SEPARATOR),
-    { name: getTerm("goBack"), value: "goBack" },
+    { name: getTerm("saveAndGoBack"), value: "goBack" },
   ];
 };
 
 export async function showSettingsData() {
   while (true) {
     const choice = await themedSelect({
+      canGoBack: true,
       message: primaryColor(getTerm("settingsData")),
       choices: getSettingsOptions(),
     });
@@ -90,12 +90,14 @@ export async function showSettingsData() {
 async function changeSettingsScreen(choice: string) {
   let changeSettingFunction: (input: any) => void;
   let functionToValidate: (input: string) => boolean | string = () => true;
+  let defaultValue: string = "";
   const colorRegex = /^#[0-9A-F]{6}$/i;
   const languageRegex = /^(en|de)$/;
 
   switch (choice) {
     case "language":
       changeSettingFunction = (input: Language) => setLanguage(input);
+      defaultValue = getLanguage();
       functionToValidate = (input: string) =>
         languageRegex.test(input) ? true : getTerm("invalidLanguage");
       break;
@@ -108,6 +110,7 @@ async function changeSettingsScreen(choice: string) {
           [choice]: input,
           name: { de: "Benutzerdefiniert", en: "Custom" },
         });
+      defaultValue = getTheme()[choice];
       functionToValidate = (input: string) =>
         input.length <= maxLength ? true : getTerm("tooLong") + maxLength;
       break;
@@ -122,6 +125,7 @@ async function changeSettingsScreen(choice: string) {
           [choice]: input,
           name: { de: "Benutzerdefiniert", en: "Custom" },
         });
+      defaultValue = getTheme()[choice];
       functionToValidate = (input: string) =>
         colorRegex.test(input) ? true : getTerm("invalidColor");
       break;
@@ -131,6 +135,7 @@ async function changeSettingsScreen(choice: string) {
 
   const newValue = await themedInput({
     message: getTerm(choice),
+    default: defaultValue,
     validate: functionToValidate,
   });
 

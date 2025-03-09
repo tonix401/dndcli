@@ -2,11 +2,11 @@ import {
   pressEnter,
   primaryColor,
   secondaryColor,
-  themedSelect,
   totalClear,
 } from "@utilities/ConsoleService.js";
 import { getTerm } from "@utilities/LanguageService.js";
 import { clearLogs, getLogData, log } from "@utilities/LogService.js";
+import { themedSelect } from "@utilities/MenuService.js";
 
 export async function showLogsMenu() {
   const logMenuChoices = [
@@ -27,6 +27,7 @@ export async function showLogsMenu() {
   while (true) {
     totalClear();
     const choice = await themedSelect({
+      canGoBack: true,
       message: getTerm("logsMenu"),
       choices: logMenuChoices,
     });

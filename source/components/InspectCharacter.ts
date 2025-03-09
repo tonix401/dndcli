@@ -2,6 +2,8 @@ import ICharacter from "@utilities/ICharacter.js";
 import {
   alignText,
   alignTextAsTable,
+  boxItUp,
+  getTextInRoomAsciiIfNotTooLong,
   pressEnter,
   primaryColor,
   secondaryColor,
@@ -45,7 +47,7 @@ export async function inspectCharacter() {
   ];
 
   // Calculate total width
-  const margin = "| ";
+  const margin = "";
   const separator = ":  ";
   const maxWidthOfBody =
     Math.max(
@@ -68,10 +70,12 @@ export async function inspectCharacter() {
   ).text;
   const formattedBodyTable = secondaryColor(alignText(bodyTable, "center"));
 
-  // Log out
-  console.log(secondaryColor("/" + "‾".repeat(totalMaxWidth - 2) + "\\"));
-  console.log(formattedTitle + "\n" + formattedBodyTable);
-  console.log(secondaryColor("\\" + "_".repeat(totalMaxWidth - 2) + "/"));
+  
+  console.log(
+    getTextInRoomAsciiIfNotTooLong(
+      boxItUp(formattedTitle + "\n" + formattedBodyTable)
+    )
+  );
 
   await pressEnter();
 }

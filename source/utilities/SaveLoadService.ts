@@ -35,10 +35,9 @@ export async function saveGameState(gameState: GameState): Promise<void> {
       state: gameState,
     };
 
-    // Write to a temporary file, then move it atomically.
+    // Write to a temporary file, then move it automically.
     await fs.writeJson(tempPath, saveData, { spaces: 2 });
     await fs.move(tempPath, SAVE_FILE_PATH, { overwrite: true });
-    console.log("Game state saved successfully to", SAVE_FILE_PATH);
   } catch (error) {
     console.error("Error saving game state:", error);
   }

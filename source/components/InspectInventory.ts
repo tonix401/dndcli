@@ -2,8 +2,10 @@ import ICharacter from "@utilities/ICharacter.js";
 import { getTerm } from "@utilities/LanguageService.js";
 import {
   alignTextAsMultiTable,
+  boxItUp,
+  getTextInRoomAsciiIfNotTooLong,
   pressEnter,
-  secondaryColor,
+  primaryColor,
   skippableSlowWrite,
   totalClear,
 } from "@utilities/ConsoleService.js";
@@ -34,11 +36,11 @@ export async function inspectInventory() {
         [getTerm("quantity"), item.quantity.toString()],
       ];
     }),
-    "|"
+    " | "
   );
-
-  console.log(secondaryColor("/" + "‾".repeat(multiTable.width - 2) + "\\"));
-  console.log(secondaryColor(multiTable.text));
-  console.log(secondaryColor("\\" + "_".repeat(multiTable.width - 2) + "/"));
+  const overlayedOnRoom = getTextInRoomAsciiIfNotTooLong(
+    boxItUp(primaryColor(multiTable.text))
+  );
+  console.log(overlayedOnRoom);
   await pressEnter();
 }

@@ -52,7 +52,6 @@ const SELECT_SEPARATOR = chalk.dim(" ──────────");
 
 // #region Standard Settings
 const LOG_LEVELS: LogTypes[] = [
-  "Info ",
   "Warn ",
   "Error",
 ]

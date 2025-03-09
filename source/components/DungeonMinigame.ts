@@ -1,7 +1,8 @@
 import { getDungeon, setDungeon } from "@utilities/CacheService.js";
-import { themedSelect, totalClear } from "@utilities/ConsoleService.js";
+import { totalClear } from "@utilities/ConsoleService.js";
 import { getDungeonMapVisual } from "@utilities/DungeonService.js";
 import { getTerm } from "@utilities/LanguageService.js";
+import { themedSelect } from "@utilities/MenuService.js";
 
 export async function dungeonMinigame() {
   process.stdin.setRawMode(true);

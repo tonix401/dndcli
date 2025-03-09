@@ -1,6 +1,6 @@
 import readline from "readline";
 import { log } from "@utilities/LogService.js";
-import { input, password, select } from "@inquirer/prompts";
+import { input } from "@inquirer/prompts";
 import chalk from "chalk";
 import { getTerm } from "@utilities/LanguageService.js";
 import { getTheme } from "@utilities/CacheService.js";
@@ -12,6 +12,7 @@ import getEmptyAscii from "@resources/rooms/emptyAscii.js";
 import fs from "fs-extra";
 import Config from "./Config.js";
 import path from "path";
+import { themedSingleKeyPrompt } from "@utilities/MenuService.js";
 
 /**
  * Clears the console completely, without leaving any annoying scroll-up buffer behind
@@ -136,69 +137,6 @@ export async function skippableSlowWrite(
   return;
 }
 
-/**
- * A version of the select from inquirer that used the custom theme and current colors
- * @param config The same config select from inquirer/prompt uses
- * @returns The value of the choice the user made
- */
-export async function themedSelect(config: any): Promise<string> {
-  const theme = {
-    prefix: getTheme().prefix,
-    icon: {
-      cursor: getTheme().cursor,
-    },
-    style: {
-      message: (text: string) => primaryColor(chalk.bold(text)),
-      highlight: (text: string) => chalk.bold(secondaryColor(text)),
-      disabled: (text: string) =>
-        chalk.hex(getTheme().secondaryColor).dim("  " + text),
-      error: (text: string) => errorColor(text),
-    },
-    helpMode: "never",
-  };
-  return await select(
-    { ...config, pageSize: 50, theme: theme },
-    { clearPromptOnDone: true }
-  );
-}
-
-/**
- * A version of the input from inquirer that used the custom theme and current colors
- * @param config The same config input from inquirer/prompt uses
- * @returns The value of the input the user entered
- */
-export async function themedInput(config: {
-  message: string;
-  default?: string;
-  required?: boolean;
-  validate?: (value: string) => boolean | string | Promise<string | boolean>;
-}): Promise<string> {
-  const theme = {
-    prefix: getTheme().prefix,
-    style: {
-      message: (text: string) => primaryColor(chalk.bold(text)),
-    },
-    helpMode: "never",
-  };
-  return await input({ ...config, theme }, { clearPromptOnDone: true });
-}
-
-/**
- * A version of the password from inquirer that used the custom theme and current colors
- * @param config The same config password from inquirer/prompt uses
- * @returns The value of the password the user entered
- */
-export function themedPassword(config: { message: string }): Promise<string> {
-  const theme = {
-    prefix: getTheme().prefix,
-    style: {
-      message: (text: string) => primaryColor(chalk.bold(text)),
-    },
-    helpMode: "never",
-  };
-  return password({ ...config, theme, mask: "*" }, { clearPromptOnDone: true });
-}
-
 export function primaryColor(text: string) {
   return chalk.hex(getTheme().primaryColor)(text);
 }
@@ -213,16 +151,18 @@ export function errorColor(text: string) {
 }
 
 /**
- * Prompt the user to press enter to continue
+ * Prompt the user to press enter or right to continue
  */
 export async function pressEnter() {
-  return await input({
+  return await themedSingleKeyPrompt({
     message: getTerm("pressEnter"),
+    keybindings: {
+      return: true,
+      right: true,
+      space: true,
+    },
     theme: {
-      style: {
-        message: (text: string) => chalk.bold(secondaryColor(text)),
-      },
-      prefix: chalk.bold(secondaryColor(getTheme().cursor)),
+      prefix: getTheme().cursor,
     },
   });
 }
@@ -299,7 +239,9 @@ export function alignTextAsTable(
     margin.split("").reverse().join("")
   );
 
-  let width = Math.max(...rows.map((row) => removeFormatting(row.join("")).string.length));
+  let width = Math.max(
+    ...rows.map((row) => removeFormatting(row.join("")).string.length)
+  );
   width = width >= internalMinWidth ? width : internalMinWidth;
 
   const result = rows.map(
@@ -327,10 +269,10 @@ export function alignTextAsTable(
  * @param tables The strings to process into a multi table
  * @param tableSeparator The separator between the tables, please use symmetric ones for best outcomes, a space will be added between any separator and data
  * @example
- * alignTextAsMultiTable([[["Firstname", "Jon"],["Lastname", "Doe"]][["Firstname", "Peter"],["Lastname", "Poe"]], "|")
+ * alignTextAsMultiTable([[["Firstname", "Jon"],["Lastname", "Doe"]][["Firstname", "Peter"],["Lastname", "Poe"]], " | ")
  *
- * | Firstname  Jon | Firstname  Peter |
- * | Lastname   Doe | Lastname     Poe |
+ * Firstname  Jon | Firstname  Peter
+ * Lastname   Doe | Lastname     Poe
  */
 export function alignTextAsMultiTable(
   tables: [string, string][][],
@@ -352,12 +294,15 @@ export function alignTextAsMultiTable(
     alignTextAsTable(table, "", "   ").text.split("\n")
   );
 
-  // Example: | Firstname  Jon | Firstname  Peter |
-  //          | Lastname   Doe | Lastname     Poe |
+  // Example: Firstname  Jon | Firstname  Peter
+  //          Lastname   Doe | Lastname     Poe
   const multitableRows = alignedTables[0].map((_l, yIndex) => {
-    let line = tableSeparator;
+    let line = "";
     for (let xIndex = 0; xIndex < tables.length; xIndex++) {
-      line = line + " " + alignedTables[xIndex][yIndex] + " " + tableSeparator;
+      line += alignedTables[xIndex][yIndex];
+      if (xIndex < tables.length - 1) {
+        line += tableSeparator;
+      }
     }
     return line;
   });
@@ -474,10 +419,14 @@ export function overlayTextOnLineAndFormat(
   const startPosition = middlePosition - Math.floor(noFormatText.length / 2);
 
   const firstPart = noFormatEmptyLine.substring(0, startPosition);
-  const lastPart = noFormatEmptyLine.substring(startPosition + noFormatText.length);
+  const lastPart = noFormatEmptyLine.substring(
+    startPosition + noFormatText.length
+  );
 
   const resultLine =
-    secondaryColor(firstPart) + (hadFormatting ? text : primaryColor(text)) + secondaryColor(lastPart);
+    secondaryColor(firstPart) +
+    (hadFormatting ? text : primaryColor(text)) +
+    secondaryColor(lastPart);
   return resultLine;
 }
 
