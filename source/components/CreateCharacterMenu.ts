@@ -45,6 +45,8 @@ export async function createCharacterMenu(): Promise<void> {
       ],
     });
 
+    charData.abilitiesList = Config.START_CHARACTER_ABILITIES[charData.class] || ["default"]
+
     if (statMethod === "default") {
       // Map class to default stats if available
       charData.abilities =

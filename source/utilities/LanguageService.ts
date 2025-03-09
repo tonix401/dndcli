@@ -1,7 +1,6 @@
 import { log } from "@utilities/LogService.js";
 import { getLanguage } from "./CacheService.js";
 import chalk from "chalk";
-import { tutorial } from "@components/NewPlayerIntro.js";
 
 export type ITerm = Record<Language, string>;
 export type IColorTerm = Record<Language | "hex", string>;

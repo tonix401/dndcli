@@ -19,7 +19,7 @@ export async function inspectCharacter() {
 
   if (!charData) {
     console.log(getTerm("noCharacter"));
-    await pressEnter();
+    await pressEnter(true);
     return;
   }
 
@@ -77,5 +77,5 @@ export async function inspectCharacter() {
     )
   );
 
-  await pressEnter();
+  await pressEnter(true);
 }

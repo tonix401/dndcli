@@ -17,7 +17,7 @@ export async function inspectInventory() {
 
   if (!charData) {
     console.log(getTerm("noCharacter"));
-    await pressEnter();
+    await pressEnter(true);
     return;
   }
 
@@ -42,5 +42,5 @@ export async function inspectInventory() {
     boxItUp(primaryColor(multiTable.text))
   );
   console.log(overlayedOnRoom);
-  await pressEnter();
+  await pressEnter(true);
 }

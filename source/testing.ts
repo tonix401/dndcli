@@ -1,9 +1,7 @@
-import { tutorial } from "@components/NewPlayerIntro.js";
+
 
 async function test() {
   ///////////////////////
-
-  await tutorial(false);
   
   /////////////////////////
 }

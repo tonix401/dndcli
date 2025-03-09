@@ -7,12 +7,17 @@ import {
   totalClear,
 } from "@utilities/ConsoleService.js";
 import { log } from "@utilities/LogService.js";
+import { tutorial } from "@components/Tutorial.js";
+import {
+  ensureSetupAndCheckIsNew,
+  saveDataToFile,
+} from "@utilities/StorageService.js";
+import Config from "@utilities/Config.js";
 
 export async function titleScreen() {
   await ensureWindowSize();
-  totalClear();
-  await skippableSlowWrite(getTitleAscii(), { charDelay: 0, lineDelay: 100 });
-  await pressEnter();
+  await showTitleScreen();
+  await checkIsNewAndSetup();
 }
 
 const checkWindowSize = () => {
@@ -30,4 +35,21 @@ async function ensureWindowSize() {
     isSizeOK = checkWindowSize().isOk;
   }
   log(`Title Screen: Window size is ok: ${columns} x ${rows}`);
+}
+
+async function showTitleScreen() {
+  totalClear();
+  await skippableSlowWrite(getTitleAscii(), { charDelay: 0, lineDelay: 100 });
+  await pressEnter();
+}
+
+async function checkIsNewAndSetup() {
+  totalClear();
+  const isNew = await ensureSetupAndCheckIsNew();
+
+  if (isNew) {
+    log("New Player Screen: New Player detected");
+    await tutorial(isNew);
+    saveDataToFile("character", Config.START_CHARACTER);
+  }
 }

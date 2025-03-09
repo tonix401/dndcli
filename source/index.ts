@@ -8,7 +8,6 @@ import {
 } from "@utilities/ConsoleService.js";
 import { log } from "@utilities/LogService.js";
 import { settingsMenu } from "@components/SettingsMenu.js";
-import { newPlayerScreen, tutorial } from "@components/NewPlayerIntro.js";
 import { setLanguage, setTheme } from "@utilities/CacheService.js";
 import { secretDevMenu } from "@components/DeveloperMenu.js";
 import { inspectInventory } from "@components/InspectInventory.js";
@@ -17,6 +16,7 @@ import Config from "@utilities/Config.js";
 import { getDataFromFile } from "@utilities/StorageService.js";
 import { startCampaign } from "@utilities/GameService.js";
 import { themedSelect } from "@utilities/MenuService.js";
+import { tutorial } from "@components/Tutorial.js";
 
 const getMenuOptions = () => [
   { name: getTerm("createCharacter"), value: "1" },
@@ -118,9 +118,6 @@ setLanguage(settings?.language || "de");
 setTheme(settings?.theme || Config.STANDARD_THEME);
 
 await titleScreen().catch((error) => {
-  log(error);
-});
-await newPlayerScreen().catch((error) => {
   log(error);
 });
 await main().catch((error) => {

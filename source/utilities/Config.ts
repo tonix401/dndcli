@@ -141,6 +141,15 @@ const START_CHARACTER_STATS: Record<string, ICharacter["abilities"]> = {
  * The default character abilities by class
  */
 const START_CHARACTER_ABILITIES: Record<string, IAbility[]> = {
+  default: [
+    {
+      name: "Punch",
+      manaCost: 0,
+      type: "attack",
+      multiplier: 1.2,
+      description: "A basic punch that deals damage to the enemy.",
+    },
+  ],
   swordsman: [
     {
       name: "Power Strike",

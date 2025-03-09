@@ -21,36 +21,37 @@ import { resetDataMenu } from "@components/ResetDataMenu.js";
 import { getDataFromFile, saveDataToFile } from "@utilities/StorageService.js";
 import ICharacter from "@utilities/ICharacter.js";
 import { themedSelect } from "@utilities/MenuService.js";
+import { IEnemy } from "@utilities/IEnemy.js";
 
 // ----------------- (Temporary) Test Combat Section -----------------
 
-const testEnemy = {
+const testEnemy: IEnemy = {
   name: "Test Dummy",
   hp: 80,
   maxhp: 80,
-  attack: 8,
+  attack: 0,
   defense: 3,
   xpReward: 50,
   moves: [
     {
       name: "Curse Strike",
-      type: "attack" as "attack",
+      type: "attack",
       multiplier: 1.3,
       description: "A dark, cursed attack.",
     },
     {
       name: "Defensive Ward",
-      type: "defend" as "defend",
+      type: "defend",
       description: "Raises its defenses for a short time.",
     },
     {
       name: "Intimidating Howl",
-      type: "scare" as "scare",
+      type: "scare",
       description: "Attempts to frighten you, making you lose your next turn.",
     },
     {
       name: "Healing Ritual",
-      type: "heal" as "heal",
+      type: "heal",
       healAmount: 12,
       description: "Calls on dark forces to heal itself.",
     },
