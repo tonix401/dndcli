@@ -2,6 +2,8 @@ import chalk from "chalk";
 import { IEnemy } from "@utilities/IEnemy.js";
 import { getDungeon } from "@utilities/CacheService.js";
 import { primaryColor, secondaryColor } from "@utilities/ConsoleService.js";
+import { getDataFromFile } from "./StorageService.js";
+import { getRandomEnemy } from "./GameService.js";
 
 export enum RoomTypes {
   START = "START",
@@ -45,22 +47,6 @@ export type Dungeon = {
   rooms: Room[][];
   player: { x: number; y: number };
 };
-
-function getRandomEnemies(amount: number = Math.floor(Math.random() * 4) + 1) {
-  let enemies: IEnemy[] = [];
-
-  for (let i = 0; i < amount; i++) {
-    enemies.push({
-      name: "Goblin",
-      hp: 10,
-      maxhp: 10,
-      attack: 3,
-      defense: 1,
-      xpReward: 20,
-    });
-  }
-  return enemies;
-}
 
 export function getDungeonMapVisual() {
   const dungeon = getDungeon();
@@ -122,10 +108,16 @@ export function getRoomAtPosition(x: number, y: number) {
   return getDungeon().rooms[y][x] ?? undefined;
 }
 
+/**
+ * Initiates and give back a dungeon with hallways connecting the rooms
+ * @param size The size of the dungeon. The default is DungeonSizes.SMALL
+ * @returns The dungeon object with rooms and hallways
+ */
 export function initiateDungeonMapWithHallways(
   size: DungeonSizes = DungeonSizes.SMALL
-) {
+): Dungeon {
   const dungeon: Dungeon = { size: size, rooms: [], player: { x: 0, y: 0 } };
+  const character = getDataFromFile("character");
 
   // Create an empty grid of rooms with a default type
   for (let y = 0; y < size; y++) {
@@ -192,5 +184,25 @@ export function initiateDungeonMapWithHallways(
   // Start DFS from the boss room to ensure connectivity across dungeon
   dfs(mid, mid);
 
+  for (let y in dungeon.rooms) {
+    for (let x in dungeon.rooms[y]) {
+      const room = dungeon.rooms[y][x];
+      fillRoomWithEnemyIfNecessary(room, character.level);
+    }
+  }
   return dungeon;
+}
+
+function fillRoomWithEnemyIfNecessary(room: Room, difficulty: number) {
+  switch (room.type) {
+    case RoomTypes.ENEMY:
+      room.enemies = [getRandomEnemy(difficulty)];
+      break;
+    case RoomTypes.BOSS:
+      room.enemies = [getRandomEnemy(difficulty + 10)];
+      break;
+    default:
+      room.enemies = [];
+      break;
+  }
 }

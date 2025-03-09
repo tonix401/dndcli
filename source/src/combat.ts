@@ -230,6 +230,9 @@ export async function runCombat(
   return { success: true, fled: false };
 }
 
+/**
+ * Do an attack on the enemy.
+ */
 async function doAttack(character: ICharacter, enemy: IEnemy): Promise<void> {
   await playAnimation("attack.json");
   const [playerRoll] = rollDice(4, 1);
@@ -244,6 +247,10 @@ async function doAttack(character: ICharacter, enemy: IEnemy): Promise<void> {
   enemy.hp -= damage;
 }
 
+/**
+ * Defend against the enemy's attack.
+ * This reduces the damage taken from the next attack.
+ */
 async function doDefend(character: ICharacter): Promise<void> {
   await playAnimation("defend.json");
   console.log(
@@ -252,6 +259,9 @@ async function doDefend(character: ICharacter): Promise<void> {
   character.isDefending = true;
 }
 
+/**
+ * Use an ability during combat.
+ */
 async function useAbility(character: ICharacter, enemy: IEnemy): Promise<void> {
   if (!character.abilitiesList || character.abilitiesList.length === 0) {
     console.log(primaryColor("You have no abilities available!"));
@@ -318,6 +328,10 @@ async function useAbility(character: ICharacter, enemy: IEnemy): Promise<void> {
   await pause(1000);
 }
 
+/**
+ * Try to run away from combat.
+ * This has a chance to succeed based on the character's dexterity.
+ */
 async function tryToRunAway(character: ICharacter) {
   await playAnimation("running.json");
   const [runRoll] = rollDice(20, 1);

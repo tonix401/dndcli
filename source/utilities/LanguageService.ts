@@ -574,8 +574,8 @@ const terms: Record<string, ITerm> = {
     en: "Seems like there is really nothing here... sad",
   },
   enemyRoomDiscovered: {
-    de: "Du hast einen Raum mit Gegnern entdeckt",
-    en: "You discovered a room with enemies",
+    de: "Du hast einen Raum mit einem Gegner entdeckt",
+    en: "You discovered a room with an enemy",
   },
   enterToFight: {
     de: "Drücke [Enter], um den Kampf zu beginnen",
@@ -592,6 +592,10 @@ const terms: Record<string, ITerm> = {
   engageFight: {
     de: "Willst Du kämpfen?",
     en: "Would you like to fight?",
+  },
+  foundItem: {
+    de: "Du hast einen Gegenstand gefunden: ",
+    en: "You found an item: ",
   },
   // #endregion
 };

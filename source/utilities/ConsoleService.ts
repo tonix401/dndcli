@@ -153,8 +153,12 @@ export function errorColor(text: string) {
 /**
  * Prompt the user to press enter or right to continue
  */
-export async function pressEnter(allowLeft: boolean = false) {
+export async function pressEnter(
+  config?: { message?: string; allowLeft?: boolean }
+): Promise<void> {
   let keybindings;
+  const message = config?.message ?? getTerm("pressEnter");
+  const allowLeft = config?.allowLeft ?? false;
 
   // Left is only allowed for info screen where you can go back
   if (allowLeft) {
@@ -171,7 +175,7 @@ export async function pressEnter(allowLeft: boolean = false) {
   }
 
   return await themedSingleKeyPrompt({
-    message: getTerm("pressEnter"),
+    message: message,
     keybindings: keybindings,
     theme: {
       prefix: getTheme().cursor,

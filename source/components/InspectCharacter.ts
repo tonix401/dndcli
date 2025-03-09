@@ -19,7 +19,7 @@ export async function inspectCharacter() {
 
   if (!charData) {
     console.log(getTerm("noCharacter"));
-    await pressEnter(true);
+    await pressEnter({ allowLeft: true });
     return;
   }
 
@@ -70,12 +70,11 @@ export async function inspectCharacter() {
   ).text;
   const formattedBodyTable = secondaryColor(alignText(bodyTable, "center"));
 
-  
   console.log(
     getTextInRoomAsciiIfNotTooLong(
       boxItUp(formattedTitle + "\n" + formattedBodyTable)
     )
   );
 
-  await pressEnter(true);
+  await pressEnter({ allowLeft: true });
 }

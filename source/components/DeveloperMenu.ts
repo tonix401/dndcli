@@ -22,41 +22,11 @@ import { getDataFromFile, saveDataToFile } from "@utilities/StorageService.js";
 import ICharacter from "@utilities/ICharacter.js";
 import { themedSelect } from "@utilities/MenuService.js";
 import { IEnemy } from "@utilities/IEnemy.js";
+import { getRandomEnemy } from "@utilities/GameService.js";
 
 // ----------------- (Temporary) Test Combat Section -----------------
 
-const testEnemy: IEnemy = {
-  name: "Test Dummy",
-  hp: 80,
-  maxhp: 80,
-  attack: 0,
-  defense: 3,
-  xpReward: 50,
-  moves: [
-    {
-      name: "Curse Strike",
-      type: "attack",
-      multiplier: 1.3,
-      description: "A dark, cursed attack.",
-    },
-    {
-      name: "Defensive Ward",
-      type: "defend",
-      description: "Raises its defenses for a short time.",
-    },
-    {
-      name: "Intimidating Howl",
-      type: "scare",
-      description: "Attempts to frighten you, making you lose your next turn.",
-    },
-    {
-      name: "Healing Ritual",
-      type: "heal",
-      healAmount: 12,
-      description: "Calls on dark forces to heal itself.",
-    },
-  ],
-};
+const testEnemy: IEnemy = getRandomEnemy(getDataFromFile("character")?.level ?? 1);
 
 async function testCombat() {
   let character: ICharacter = getDataFromFile("character");

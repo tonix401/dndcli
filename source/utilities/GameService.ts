@@ -22,6 +22,9 @@ import {
   secondaryColor,
 } from "@utilities/ConsoleService.js";
 import { themedSelect } from "@utilities/MenuService.js";
+import { EnemyMove, EnemyMoveType, IEnemy } from "@utilities/IEnemy.js";
+import Config from "./Config.js";
+import { dungeonMinigame } from "@components/DungeonMinigame.js";
 
 /**
  * Pauses until user input.
@@ -97,6 +100,7 @@ World Building & Narrative:
 
 Combat & Special Encounters:
 - When a combat situation arises, begin your narrative with "COMBAT ENCOUNTER:" followed by any necessary dice roll calculations (e.g., “(roll: 1d20+3)”).
+- When the player enters a dungeon start with "START DUNGEON:"
 - Do not provide in-game choices during combat or dungeon encounters.
 
 Player Actions & In-Game Syntax:
@@ -247,7 +251,10 @@ Please respond in clear, concise ${getTerm(getLanguage())}.
       gameState.addNarrative(narrative);
       console.log("\n" + secondaryColor(narrative) + "\n");
 
-      if (narrative.toLowerCase().includes("combat encounter:")) {
+      // TODO: Tidy up and refactor
+      if (narrative.toLowerCase().includes("start dungeon:")) {
+        await dungeonMinigame();
+      } else if (narrative.toLowerCase().includes("combat encounter:")) {
         await pauseForReflection("Press Enter when you're ready for combat...");
         const enemy = await generateEnemyFromNarrative(
           narrative,
@@ -379,4 +386,66 @@ export async function promptForChoice(narrative: string): Promise<string> {
   });
 
   return selectedOption;
+}
+
+/**
+ * Generates a random enemy based on the difficulty level.
+ * Difficulty should be the level of the player, or relative to it
+ */
+export function getRandomEnemy(difficulty: number): IEnemy {
+  const maxhp = Math.floor(difficulty * getRandomNumber(0.75, 1.25));
+  const hp = getEnemyHp(maxhp);
+  const name = getEnemyName(difficulty);
+
+  let enemy: IEnemy = {
+    maxhp: maxhp,
+    hp: hp,
+    name: name,
+    attack: Math.floor(difficulty * getRandomNumber(0.75, 1.25)),
+    defense: Math.floor(difficulty * getRandomNumber(0.75, 1.25)),
+    xpReward: Math.floor(difficulty * getRandomNumber(0.75, 1.25) * 10),
+    moves: getEnemyMoves(),
+    isDefending: false,
+  };
+
+  return enemy;
+}
+
+function getEnemyName(difficulty: number): string {
+  const enemies = Config.ENEMY_NAMES_ARRAY;
+
+  const randomizedDifficulty = Math.floor(
+    (difficulty * getRandomNumber(0.95, 1.05)) / 25
+  );
+
+  if (randomizedDifficulty < 0) {
+    return "Small Slime";
+  }
+  if (randomizedDifficulty > 4) {
+    return "Ancient Dragon";
+  }
+
+  return getRandomItemFromArray(enemies[randomizedDifficulty]);
+}
+
+function getEnemyHp(maxhp: number) {
+  const isWounded = Math.random() < 0.5;
+  const hp = isWounded ? Math.floor(maxhp * getRandomNumber(0.5, 1)) : maxhp;
+  return hp;
+}
+
+function getEnemyMoves(): IEnemy["moves"] {
+  let moves: EnemyMove[] = [];
+  for (let i = 0; i < 4; i++) {
+    moves.push(getRandomItemFromArray(Config.ENEMY_MOVES_ARRAY));
+  }
+  return moves;
+}
+
+function getRandomItemFromArray<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function getRandomNumber(min: number, max: number): number {
+  return Math.random() * (max - min + 1) + min;
 }

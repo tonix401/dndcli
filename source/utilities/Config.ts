@@ -6,6 +6,7 @@ import ICharacter from "@utilities/ICharacter.js";
 import { Language } from "@utilities/LanguageService.js";
 import { IAbility } from "@utilities/IAbility.js";
 import { LogTypes } from "./LogService.js";
+import { EnemyMove } from "@utilities/IEnemy.js";
 
 // #region Paths
 // Base directory (assumes process.cwd() is the project root)
@@ -51,10 +52,7 @@ const SELECT_SEPARATOR = chalk.dim(" ──────────");
 // #endregion
 
 // #region Standard Settings
-const LOG_LEVELS: LogTypes[] = [
-  "Warn ",
-  "Error",
-]
+const LOG_LEVELS: LogTypes[] = ["Info ", "Warn ", "Error"];
 
 const STANDARD_THEME: ITheme = {
   name: { de: "Standard", en: "Standard" },
@@ -206,6 +204,433 @@ const START_CHARACTER_ABILITIES: Record<string, IAbility[]> = {
 const ORIGIN_STORIES = [""];
 // #endregion
 
+// #region Enemies
+const easyEnemies = [
+  "Goblin Scout",
+  "Kobold",
+  "Giant Rat",
+  "Skeleton",
+  "Sprite",
+  "Giant Ant",
+  "Feral Cat",
+  "Bandit",
+  "Swarm of Bats",
+  "Slime",
+  "Shadow Imp",
+  "Zombie Dog",
+  "Bog Lurker",
+  "Cave Spider",
+  "Mischievous Pixie",
+  "Mud Crab",
+  "Rogue Squire",
+  "Giant Beetle",
+  "Vermin Swarm",
+  "Dust Mephit",
+  "Wild Boar",
+  "Angry Peasant",
+  "Scrawny Thief",
+  "Haunted Doll",
+  "Possessed Toy",
+  "Rabid Raccoon",
+  "Cursed Frog",
+  "Lost Soul",
+  "Undead Servant",
+  "Maggot Swarm",
+  "Fungal Crawler",
+  "Goblin Pyromaniac",
+  "Crazed Cultist",
+  "Angry Drunkard",
+  "Tavern Brawler",
+  "Swamp Leech",
+  "Will-o'-the-Wisp",
+];
+
+const mediumEnemies = [
+  "Orc Warrior",
+  "Zombie",
+  "Wolf",
+  "Ghoul",
+  "Hobgoblin",
+  "Bugbear",
+  "Imp",
+  "Gnoll",
+  "Warg",
+  "Lizardman",
+  "Dark Elf Rogue",
+  "Gargoyle",
+  "Skeletal Archer",
+  "Vampire Thrall",
+  "Plague Bearer",
+  "Werebat",
+  "Drowned Spirit",
+  "Forest Warden",
+  "Stone Golem",
+  "Cursed Knight",
+  "Flesh Golem",
+  "Demonic Hound",
+  "Venomous Serpent",
+  "Ghostly Assassin",
+  "Trollkin",
+  "Ghast",
+  "Revenant",
+  "Cursed Monk",
+  "Fire Salamander",
+  "Brutal Enforcer",
+  "Chaos Cultist",
+  "Fungal Horror",
+  "Lich Acolyte",
+  "Drider Spawn",
+  "Frost Revenant",
+  "Wraithling",
+  "Ooze Horror",
+];
+
+const hardEnemies = [
+  "Troll",
+  "Werewolf",
+  "Wraith",
+  "Ogre",
+  "Wyvern",
+  "Minotaur",
+  "Manticore",
+  "Vampire Spawn",
+  "Lich",
+  "Dread Knight",
+  "Fire Elemental",
+  "Frost Giant",
+  "Void Specter",
+  "Dark Paladin",
+  "Blackfang Assassin",
+  "Chimera",
+  "Shadow Reaper",
+  "Infernal Behemoth",
+  "Necromancer",
+  "Cursed Samurai",
+  "Stone Titan",
+  "Swamp Hydra",
+  "Elder Basilisk",
+  "Corrupt Archmage",
+  "Stormborn Harbinger",
+  "Hellhound Alpha",
+  "Warlord of the Wastes",
+  "Demon Berserker",
+  "Frost Wraith",
+  "Blood Golem",
+  "Bone Colossus",
+  "Ancient Wight",
+  "Feral Drider",
+  "Cave Behemoth",
+  "Chaos Knight",
+  "Gorgon",
+];
+
+const bossEnemies = [
+  "Dragon",
+  "Giant",
+  "Lich King",
+  "Vampire Lord",
+  "Beholder",
+  "Mind Flayer",
+  "Demon Prince",
+  "Kraken",
+  "Tarrasque",
+  "Grand Demon",
+  "Archlich",
+  "Void Dragon",
+  "Titan of Destruction",
+  "Eldritch Horror",
+  "Leviathan",
+  "The Shadow Tyrant",
+  "Blood Emperor",
+  "Dread Wyrm",
+  "The Nightmare King",
+  "Abyssal Colossus",
+  "Demon Overlord",
+  "God of War",
+  "Chaos Dragon",
+  "The Fallen God",
+  "Lord of the Void",
+  "Ancient Cosmic Horror",
+  "The Corrupt Celestial",
+  "The Death Bringer",
+  "Primordial Devourer",
+  "The Unchained Titan",
+  "Abyssal Warlord",
+  "The Eternal Lich",
+  "Riftborn Leviathan",
+  "The Ever-Hungering Maw",
+  "The Doom Herald",
+  "The Forgotten One",
+];
+
+const ENEMY_NAMES_ARRAY = [
+  easyEnemies,
+  mediumEnemies,
+  hardEnemies,
+  bossEnemies,
+];
+
+const healingMoves: EnemyMove[] = [
+  {
+    name: "Healing Ritual",
+    type: "heal",
+    healAmount: 10,
+    description: "Calls on dark forces to heal itself.",
+  },
+  {
+    name: "Dark Regeneration",
+    type: "heal",
+    healAmount: 15,
+    description: "Regenerates health using dark magic.",
+  },
+  {
+    name: "Life Drain",
+    type: "heal",
+    healAmount: 8,
+    description: "Absorbs nearby life essence to restore vitality.",
+  },
+  {
+    name: "Natural Remedy",
+    type: "heal",
+    healAmount: 12,
+    description: "Quickly consumes herbs from the surroundings for healing.",
+  },
+  {
+    name: "Moonlight Bath",
+    type: "heal",
+    healAmount: 14,
+    description: "Bathes in mystical moonlight that repairs wounds.",
+  },
+  {
+    name: "Blood Feast",
+    type: "heal",
+    healAmount: 11,
+    description: "Consumes a vial of crimson liquid for rapid healing.",
+  },
+  {
+    name: "Elemental Mending",
+    type: "heal",
+    healAmount: 16,
+    description: "Channels elemental energy to close wounds and restore flesh.",
+  },
+  {
+    name: "Shadow Weaving",
+    type: "heal",
+    healAmount: 9,
+    description: "Weaves shadows into physical form to patch injuries.",
+  },
+];
+
+const defendMoves: EnemyMove[] = [
+  {
+    name: "Shield Wall",
+    type: "defend",
+    description: "Raises a barrier to absorb incoming damage.",
+  },
+  {
+    name: "Fortify",
+    type: "defend",
+    description: "Temporarily increases defense against attacks.",
+  },
+  {
+    name: "Evasive Maneuver",
+    type: "defend",
+    description: "Dodges the next attack, reducing damage taken.",
+  },
+  {
+    name: "Iron Skin",
+    type: "defend",
+    description: "Hardens skin to reduce damage from physical attacks.",
+  },
+  {
+    name: "Mystic Barrier",
+    type: "defend",
+    description: "Creates a magical shield that absorbs damage.",
+  },
+  {
+    name: "Defensive Stance",
+    type: "defend",
+    description: "Adopts a stance that increases defense for a short time.",
+  },
+  {
+    name: "Guardian's Shield",
+    type: "defend",
+    description: "Summons a protective spirit to absorb damage.",
+  },
+  {
+    name: "Stone Form",
+    type: "defend",
+    description: "Transforms into stone to reduce damage taken.",
+  },
+  {
+    name: "Shadow Cloak",
+    type: "defend",
+    description: "Wraps the body in shadows to become harder to hit.",
+  },
+  {
+    name: "Arcane Ward",
+    type: "defend",
+    description: "Projects a magical field that nullifies incoming spells.",
+  },
+  {
+    name: "Spectral Shift",
+    type: "defend",
+    description: "Briefly phases out of physical reality to avoid harm.",
+  },
+  {
+    name: "Protective Scales",
+    type: "defend",
+    description: "Grows hardened scales that deflect attacks.",
+  },
+];
+
+const attackMoves: EnemyMove[] = [
+  {
+    name: "Savage Strike",
+    type: "attack",
+    multiplier: 1.2,
+    description: "A powerful blow that causes significant damage.",
+  },
+  {
+    name: "Venomous Bite",
+    type: "attack",
+    multiplier: 0.9,
+    description: "Bites with poisoned fangs that cause lingering pain.",
+  },
+  {
+    name: "Flame Breath",
+    type: "attack",
+    multiplier: 1.25,
+    description: "Exhales a cone of searing flames.",
+  },
+  {
+    name: "Shadow Bolt",
+    type: "attack",
+    multiplier: 1.1,
+    description: "Fires a bolt of dark energy that seeks its target.",
+  },
+  {
+    name: "Crushing Blow",
+    type: "attack",
+    multiplier: 1.25,
+    description: "Smashes down with incredible force.",
+  },
+  {
+    name: "Soul Drain",
+    type: "attack",
+    multiplier: 0.8,
+    description: "Attempts to extract life force from the victim.",
+  },
+  {
+    name: "Ice Spike",
+    type: "attack",
+    multiplier: 1.15,
+    description: "Launches a jagged spike of ice that impales the target.",
+  },
+  {
+    name: "Thunder Clap",
+    type: "attack",
+    multiplier: 1.0,
+    description:
+      "Creates a deafening sound wave that causes concussive damage.",
+  },
+  {
+    name: "Arcane Blast",
+    type: "attack",
+    multiplier: 1.05,
+    description:
+      "Releases a burst of magical energy that disrupts the target's senses.",
+  },
+  {
+    name: "Whirling Blades",
+    type: "attack",
+    multiplier: 1.2,
+    description:
+      "Spins rapidly with blades extended, slashing everything nearby.",
+  },
+  {
+    name: "Acid Spray",
+    type: "attack",
+    multiplier: 0.7,
+    description: "Ejects corrosive fluid that burns through armor and flesh.",
+  },
+  {
+    name: "Bone Shatter",
+    type: "attack",
+    multiplier: 1.15,
+    description:
+      "A precise strike aimed at breaking bones and crippling the target.",
+  },
+  {
+    name: "Necrotic Touch",
+    type: "attack",
+    multiplier: 0.85,
+    description: "A touch that causes flesh to wither and decay on contact.",
+  },
+  {
+    name: "Mind Spike",
+    type: "attack",
+    multiplier: 0.95,
+    description:
+      "Sends a painful psychic lance directly into the target's thoughts.",
+  },
+  {
+    name: "Void Tentacles",
+    type: "attack",
+    multiplier: 1.1,
+    description:
+      "Summons dark appendages from another dimension to entangle and crush.",
+  },
+  {
+    name: "Feral Charge",
+    type: "attack",
+    multiplier: 1.0,
+    description:
+      "Rushes forward with incredible speed to slam into the target.",
+  },
+];
+
+const scareMoves: EnemyMove[] = [
+  {
+    name: "Intimidating Howl",
+    type: "scare",
+    description: "Attempts to frighten you, making you lose your next turn.",
+  },
+  {
+    name: "Terrifying Roar",
+    type: "scare",
+    description: "Unleashes a bone-chilling roar that instills fear.",
+  },
+  {
+    name: "Shadowy Apparition",
+    type: "scare",
+    description: "Summons a ghostly figure that terrifies the target.",
+  },
+  {
+    name: "Mind Fracture",
+    type: "scare",
+    description: "Creates a psychic disturbance that causes panic.",
+  },
+  {
+    name: "Creeping Dread",
+    type: "scare",
+    description: "Instills a deep sense of dread that paralyzes the target.",
+  },
+  {
+    name: "Nightmare Visions",
+    type: "scare",
+    description: "Projects horrifying images into the target's mind.",
+  },
+];
+
+const ENEMY_MOVES_ARRAY: EnemyMove[] = [
+  ...attackMoves,
+  ...defendMoves,
+  ...healingMoves,
+  ...scareMoves,
+];
+// #endregion
+
 export default {
   // Paths
   ROOT_DIR,
@@ -233,6 +658,10 @@ export default {
   START_CHARACTER,
   START_CHARACTER_STATS,
   START_CHARACTER_ABILITIES,
+
+  // Enemies
+  ENEMY_NAMES_ARRAY,
+  ENEMY_MOVES_ARRAY,
 
   // Choices
   CHARACTER_CLASSES,

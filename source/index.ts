@@ -56,6 +56,7 @@ async function handleMenuChoice(choice: string) {
         break;
       case "tutorial":
         await tutorial(false);
+        break;
       case "goBack":
         const isSure = await themedSelect({
           message: getTerm("confirmExit"),
