@@ -1,5 +1,11 @@
 import chalk from "chalk";
-import { pause, totalClear } from "@utilities/ConsoleService.js";
+import {
+  alignText,
+  boxItUp,
+  getTextInRoomAsciiIfNotTooLong,
+  pause,
+  totalClear,
+} from "@utilities/ConsoleService.js";
 
 const frames = [
   "\n(°□°)       ┬─┬      \n",
@@ -10,13 +16,13 @@ const frames = [
   "\n    (╯°□°)╯ ┬─┬      \n",
   "\n   (╯°□°)╯︵ ┻━┻     \n",
   "\n   (╯°□°)╯︵     ┻━┻ \n",
-  "\n \\(°□°)/         ┻━┻\n",
+  "\n \\(°□°)/          ┻━┻\n",
   "\n  (°□°)/          ┻━┻\n",
-  "\n  \\(°□°)         ┻━┻\n",
+  "\n  \\(°□°)          ┻━┻\n",
   "\n  (°□°)/          ┻━┻\n",
-  "\n  \\(°□°)/        ┻━┻\n",
+  "\n  \\(°□°)/         ┻━┻\n",
   "\n  (⌐■_■)/         ┻━┻\n",
-  "\n  \\(⌐■_■)        ┻━┻\n",
+  "\n  \\(⌐■_■)         ┻━┻\n",
   "\n  (⌐■_■)/         ┻━┻\n",
   "\n  (⌐■_■)          ┻━┻\n",
   "\n   (⌐■_■)         ┻━┻\n",
@@ -24,18 +30,20 @@ const frames = [
   "\n     (⌐■_■)       ┻━┻\n",
   "\n      (⌐■_■)      ┻━┻\n",
   "\n       ( ■_■ )    ┻━┻\n",
-  `\n      ( ${chalk.redBright("■_■")} )  ┻━┻\n`,
+  `\n      ( ${chalk.redBright("■_■")} )   ┻━┻\n`,
   `
-     /          \\
+     /         \\
     |   🟥 🟥   | you're next
-     \\   ${chalk.redBright("‾‾")}    /       
+     \\   ${chalk.redBright("‾‾")}    /   
 `,
 ];
 
 export async function flipATable() {
   for (let i in frames) {
     totalClear();
-    console.log(frames[i]);
+    console.log(
+      getTextInRoomAsciiIfNotTooLong(boxItUp(alignText(frames[i], "left")))
+    );
     const index = parseInt(i);
     let delay;
     switch (true) {

@@ -1,4 +1,4 @@
-import { primaryColor } from "@utilities/ConsoleService.js";
+import { primaryColor, totalClear } from "@utilities/ConsoleService.js";
 import { getTerm } from "@utilities/LanguageService.js";
 import { Separator } from "@inquirer/prompts";
 import config from "@utilities/Config.js";
@@ -8,8 +8,8 @@ import { getDataFromFile, saveDataToFile } from "@utilities/StorageService.js";
 import {
   inputValidators,
   themedInput,
-  themedSelect,
 } from "@utilities/MenuService.js";
+import { themedSelectInRoom } from "./ThemedSelectInRoom.js";
 
 const getCharacterOptions = (character: ICharacter) => {
   // Calculate inventory sum
@@ -79,7 +79,8 @@ export async function showCharacterData() {
     getDataFromFile("character") || config.START_CHARACTER;
 
   while (true) {
-    const choice = await themedSelect({
+    totalClear();
+    const choice = await themedSelectInRoom({
       message: primaryColor(getTerm("characterData")),
       choices: getCharacterOptions(character),
       canGoBack: true,
@@ -100,7 +101,8 @@ export async function showCharacterData() {
         break;
 
       case "class":
-        character.class = await themedSelect({
+        totalClear();
+        character.class = await themedSelectInRoom({
           canGoBack: true,
           message: primaryColor(getTerm("class")),
           default: character.class,

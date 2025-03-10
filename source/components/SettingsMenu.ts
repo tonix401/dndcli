@@ -6,19 +6,16 @@ import {
 } from "@utilities/CacheService.js";
 import { getTerm, Language } from "@utilities/LanguageService.js";
 import { log } from "@utilities/LogService.js";
-import {
-  pressEnter,
-  totalClear,
-} from "@utilities/ConsoleService.js";
+import { pressEnter, totalClear } from "@utilities/ConsoleService.js";
 import { getAllThemeOverrides } from "@utilities/ThemingService.js";
 import chalk from "chalk";
 import Config from "@utilities/Config.js";
-import { themedSelect } from "@utilities/MenuService.js";
+import { themedSelectInRoom } from "./ThemedSelectInRoom.js";
 
 export async function settingsMenu() {
   while (true) {
     totalClear();
-    const subSettingChoice = await themedSelect({
+    const subSettingChoice = await themedSelectInRoom({
       message: getTerm("settings"),
       canGoBack: true,
       choices: [
@@ -64,6 +61,7 @@ export async function settingsMenu() {
  *  English
  */
 async function changeLanguageMenu() {
+  totalClear();
   const langChoices: { name: string; value: Language }[] = [
     {
       name: getTerm("de"),
@@ -74,7 +72,7 @@ async function changeLanguageMenu() {
       value: "en",
     },
   ];
-  const chosenLang: Language | string = await themedSelect({
+  const chosenLang: Language | string = await themedSelectInRoom({
     message: `${getTerm("language")}`,
     canGoBack: true,
     choices: langChoices,
@@ -88,9 +86,10 @@ async function changeLanguageMenu() {
 }
 
 async function changeThemeMenu() {
+  totalClear();
   const themes = Object.values(getAllThemeOverrides());
 
-  const themeChoice = await themedSelect({
+  const themeChoice = await themedSelectInRoom({
     canGoBack: true,
     message: getTerm("theme"),
     choices: [

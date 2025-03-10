@@ -153,9 +153,10 @@ export function errorColor(text: string) {
 /**
  * Prompt the user to press enter or right to continue
  */
-export async function pressEnter(
-  config?: { message?: string; allowLeft?: boolean }
-): Promise<void> {
+export async function pressEnter(config?: {
+  message?: string;
+  allowLeft?: boolean;
+}): Promise<void> {
   let keybindings;
   const message = config?.message ?? getTerm("pressEnter");
   const allowLeft = config?.allowLeft ?? false;
@@ -186,7 +187,7 @@ export async function pressEnter(
 /**
  * A function that adds spaces to align multi line text to the center or right, relative to the longest line in the text
  * @param text The text you want to align
- * @param direction Center or right, (you don't need this for left)
+ * @param direction Center, right or left, default is left
  * @param [margin=""] A string that gets added on both sides, mirrored
  * @param [minWidth=0] The minimum width of the resulting text
  */
@@ -205,22 +206,25 @@ export function alignText(
 
   // Determine Width
   const internalMinWidth = minWidth - margin.length * 2;
-  let width = Math.max(...lines.map((line) => line.length));
+  let width = Math.max(
+    ...lines.map((line) => removeFormatting(line).text.length)
+  );
   width = width >= internalMinWidth ? width : internalMinWidth;
 
   // Format lines
   lines = lines.map((line) => {
-    const space = " ".repeat(Math.floor((width - line.length) / 2));
+    const lineLength = removeFormatting(line).text.length;
+    const space = " ".repeat(Math.floor((width - lineLength) / 2));
     let result;
     switch (direction) {
       case "left":
-        result = line + " ".repeat(width - line.length);
+        result = line + " ".repeat(width - lineLength);
         break;
       case "center":
-        result = " ".repeat(width - line.length - space.length) + line + space;
+        result = " ".repeat(width - lineLength - space.length) + line + space;
         break;
       case "right":
-        result = " ".repeat(width - line.length) + line;
+        result = " ".repeat(width - lineLength) + line;
         break;
     }
     return formattedMargin + result + reverseformattedMargin;
@@ -228,6 +232,39 @@ export function alignText(
 
   // Return joined lines
   return lines.join("\n");
+}
+
+export function alignTextSideBySide(text1: string, text2: string) {
+  const height1 = text1.split("\n").length;
+  const height2 = text2.split("\n").length;
+
+  const width1 = Math.max(...removeFormatting(text1).text.split("\n").map((line: string) => line.length));
+  const width2 = Math.max(...removeFormatting(text2).text.split("\n").map((line: string) => line.length));
+  const width = Math.max(width1, width2);
+
+  const height = Math.max(height1, height2);
+  const lines1 = alignText(text1, "left").split("\n");
+  const lines2 = alignText(text2, "left").split("\n");
+
+  if (height1 < height) {
+    for (let i = 0; i < height - height1; i++) {
+      lines1.push(" ".repeat(width1));
+    }
+  }
+  if (height2 < height) {
+    for (let i = 0; i < height - height2; i++) {
+      lines2.push(" ".repeat(width2));
+    }
+  }
+
+  const result = [];
+  for (let i = 0; i < height; i++) {
+    const line1 = lines1[i] || "";
+    const line2 = lines2[i] || "";
+    result.push(line1 + line2);
+  }
+
+  return result.join("\n");
 }
 
 /**
@@ -256,7 +293,7 @@ export function alignTextAsTable(
   );
 
   let width = Math.max(
-    ...rows.map((row) => removeFormatting(row.join("")).string.length)
+    ...rows.map((row) => removeFormatting(row.join("")).text.length)
   );
   width = width >= internalMinWidth ? width : internalMinWidth;
 
@@ -265,7 +302,7 @@ export function alignTextAsTable(
       formattedMargin +
       row[0] +
       separator +
-      " ".repeat(width - removeFormatting(row.join("")).string.length) +
+      " ".repeat(width - removeFormatting(row.join("")).text.length) +
       row[1] +
       reverseformattedMargin
   );
@@ -367,7 +404,7 @@ export function getTextInRoomAsciiIfNotTooLong(text: string): string {
   const textLines = text.split("\n").filter((line) => line.length > 0);
   const margin = Math.round((roomLines.length - textLines.length) / 2);
 
-  if (margin < 3) {
+  if (margin < 2) {
     return text;
   }
 
@@ -423,8 +460,8 @@ export function overlayTextOnLineAndFormat(
   emptyLine: string,
   text: string
 ): string {
-  const noFormatEmptyLine = removeFormatting(emptyLine).string;
-  const { string, hadFormatting } = removeFormatting(text);
+  const noFormatEmptyLine = removeFormatting(emptyLine).text;
+  const { text: string, hadFormatting } = removeFormatting(text);
   const noFormatText = string;
 
   if (noFormatText.length > noFormatEmptyLine.length) {
@@ -452,20 +489,34 @@ export function overlayTextOnLineAndFormat(
  * @returns Text without formatting
  */
 export function removeFormatting(text: string): {
-  string: string;
+  text: string;
   hadFormatting: boolean;
 } {
   const result = util.stripVTControlCharacters(text);
-  return { string: result, hadFormatting: result.length !== text.length };
+  return { text: result, hadFormatting: result.length !== text.length };
 }
 
-export function boxItUp(text: string): string {
+/**
+ * Surrounds text with a box
+ * @param text The text to box
+ * @param padding The padding to add to the box
+ * @returns boxed up string
+ */
+export function boxItUp(
+  text: string,
+  padding?: { top: number; bottom: number; left: number; right: number }
+): string {
+  const pTop = padding?.top ?? 0;
+  const pBottom = padding?.bottom ?? 0;
+  const pLeft = padding?.left ?? 1;
+  const pRight = padding?.right ?? 1;
+
   return boxen(text, {
     padding: {
-      top: 0,
-      bottom: 0,
-      left: 1,
-      right: 1,
+      top: pTop,
+      bottom: pBottom,
+      left: pLeft,
+      right: pRight,
     },
     borderStyle: {
       topLeft: "/",

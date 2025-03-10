@@ -1,11 +1,9 @@
 import crypto from "crypto";
 import { getTerm } from "@utilities/LanguageService.js";
 import { getPassword, setPassword } from "@utilities/CacheService.js";
-import {
-  primaryColor,
-  totalClear,
-} from "@utilities/ConsoleService.js";
-import { themedInput, themedPassword, themedSelect } from "@utilities/MenuService.js";
+import { primaryColor, totalClear } from "@utilities/ConsoleService.js";
+import { themedInput, themedPassword } from "@utilities/MenuService.js";
+import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
 
 /**
  * A Screen to check for a password
@@ -55,11 +53,11 @@ export async function setPasswordScreen() {
     });
 
     isPasswordConfirmed = newPassword === confirmPassword;
-
+    totalClear();
     if (!isPasswordConfirmed) {
       console.log(primaryColor(getTerm("notTheSame", true)));
       if (
-        (await themedSelect({
+        (await themedSelectInRoom({
           canGoBack: true,
           message: getTerm("tryAgain"),
           choices: [

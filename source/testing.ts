@@ -3,11 +3,9 @@ import { dungeonMinigame } from "@components/DungeonMinigame.js";
 async function test() {
   ///////////////////////
 
-  await dungeonMinigame()
+  await dungeonMinigame();
 
   /////////////////////////
 }
-await test().catch((err) => {
-  console.error("Error during test:", err);
-});
+await test()
 console.log("End of test!");

@@ -2,6 +2,92 @@ import { input, password } from "@inquirer/prompts";
 import { getTheme } from "./CacheService.js";
 import { errorColor, primaryColor, secondaryColor } from "./ConsoleService.js";
 import chalk from "chalk";
+import {
+  createPrompt,
+  useState,
+  useKeypress,
+  usePrefix,
+  usePagination,
+  useRef,
+  useMemo,
+  useEffect,
+  isBackspaceKey,
+  isEnterKey,
+  isUpKey,
+  isDownKey,
+  isNumberKey,
+  Separator,
+  ValidationError,
+  makeTheme,
+  type Theme,
+  type Status,
+} from "@inquirer/core";
+import type { PartialDeep } from "@inquirer/type";
+import colors from "yoctocolors-cjs";
+import figures from "@inquirer/figures";
+import ansiEscapes from "ansi-escapes";
+import { getTerm } from "./LanguageService.js";
+import ICharacter from "@utilities/ICharacter.js";
+
+/**
+ * The validation functions for user inputs
+ */
+export const inputValidators = {
+  apiKey: (input: string) => {
+    const regex = /^sk-[a-zA-Z0-9_-]{40,}$/;
+    if (input.trim().length === 0) return getTerm("apiKeyRequired");
+    if (!regex.test(input.trim())) return getTerm("wrongFormat");
+    return true;
+  },
+  name: (input: string) => {
+    const normalizedInput = input.trim().toLowerCase();
+    const minLength = 2;
+    const maxLength = 25;
+    if (normalizedInput.length === 0) return getTerm("nameRequired");
+    if (normalizedInput.length < minLength)
+      return getTerm("tooShort") + minLength;
+    if (normalizedInput.length > maxLength)
+      return getTerm("tooLong") + maxLength;
+    if (!isNaN(parseInt(input))) return getTerm("cantBeNumber");
+    return true;
+  },
+  level: (input: string) => {
+    const num = parseInt(input);
+    const max = 1000;
+    if (isNaN(num)) return getTerm("mustBeNumber");
+    if (num < 0) return getTerm("cantBeNegative");
+    if (num > max) return getTerm("tooHigh") + max;
+    return true;
+  },
+  hp: (input: string) => {
+    const num = parseInt(input);
+    if (isNaN(num)) return getTerm("mustBeNumber");
+    if (num < 0) return getTerm("cantBeNegative");
+    return true;
+  },
+  maxhp: (input: string, character: ICharacter) => {
+    const num = parseInt(input);
+    if (isNaN(num)) return getTerm("mustBeNumber");
+    if (num < 0) return getTerm("cantBeNegative");
+    if (num < character.hp) return getTerm("mustBeHigherThanCurrentHp");
+    return true;
+  },
+  xp: (input: string) => {
+    const num = parseInt(input);
+    if (isNaN(num)) return getTerm("mustBeNumber");
+    if (num < 0) return getTerm("cantBeNegative");
+    return true;
+  },
+  numericAbility: (input: string) => {
+    const num = parseInt(input);
+    const max = 999;
+    if (isNaN(num)) return getTerm("mustBeNumber");
+    if (num < 0) return getTerm("cantBeNegative");
+    if (num > max) return getTerm("tooHigh") + max;
+    return true;
+  },
+};
+
 
 /**
  * A version of the select from inquirer that used the custom theme and current colors
@@ -68,34 +154,7 @@ export function themedPassword(config: { message: string }): Promise<string> {
   return password({ ...config, theme, mask: "*" }, { clearPromptOnDone: true });
 }
 
-import {
-  createPrompt,
-  useState,
-  useKeypress,
-  usePrefix,
-  usePagination,
-  useRef,
-  useMemo,
-  useEffect,
-  isBackspaceKey,
-  isEnterKey,
-  isUpKey,
-  isDownKey,
-  isNumberKey,
-  Separator,
-  ValidationError,
-  makeTheme,
-  type Theme,
-  type Status,
-} from "@inquirer/core";
-import type { PartialDeep } from "@inquirer/type";
-import colors from "yoctocolors-cjs";
-import figures from "@inquirer/figures";
-import ansiEscapes from "ansi-escapes";
-import { getTerm } from "./LanguageService.js";
-import ICharacter from "@utilities/ICharacter.js";
-
-type SelectTheme = {
+export type SelectTheme = {
   icon: { cursor: string };
   style: {
     disabled: (text: string) => string;
@@ -104,7 +163,7 @@ type SelectTheme = {
   helpMode: "always" | "never" | "auto";
 };
 
-const selectTheme: SelectTheme = {
+export const selectTheme: SelectTheme = {
   icon: { cursor: figures.pointer },
   style: {
     disabled: (text: string) => colors.dim(`- ${text}`),
@@ -113,7 +172,7 @@ const selectTheme: SelectTheme = {
   helpMode: "auto",
 };
 
-type Choice<Value> = {
+export type Choice<Value> = {
   value: Value;
   name?: string;
   description?: string;
@@ -122,7 +181,7 @@ type Choice<Value> = {
   type?: never;
 };
 
-type NormalizedChoice<Value> = {
+export type NormalizedChoice<Value> = {
   value: Value;
   name: string;
   description?: string;
@@ -130,7 +189,7 @@ type NormalizedChoice<Value> = {
   disabled: boolean | string;
 };
 
-type SelectConfig<
+export type SelectConfig<
   Value,
   ChoicesObject =
     | ReadonlyArray<string | Separator>
@@ -147,13 +206,13 @@ type SelectConfig<
   canGoBack?: boolean;
 };
 
-function isSelectable<Value>(
+export function isSelectable<Value>(
   item: NormalizedChoice<Value> | Separator
 ): item is NormalizedChoice<Value> {
   return !Separator.isSeparator(item) && !item.disabled;
 }
 
-function normalizeChoices<Value>(
+export function normalizeChoices<Value>(
   choices:
     | ReadonlyArray<string | Separator>
     | ReadonlyArray<Choice<Value> | Separator>
@@ -374,60 +433,3 @@ export const themedSingleKeyPrompt = createPrompt(
     return theme.prefix + " " + chalk.hex(theme.secondaryColor)(config.message);
   }
 );
-
-
-export const inputValidators = {
-  apiKey: (input: string) => {
-    const regex = /^sk-[a-zA-Z0-9_-]{40,}$/;
-    if (input.trim().length === 0) return getTerm("apiKeyRequired");
-    if (!regex.test(input.trim())) return getTerm("wrongFormat");
-    return true;
-  },
-  name: (input: string) => {
-    const normalizedInput = input.trim().toLowerCase();
-    const minLength = 2;
-    const maxLength = 25;
-    if (normalizedInput.length === 0) return getTerm("nameRequired");
-    if (normalizedInput.length < minLength)
-      return getTerm("tooShort") + minLength;
-    if (normalizedInput.length > maxLength)
-      return getTerm("tooLong") + maxLength;
-    if (!isNaN(parseInt(input))) return getTerm("cantBeNumber");
-    return true;
-  },
-  level: (input: string) => {
-    const num = parseInt(input);
-    const max = 1000;
-    if (isNaN(num)) return getTerm("mustBeNumber");
-    if (num < 0) return getTerm("cantBeNegative");
-    if (num > max) return getTerm("tooHigh") + max;
-    return true;
-  },
-  hp: (input: string) => {
-    const num = parseInt(input);
-    if (isNaN(num)) return getTerm("mustBeNumber");
-    if (num < 0) return getTerm("cantBeNegative");
-    return true;
-  },
-  maxhp: (input: string, character: ICharacter) => {
-    const num = parseInt(input);
-    if (isNaN(num)) return getTerm("mustBeNumber");
-    if (num < 0) return getTerm("cantBeNegative");
-    if (num < character.hp) return getTerm("mustBeHigherThanCurrentHp");
-    return true;
-  },
-  xp: (input: string) => {
-    const num = parseInt(input);
-    if (isNaN(num)) return getTerm("mustBeNumber");
-    if (num < 0) return getTerm("cantBeNegative");
-    return true;
-  },
-  numericAbility: (input: string) => {
-    const num = parseInt(input);
-    const max = 999;
-    if (isNaN(num)) return getTerm("mustBeNumber");
-    if (num < 0) return getTerm("cantBeNegative");
-    if (num > max) return getTerm("tooHigh") + max;
-    return true;
-  },
-};

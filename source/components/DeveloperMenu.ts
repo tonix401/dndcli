@@ -20,13 +20,16 @@ import { showCharacterData } from "@components/ShowCharacterData.js";
 import { resetDataMenu } from "@components/ResetDataMenu.js";
 import { getDataFromFile, saveDataToFile } from "@utilities/StorageService.js";
 import ICharacter from "@utilities/ICharacter.js";
-import { themedSelect } from "@utilities/MenuService.js";
 import { IEnemy } from "@utilities/IEnemy.js";
 import { getRandomEnemy } from "@utilities/GameService.js";
+import { themedSelectInRoom } from "./ThemedSelectInRoom.js";
+import { dungeonMinigame } from "./DungeonMinigame.js";
 
 // ----------------- (Temporary) Test Combat Section -----------------
 
-const testEnemy: IEnemy = getRandomEnemy(getDataFromFile("character")?.level ?? 1);
+const testEnemy: IEnemy = getRandomEnemy(
+  getDataFromFile("character")?.level ?? 1
+);
 
 async function testCombat() {
   let character: ICharacter = getDataFromFile("character");
@@ -117,6 +120,10 @@ export async function secretDevMenu() {
       value: "testCombat",
     },
     {
+      name: "Test Dungeon",
+      value: "testDungeon",
+    },
+    {
       name: getTerm("goBack"),
       value: "goBack",
     },
@@ -128,13 +135,15 @@ export async function secretDevMenu() {
   }
 
   while (true) {
-    totalClear();
+    
     try {
-      const chosenOption = await themedSelect({
+      totalClear();
+      const chosenOption = await themedSelectInRoom({
         message: getTerm("devMenu"),
         choices: devMenuOptions,
         canGoBack: true,
       });
+      totalClear();
       switch (chosenOption) {
         case "settings":
           log("Dev Menu: showing saved data");
@@ -160,6 +169,9 @@ export async function secretDevMenu() {
           break;
         case "testCombat":
           await testCombat();
+          break;
+        case "testDungeon":
+          await dungeonMinigame();
           break;
         case "goBack":
           return;

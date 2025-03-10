@@ -7,11 +7,13 @@ import {
 } from "@utilities/CacheService.js";
 import {
   primaryColor,
+  totalClear,
 } from "@utilities/ConsoleService.js";
 import { getTerm, Language } from "@utilities/LanguageService.js";
 import { Separator } from "@inquirer/prompts";
 import config from "@utilities/Config.js";
 import { themedInput, themedSelect } from "@utilities/MenuService.js";
+import { themedSelectInRoom } from "./ThemedSelectInRoom.js";
 
 const getSettingsOptions = () => {
   const theme = getTheme();
@@ -77,7 +79,8 @@ const getSettingsOptions = () => {
 
 export async function showSettingsData() {
   while (true) {
-    const choice = await themedSelect({
+    totalClear();
+    const choice = await themedSelectInRoom({
       canGoBack: true,
       message: primaryColor(getTerm("settingsData")),
       choices: getSettingsOptions(),
