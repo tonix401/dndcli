@@ -187,7 +187,7 @@ export function initiateDungeonMapWithHallways(
   for (let y in dungeon.rooms) {
     for (let x in dungeon.rooms[y]) {
       const room = dungeon.rooms[y][x];
-      fillRoomWithEnemyIfNecessary(room, character.level);
+      fillRoomWithEnemyIfNecessary(room, character?.level || 10);
     }
   }
   return dungeon;

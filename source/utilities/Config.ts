@@ -76,6 +76,7 @@ const STANDARD_PASSWORD: string = crypto
  * List of available character classes
  */
 const CHARACTER_CLASSES = ["swordsman", "mage", "archer", "thief"];
+
 /**
  * The default character data
  */

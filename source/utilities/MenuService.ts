@@ -358,8 +358,8 @@ type SingleKeyPromptConfig = {
  * A prompt that waits for the given keys and returns the value associated with the key.
  * @example
  * keybindings: {
- *  "space": "confirm",
- *  "q": "quit",
+ *  space: "confirm",
+ *  q: "quit",
  * }
  * -> Waits for the user to press either space or q and returns "confirm" or "quit" respectively.
  */
@@ -374,6 +374,7 @@ export const themedSingleKeyPrompt = createPrompt(
     return theme.prefix + " " + chalk.hex(theme.secondaryColor)(config.message);
   }
 );
+
 
 export const inputValidators = {
   apiKey: (input: string) => {
