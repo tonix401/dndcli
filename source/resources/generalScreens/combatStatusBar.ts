@@ -27,7 +27,11 @@ import chalk from "chalk";
  *  _________|___________________|__________________|___________________|_________
  * ```
  */
-export function getCombatStatusBar(character: ICharacter, enemy: IEnemy, _round: number = 0) {
+export function getCombatStatusBar(
+  character: ICharacter,
+  enemy: IEnemy,
+  _round: number = 0
+) {
   const background =
     secondaryColor(`*******************************************************************************
           |                   |                  |                  |          
@@ -48,8 +52,8 @@ export function getCombatStatusBar(character: ICharacter, enemy: IEnemy, _round:
   ];
 
   const healthBarMinLength = Math.max(
-    removeFormatting(heroBar.join()).string.length,
-    removeFormatting(enemyBar.join()).string.length
+    removeFormatting(heroBar.join()).text.length,
+    removeFormatting(enemyBar.join()).text.length
   );
 
   const heroArr: [string, string] = [

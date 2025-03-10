@@ -6,7 +6,7 @@ import {
 } from "@utilities/ConsoleService.js";
 import { getTerm } from "@utilities/LanguageService.js";
 import { clearLogs, getLogData, log } from "@utilities/LogService.js";
-import { themedSelect } from "@utilities/MenuService.js";
+import { themedSelectInRoom } from "./ThemedSelectInRoom.js";
 
 export async function showLogsMenu() {
   const logMenuChoices = [
@@ -26,7 +26,7 @@ export async function showLogsMenu() {
 
   while (true) {
     totalClear();
-    const choice = await themedSelect({
+    const choice = await themedSelectInRoom({
       canGoBack: true,
       message: getTerm("logsMenu"),
       choices: logMenuChoices,

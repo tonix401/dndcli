@@ -17,6 +17,7 @@ import { getDataFromFile } from "@utilities/StorageService.js";
 import { startCampaign } from "@utilities/GameService.js";
 import { themedSelect } from "@utilities/MenuService.js";
 import { tutorial } from "@components/Tutorial.js";
+import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
 
 const getMenuOptions = () => [
   { name: getTerm("createCharacter"), value: "1" },
@@ -58,7 +59,8 @@ async function handleMenuChoice(choice: string) {
         await tutorial(false);
         break;
       case "goBack":
-        const isSure = await themedSelect({
+        totalClear();
+        const isSure = await themedSelectInRoom({
           message: getTerm("confirmExit"),
           choices: [
             { name: getTerm("yes"), value: "yes" },
@@ -85,7 +87,7 @@ async function handleMenuChoice(choice: string) {
 async function main() {
   while (true) {
     totalClear();
-    const choice = await themedSelect({
+    const choice = await themedSelectInRoom({
       message: getTerm("mainMenu"),
       choices: getMenuOptions(),
       canGoBack: true,

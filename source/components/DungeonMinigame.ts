@@ -1,27 +1,34 @@
 import { getDungeon, setDungeon } from "@utilities/CacheService.js";
-import { totalClear } from "@utilities/ConsoleService.js";
 import {
+  boxItUp,
+  getTextInRoomAsciiIfNotTooLong,
+  totalClear,
+} from "@utilities/ConsoleService.js";
+import {
+  Dungeon,
   getDungeonMapVisual,
   initiateDungeonMapWithHallways,
+  Room,
 } from "@utilities/DungeonService.js";
-import { getTerm } from "@utilities/LanguageService.js";
-import { themedSelect } from "@utilities/MenuService.js";
 import { enterRoom } from "./EnterRoom.js";
+import { dungeonMovementSelect } from "./DungeonMovementSelect.js";
 
 /**
  * Dungeon minigame.
  */
 export async function dungeonMinigame() {
   setDungeon(initiateDungeonMapWithHallways());
-  let goBack = false;
   while (true) {
+    const dungeon = getDungeon();
+    let currentRoom = dungeon.rooms[dungeon.player.y][dungeon.player.x];
+
     totalClear();
-    console.log(getDungeonMapVisual());
-    goBack = (await movePlayerMenu()) || false;
-    if (goBack) {
-      continue;
-    }
-    await enterRoom(getDungeon().rooms[getDungeon().player.y][getDungeon().player.x]);
+    await movePlayerMenu(currentRoom, dungeon);
+
+    currentRoom = dungeon.rooms[dungeon.player.y][dungeon.player.x];
+    await enterRoom(currentRoom);
+
+    setDungeon(dungeon);
   }
 }
 
@@ -29,36 +36,12 @@ export async function dungeonMinigame() {
  * Shows the movement menu for the player.
  * @returns Whether the user wants to go back.
  */
-async function movePlayerMenu() {
-  const dungeon = getDungeon();
-  const currentRoom = dungeon.rooms[dungeon.player.y][dungeon.player.x];
-  const directions = [
-    {
-      name: getTerm("north"),
-      value: "north",
-      disabled: !currentRoom.hallways.north,
-    },
-    {
-      name: getTerm("east"),
-      value: "east",
-      disabled: !currentRoom.hallways.east,
-    },
-    {
-      name: getTerm("south"),
-      value: "south",
-      disabled: !currentRoom.hallways.south,
-    },
-    {
-      name: getTerm("west"),
-      value: "west",
-      disabled: !currentRoom.hallways.west,
-    },
-  ];
-
-  const chosenDirection = await themedSelect({
-    message: "Current position: " + dungeon.player.x + ", " + dungeon.player.y,
-    choices: directions,
-    canGoBack: true,
+async function movePlayerMenu(currentRoom: Room, dungeon: Dungeon) {
+  const chosenDirection = await dungeonMovementSelect({
+    north: currentRoom.hallways.north,
+    south: currentRoom.hallways.south,
+    west: currentRoom.hallways.west,
+    east: currentRoom.hallways.east,
   });
 
   switch (chosenDirection) {
@@ -74,8 +57,6 @@ async function movePlayerMenu() {
     case "east":
       dungeon.player.x += 1;
       break;
-    case "goBack":
-      return true;
     default:
       console.log("No valid movement selected");
   }

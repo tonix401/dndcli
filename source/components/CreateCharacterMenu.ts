@@ -4,7 +4,8 @@ import { log } from "@utilities/LogService.js";
 import {
   pressEnter,
   primaryColor,
-  secondaryColor
+  secondaryColor,
+  totalClear
 } from "@utilities/ConsoleService.js";
 import { rollDiceTotal } from "@utilities/DiceService.js";
 import Config from "@utilities/Config.js";
@@ -15,7 +16,8 @@ import {
 import ICharacter from "@utilities/ICharacter.js";
 import { saveDataToFile } from "@utilities/StorageService.js";
 import { getLanguage } from "@utilities/CacheService.js";
-import { inputValidators, themedInput, themedSelect } from "@utilities/MenuService.js";
+import { inputValidators, themedInput } from "@utilities/MenuService.js";
+import { themedSelectInRoom } from "./ThemedSelectInRoom.js";
 
 export async function createCharacterMenu(): Promise<void> {
   try {
@@ -26,7 +28,8 @@ export async function createCharacterMenu(): Promise<void> {
     charData.name = await themedInput({ message: namePrompt,  validate: inputValidators.name });
 
     // Get character class
-    charData.class = await themedSelect({
+    totalClear();
+    charData.class = await themedSelectInRoom({
       message: primaryColor(getTerm("classPrompt")),
       choices: Config.CHARACTER_CLASSES.map((cls) => ({
         name: getTerm(cls),
@@ -35,7 +38,8 @@ export async function createCharacterMenu(): Promise<void> {
     });
 
     // Ask user if they want default stats or custom allocation
-    const statMethod = await themedSelect({
+    totalClear();
+    const statMethod = await themedSelectInRoom({
       message: primaryColor(
         "Do you want the default stat distribution or allocate custom points?"
       ),

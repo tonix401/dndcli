@@ -1,9 +1,14 @@
 import chalk from "chalk";
 import { IEnemy } from "@utilities/IEnemy.js";
 import { getDungeon } from "@utilities/CacheService.js";
-import { primaryColor, secondaryColor } from "@utilities/ConsoleService.js";
+import {
+  alignTextSideBySide,
+  primaryColor,
+  secondaryColor,
+} from "@utilities/ConsoleService.js";
 import { getDataFromFile } from "./StorageService.js";
 import { getRandomEnemy } from "./GameService.js";
+import { log } from "./LogService.js";
 
 export enum RoomTypes {
   START = "START",
@@ -50,62 +55,59 @@ export type Dungeon = {
 
 export function getDungeonMapVisual() {
   const dungeon = getDungeon();
-  let dungeonVisual = "";
-
-  for (let row = 0; row < dungeon.size; row++) {
-    let rowVisual = [[""], [""], [""], [""], [""]];
-    for (let col = 0; col < dungeon.size; col++) {
-      const miniRoom = getMiniRoomVisual(dungeon.rooms[row][col], row, col);
-      rowVisual[0].push(miniRoom.split("\n")[0]);
-      rowVisual[1].push(miniRoom.split("\n")[1]);
-      rowVisual[2].push(miniRoom.split("\n")[2]);
-      rowVisual[3].push(miniRoom.split("\n")[3]);
-    }
-    dungeonVisual += rowVisual.map((row) => row.join("")).join("\n");
+  let dungeonVisual: string[] = [];
+  for (let i = 0; i < dungeon.size; i++) {
+    dungeonVisual[i] = "";
   }
 
-  return dungeonVisual;
+  for (let i in dungeon.rooms) {
+    let row: string = "";
+    for (let j in dungeon.rooms[i]) {
+      const room = dungeon.rooms[i][j];
+      const miniRoom = getMiniRoomVisual(room, parseInt(i), parseInt(j));
+      row = alignTextSideBySide(row, miniRoom);
+    }
+    dungeonVisual[i] += row;
+  }
+
+  return dungeonVisual.join("\n");
 }
 
-function getMiniRoomVisual(room: Room, row: number, col: number) {
+export function getMiniRoomVisual(room: Room, row: number, col: number) {
   const playerX = getDungeon().player.x;
   const playerY = getDungeon().player.y;
+  const isPlayerInRoom =
+    playerX === room.position.x && playerY === room.position.y;
+  let middleSymbol = "?";
+  middleSymbol = room.discovered
+    ? room.type.toUpperCase().substring(0, 1)
+    : middleSymbol;
+  middleSymbol = isPlayerInRoom ? "@" : middleSymbol;
 
-  const northRoom = getDungeon().rooms[row - 1]?.[col];
-  const westRoom = getDungeon().rooms[row - 1]?.[col];
+  const northRoom = getDungeon().rooms[row - 1]?.[col] || null;
+  const westRoom = getDungeon().rooms[row]?.[col - 1] || null;
 
-  const eastHallway = room.hallways.east ? "=" : " ";
-  const southHallway = room.hallways.south ? "║" : " ";
+  const southRoom = getDungeon().rooms[row + 1]?.[col] || null;
+  const eastRoom = getDungeon().rooms[row]?.[col + 1] || null;
 
-  // In case we want to adjust the room design later (also need to adjust the dungeon map visual to include the new rows)
-  const westHallway = westRoom?.hallways.east ? "=" : " ";
-  const northHallway = northRoom?.hallways.south ? "| |" : " ";
+  const eastHallway =
+    eastRoom?.hallways.west || room.hallways.east ? "╠═" : "║";
+  const southHallway =
+    southRoom?.hallways.north || room.hallways.south ? "╦" : "═";
+  const westHallway = westRoom?.hallways.east || room.hallways.west ? "╣" : "║";
+  const northHallway =
+    northRoom?.hallways.south || room.hallways.north ? "╩" : "═";
 
-  let symbol = " ";
-  if (room === undefined) {
-    return "     \n     \n     \n     ";
-  } else if (playerX === room.position.x && playerY === room.position.y) {
-    symbol = chalk.bold(primaryColor("@"));
-  } else if (!room.discovered) {
-    symbol = "?";
-  } else {
-    symbol =
-      room.type === RoomTypes.EMPTY || room.cleared
-        ? " "
-        : room.type.substring(0, 1);
-    symbol =
-      room.type === RoomTypes.EMPTY || room.cleared
-        ? " "
-        : room.type.substring(0, 1);
-  }
+  const eastEnd = eastRoom !== null ? " " : "";
 
-  return `${secondaryColor("╔═══╗ \n║ ")}${symbol}${secondaryColor(
-    ` ║${eastHallway}\n╚═══╝ \n  ${southHallway}   `
-  )}`;
-}
-
-export function getRoomAtPosition(x: number, y: number) {
-  return getDungeon().rooms[y][x] ?? undefined;
+  const color = isPlayerInRoom ? primaryColor : secondaryColor;
+  return color(
+    [
+      `╔═${northHallway}═╗` + eastEnd,
+      westHallway + " " + middleSymbol + " " + eastHallway,
+      `╚═${southHallway}═╝` + eastEnd,
+    ].join("\n")
+  );
 }
 
 /**
