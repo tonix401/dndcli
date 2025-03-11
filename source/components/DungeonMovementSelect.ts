@@ -12,7 +12,7 @@ import {
   alignText,
   alignTextSideBySide,
   boxItUp,
-  getTextInRoomAsciiIfNotTooLong,
+  getTextOnBackground,
   primaryColor,
   removeFormatting,
   secondaryColor,
@@ -129,9 +129,7 @@ export const dungeonMovementSelect = createPrompt(
 
     const megaBox = alignTextSideBySide(dungeonMapBox, statsOverControl);
 
-    const boxOnBackground = getTextInRoomAsciiIfNotTooLong(megaBox);
-
-    return megaBox + ansiEscapes.cursorHide;
+    return holdMyText(megaBox) + ansiEscapes.cursorHide;
   }
 );
 
@@ -149,33 +147,33 @@ export function getCardinals(
   const nothing = (text: string) => text;
   const n =
     direction === "north"
-      ? (text: string) => chalk.bold(secondaryColor(text))
+      ? (text: string) => chalk.bold(primaryColor(text))
       : north
       ? nothing
       : chalk.dim;
   const s =
     direction === "south"
-      ? (text: string) => chalk.bold(secondaryColor(text))
+      ? (text: string) => chalk.bold(primaryColor(text))
       : south
       ? nothing
       : chalk.dim;
   const e =
     direction === "east"
-      ? (text: string) => chalk.bold(secondaryColor(text))
+      ? (text: string) => chalk.bold(primaryColor(text))
       : east
       ? nothing
       : chalk.dim;
   const w =
     direction === "west"
-      ? (text: string) => chalk.bold(secondaryColor(text))
+      ? (text: string) => chalk.bold(primaryColor(text))
       : west
       ? nothing
       : chalk.dim;
   const m =
     direction === "neutral"
-      ? (text: string) => chalk.bold(secondaryColor(text))
+      ? (text: string) => chalk.bold(primaryColor(text))
       : (text: string) => text;
-  return (
+  return chalk.white(
     n("    ▲    \n") +
     n(`  ${w("▾")} N ${e("▾")}  \n`) +
     w("◄ W") +
@@ -183,5 +181,65 @@ export function getCardinals(
     e("E ►\n") +
     s(`  ${w("▴")} S ${e("▴")}  \n`) +
     s("    ▼    ")
+  );
+}
+
+const leftHand = [
+  `     .==. `,
+  `    /   |/`,
+  `   /    / `,
+  `  /    /  `,
+  ` |        `,
+  ` |        `,
+  ` \\        `,
+  ` /.       `,
+  `/  ' .    `,
+];
+
+const rightHand = leftHand.map((line) =>
+  line
+    .replaceAll("\\", "&")
+    .replaceAll("/", "\\")
+    .replaceAll("&", "/")
+    .split("")
+    .reverse()
+    .join("")
+);
+
+/**
+ * Takes a string and returns a string with the text held by two hands. Scales with the text.
+ * @param text The text to hold
+ * @example
+ */
+export function holdMyText(text: string) {
+  const alignedText = alignText(text, "left").split("\n");
+  const textHeight = alignedText.length;
+  const textWidth = removeFormatting(alignedText[0]).text.length;
+  let lHand = leftHand;
+  let rHand = rightHand;
+  const lHandHeight = lHand.length
+
+  if (textHeight >= lHand.length) {
+    // Add empty lines at the top of the side pieces to compensate for the higher text
+    for (let i = 0; i < textHeight - lHandHeight; i++) {
+      lHand.unshift(" ".repeat(lHand[0].length));
+      rHand.unshift(" ".repeat(lHand[0].length));
+    }
+  } else {
+    alignedText.unshift(" ".repeat(textWidth));
+  }
+
+  const rHandAndText = alignTextSideBySide(
+    lHand.join("\n"),
+    alignedText.join("\n")
+  );
+  const holdingHands = alignTextSideBySide(rHandAndText, rHand.join("\n"));
+  const width = removeFormatting(holdingHands.split("\n")[0]).text.length;
+  return (
+    secondaryColor("*".repeat(width)) +
+    "\n" +
+    secondaryColor(holdingHands) +
+    "\n" +
+    secondaryColor("*".repeat(width))
   );
 }

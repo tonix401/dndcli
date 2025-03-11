@@ -3,7 +3,7 @@ import { getTerm } from "@utilities/LanguageService.js";
 import {
   alignTextAsMultiTable,
   boxItUp,
-  getTextInRoomAsciiIfNotTooLong,
+  getTextOnBackground,
   pressEnter,
   primaryColor,
   skippableSlowWrite,
@@ -38,7 +38,7 @@ export async function inspectInventory() {
     }),
     " | "
   );
-  const overlayedOnRoom = getTextInRoomAsciiIfNotTooLong(
+  const overlayedOnRoom = getTextOnBackground(
     boxItUp(primaryColor(multiTable.text))
   );
   console.log(overlayedOnRoom);

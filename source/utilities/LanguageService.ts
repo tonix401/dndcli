@@ -113,7 +113,7 @@ const terms: Record<string, ITerm> = {
       "This game is mainly an Open World Role Playing Game.\n" +
       "You can create a character and explore the world with it.\n" +
       "There is a lot to discover: \n" +
-      "Enemies, treasures, unexplored dungeons and much more awaits you."
+      "Enemies, treasures, unexplored dungeons and much more awaits you.",
   },
   tutorialCharacter: {
     de:
@@ -161,20 +161,20 @@ const terms: Record<string, ITerm> = {
 
   // #region Character Classes
   swordsman: {
-    de: "Schwertkämpfer",
-    en: "Sword fighter",
+    de: "⚔️ Schwertkämpfer",
+    en: "⚔️ Sword fighter",
   },
   archer: {
-    de: "Bogenschütze",
-    en: "Archer",
+    de: "🏹 Bogenschütze",
+    en: "🏹 Archer",
   },
   mage: {
-    de: "Magier",
-    en: "Mage",
+    de: "🧙 Magier",
+    en: "🧙 Mage",
   },
   thief: {
-    de: "Dieb",
-    en: "Thief",
+    de: "🗡️ Dieb",
+    en: "🗡️ Thief",
   },
   // #endregion
 

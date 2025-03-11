@@ -17,7 +17,7 @@ import { getTheme } from "@utilities/CacheService.js";
 import {
   alignText,
   boxItUp,
-  getTextInRoomAsciiIfNotTooLong,
+  getTextOnBackground,
   primaryColor,
   removeFormatting,
   secondaryColor,
@@ -119,7 +119,11 @@ export const themedSelectInRoom = createPrompt(
       Math.max(
         ...items
           .filter((item) => !Separator.isSeparator(item))
-          .map((item) => removeFormatting((item as NormalizedChoice<Value>).name).text.length)
+          .map(
+            (item) =>
+              removeFormatting((item as NormalizedChoice<Value>).name).text
+                .length
+          )
       ) +
       theme.cursor.length +
       1;
@@ -151,7 +155,7 @@ export const themedSelectInRoom = createPrompt(
       return "";
     }
 
-    return getTextInRoomAsciiIfNotTooLong(
+    return getTextOnBackground(
       boxItUp(
         alignText(
           `${[prefix, message].filter(Boolean).join(" ")}\n${page}${

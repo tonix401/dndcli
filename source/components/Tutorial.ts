@@ -1,7 +1,7 @@
 import { getTheme } from "@utilities/CacheService.js";
 import {
   boxItUp,
-  getTextInRoomAsciiIfNotTooLong,
+  getTextOnBackground,
   primaryColor,
   totalClear,
 } from "@utilities/ConsoleService.js";
@@ -27,7 +27,7 @@ export async function tutorial(isNew: boolean) {
   while (index < explanationsTerms.length) {
     totalClear();
     console.log(
-      getTextInRoomAsciiIfNotTooLong(
+      getTextOnBackground(
         boxItUp(
           primaryColor(
             getTerm(explanationsTerms[index]) +

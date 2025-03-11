@@ -1,12 +1,10 @@
-import {
-  boxItUp,
-  getTextInRoomAsciiIfNotTooLong,
-} from "@utilities/ConsoleService.js";
+import { boxItUp, getTextOnBackground } from "@utilities/ConsoleService.js";
 import dotenv from "dotenv";
 import ora from "ora";
 import fetch from "node-fetch";
 import { log } from "@utilities/LogService.js";
 import { themedInput } from "@utilities/MenuService.js";
+import fs from "fs-extra";
 
 try {
   const text = (await themedInput({ message: "Text eingeben: " })).trim();
@@ -21,7 +19,7 @@ try {
     .filter((line) => line.trim() !== "")
     .join("\n");
 
-  console.log(getTextInRoomAsciiIfNotTooLong(boxItUp(responseText)));
+  console.log(getTextOnBackground(boxItUp(responseText)));
 } catch (error) {
   if (error instanceof Error) console.log(boxItUp(error.message));
 }
@@ -130,3 +128,23 @@ export function getRoomVisual(
   const room = roomTop + roomCenter + roomBottom;
   return room;
 }
+
+const bomb: string[][] = fs.readJsonSync(
+  "./source/resources/animations/smallBomb.json"
+).frames;
+
+bomb.map((frame: string[]) => {
+  const width = frame[0].length;
+  frame.unshift("*".repeat(width));
+  frame.push("*".repeat(width));
+});
+
+console.log(bomb);
+
+fs.writeJsonSync("./source/resources/animations/smallBomb.json", {
+  totalFrames: bomb.length,
+  frameTime: 100,
+  frameHeight: bomb[0].length,
+  framewidth: bomb[0][0].length,
+  frames: bomb,
+});

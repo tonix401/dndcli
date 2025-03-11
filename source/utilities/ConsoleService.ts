@@ -238,8 +238,16 @@ export function alignTextSideBySide(text1: string, text2: string) {
   const height1 = text1.split("\n").length;
   const height2 = text2.split("\n").length;
 
-  const width1 = Math.max(...removeFormatting(text1).text.split("\n").map((line: string) => line.length));
-  const width2 = Math.max(...removeFormatting(text2).text.split("\n").map((line: string) => line.length));
+  const width1 = Math.max(
+    ...removeFormatting(text1)
+      .text.split("\n")
+      .map((line: string) => line.length)
+  );
+  const width2 = Math.max(
+    ...removeFormatting(text2)
+      .text.split("\n")
+      .map((line: string) => line.length)
+  );
   const width = Math.max(width1, width2);
 
   const height = Math.max(height1, height2);
@@ -373,6 +381,7 @@ export function alignTextAsMultiTable(
 /**
  * Overlays the given text over the template room ascii, the room is colored in the secondary color and the text in the primary color
  * @param text The text to display
+ * @param background The background to overlay the text on, if not given, the empty room ascii will be used
  * @returns The text in the room ascii
  * @example
  * getTextInRoomAsciiIfNotTooLong(characterDataTable)
@@ -398,17 +407,17 @@ export function alignTextAsMultiTable(
  * /______/______/______/______/______/______/______/______/______/______/______/_
  * *******************************************************************************
  */
-export function getTextInRoomAsciiIfNotTooLong(text: string): string {
-  const room = getEmptyAscii();
-  const roomLines = room.split("\n").filter((line) => line.length > 0);
+export function getTextOnBackground(text: string, background?: string): string {
+  const bg = background ?? getEmptyAscii();
+  const bgLines = bg.split("\n").filter((line) => line.length > 0);
   const textLines = text.split("\n").filter((line) => line.length > 0);
-  const margin = Math.round((roomLines.length - textLines.length) / 2);
+  const margin = Math.round((bgLines.length - textLines.length) / 2);
 
   if (margin < 2) {
     return text;
   }
 
-  return roomLines
+  return bgLines
     .map((line, index) =>
       overlayTextOnLineAndFormat(line, textLines[index - margin] || "")
     )

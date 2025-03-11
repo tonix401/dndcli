@@ -2,7 +2,7 @@ import chalk from "chalk";
 import {
   alignText,
   boxItUp,
-  getTextInRoomAsciiIfNotTooLong,
+  getTextOnBackground,
   pause,
   totalClear,
 } from "@utilities/ConsoleService.js";
@@ -41,9 +41,7 @@ const frames = [
 export async function flipATable() {
   for (let i in frames) {
     totalClear();
-    console.log(
-      getTextInRoomAsciiIfNotTooLong(boxItUp(alignText(frames[i], "left")))
-    );
+    console.log(getTextOnBackground(boxItUp(alignText(frames[i], "left"))));
     const index = parseInt(i);
     let delay;
     switch (true) {

@@ -1,6 +1,7 @@
 import {
   alignText,
   alignTextAsTable,
+  alignTextSideBySide,
   boxItUp,
   overlayTextOnLineAndFormat,
   primaryColor,
@@ -9,6 +10,7 @@ import {
 } from "@utilities/ConsoleService.js";
 import ICharacter from "@utilities/ICharacter.js";
 import { IEnemy } from "@utilities/IEnemy.js";
+import { getTerm } from "@utilities/LanguageService.js";
 import chalk from "chalk";
 
 /**
@@ -67,8 +69,12 @@ export function getCombatStatusBar(
   const titleArr: [string, string] = ["Combat", ""];
 
   const table = alignTextAsTable([heroArr, enemyArr], "", "   ");
+  const tableWithMana = alignTextSideBySide(
+    table.text,
+    `${getTerm("mana")}: ${character.abilities.mana}`
+  );
 
-  const boxLines = boxItUp(table.text).split("\n");
+  const boxLines = boxItUp(tableWithMana).split("\n");
 
   backgroundLines.map((line, index) => {
     if (index > 1) {
