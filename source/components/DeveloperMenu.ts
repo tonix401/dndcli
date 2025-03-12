@@ -21,7 +21,7 @@ import { resetDataMenu } from "@components/ResetDataMenu.js";
 import { getDataFromFile, saveDataToFile } from "@utilities/StorageService.js";
 import ICharacter from "@utilities/ICharacter.js";
 import { IEnemy } from "@utilities/IEnemy.js";
-import { getRandomEnemy } from "@utilities/GameService.js";
+import { getRandomEnemy } from "@utilities/EnemyService.js";
 import { themedSelectInRoom } from "./ThemedSelectInRoom.js";
 import { dungeonMinigame } from "./DungeonMinigame.js";
 
@@ -135,7 +135,6 @@ export async function secretDevMenu() {
   }
 
   while (true) {
-    
     try {
       totalClear();
       const chosenOption = await themedSelectInRoom({
