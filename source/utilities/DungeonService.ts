@@ -76,6 +76,13 @@ export function getDungeonMapVisual() {
 export function getMiniRoomVisual(room: Room, row: number, col: number) {
   const playerX = getDungeon().player.x;
   const playerY = getDungeon().player.y;
+  if (
+    room.discovered === false &&
+    !hasHallwayToPlayerRoom(room, getDungeon().rooms[playerY][playerX])
+  ) {
+    return secondaryColor([".···. ", ":   : ", "'···' "].join("\n"));
+  }
+
   const isPlayerInRoom =
     playerX === room.position.x && playerY === room.position.y;
   let middleSymbol = "?";
@@ -91,7 +98,9 @@ export function getMiniRoomVisual(room: Room, row: number, col: number) {
   const eastRoom = getDungeon().rooms[row]?.[col + 1] || null;
 
   const eastHallway =
-    eastRoom?.hallways.west || room.hallways.east ? "╠═" : "║";
+    eastRoom?.hallways.west || room.hallways.east
+      ? "╠" + secondaryColor("═")
+      : "║ ";
   const southHallway =
     southRoom?.hallways.north || room.hallways.south ? "╦" : "═";
   const westHallway = westRoom?.hallways.east || room.hallways.west ? "╣" : "║";
@@ -207,4 +216,21 @@ function fillRoomWithEnemyIfNecessary(room: Room, difficulty: number) {
       room.enemies = [];
       break;
   }
+}
+
+function hasHallwayToPlayerRoom(room: Room, playerRoom: Room): boolean {
+  return (
+    (room.hallways.north &&
+      playerRoom.position.y === room.position.y - 1 &&
+      playerRoom.position.x === room.position.x) ||
+    (room.hallways.east &&
+      playerRoom.position.x === room.position.x + 1 &&
+      playerRoom.position.y === room.position.y) ||
+    (room.hallways.south &&
+      playerRoom.position.y === room.position.y + 1 &&
+      playerRoom.position.x === room.position.x) ||
+    (room.hallways.west &&
+      playerRoom.position.x === room.position.x - 1 &&
+      playerRoom.position.y === room.position.y)
+  );
 }

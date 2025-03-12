@@ -1,6 +1,5 @@
 import readline from "readline";
 import { log } from "@utilities/LogService.js";
-import { input } from "@inquirer/prompts";
 import chalk from "chalk";
 import { getTerm } from "@utilities/LanguageService.js";
 import { getTheme } from "@utilities/CacheService.js";
@@ -234,7 +233,11 @@ export function alignText(
   return lines.join("\n");
 }
 
-export function alignTextSideBySide(text1: string, text2: string) {
+export function alignTextSideBySide(
+  text1: string,
+  text2: string,
+  separator: string = ""
+) {
   const height1 = text1.split("\n").length;
   const height2 = text2.split("\n").length;
 
@@ -269,7 +272,7 @@ export function alignTextSideBySide(text1: string, text2: string) {
   for (let i = 0; i < height; i++) {
     const line1 = lines1[i] || "";
     const line2 = lines2[i] || "";
-    result.push(line1 + line2);
+    result.push(line1 + separator + line2);
   }
 
   return result.join("\n");

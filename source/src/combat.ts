@@ -12,9 +12,9 @@ import {
   totalClear,
 } from "@utilities/ConsoleService.js";
 import { saveDataToFile } from "@utilities/StorageService.js";
-import { getCombatStatusBar } from "@resources/generalScreens/combatStatusBar.js";
 import { pause } from "@utilities/ConsoleService.js";
 import { themedSelect } from "@utilities/MenuService.js";
+import { combatStatusSelect } from "@components/CombatStatusSelect.js";
 
 interface CombatResult {
   success: boolean;
@@ -35,7 +35,6 @@ function getStrengthBonus(character: ICharacter): number {
 
 async function enemyTurn(enemy: IEnemy, character: ICharacter): Promise<void> {
   totalClear();
-  console.log(getCombatStatusBar(character, enemy));
   let move;
   if (enemy.moves && enemy.moves.length > 0) {
     const index = Math.floor(Math.random() * enemy.moves.length);
@@ -113,8 +112,6 @@ export async function runCombat(
     }>;
   }
 ): Promise<CombatResult> {
-  enemy.hp = enemy.hp < 30 ? 30 : enemy.hp;
-  enemy.maxhp = enemy.maxhp || enemy.hp;
   character.losesTurn = false;
 
   totalClear();
@@ -125,7 +122,6 @@ export async function runCombat(
   let round = 1;
   while (enemy.hp > 0 && character.hp > 0) {
     totalClear();
-    console.log(getCombatStatusBar(character, enemy, round));
 
     if (character.losesTurn) {
       console.log(accentColor("\nYou are too frightened to act this turn!"));
@@ -147,15 +143,16 @@ export async function runCombat(
     console.log(accentColor("\nYour turn!"));
     await pause(800);
 
-    const combatAction = await themedSelect({
+    const combatAction = await combatStatusSelect({
       message: "Choose your combat action:",
       choices: [
-        { name: "⚔️  Attack", value: "Attack" },
-        { name: "🛡️  Defend", value: "Defend" },
-        { name: "🌀 Use Ability", value: "Ability" },
-        { name: "🎒  Use Item", value: "Item" },
-        { name: "🏃  Run Away", value: "Run" },
+        { name: "Attack", value: "Attack" },
+        { name: "Defend", value: "Defend" },
+        { name: "Use Ability", value: "Ability" },
+        { name: "Use Item", value: "Item" },
+        { name: "Run Away", value: "Run" },
       ],
+      enemy: enemy,
     });
 
     switch (combatAction) {
@@ -286,7 +283,8 @@ async function useAbility(character: ICharacter, enemy: IEnemy): Promise<void> {
     return;
   }
 
-  const chosenAbility: IAbility = character.abilitiesList[Number(abilityIndexOrGoBack)];
+  const chosenAbility: IAbility =
+    character.abilitiesList[Number(abilityIndexOrGoBack)];
   if (character.abilities.mana < chosenAbility.manaCost) {
     console.log(accentColor("Not enough mana!"));
     await pressEnter();

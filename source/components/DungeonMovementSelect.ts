@@ -12,7 +12,6 @@ import {
   alignText,
   alignTextSideBySide,
   boxItUp,
-  getTextOnBackground,
   primaryColor,
   removeFormatting,
   secondaryColor,
@@ -128,8 +127,17 @@ export const dungeonMovementSelect = createPrompt(
     const statsOverControl = alignText(statsBox + "\n" + controlBox, "left");
 
     const megaBox = alignTextSideBySide(dungeonMapBox, statsOverControl);
+    const heldText = holdMyText(megaBox) + ansiEscapes.cursorHide;
+    const totalWidth = removeFormatting(heldText.split("\n")[0]).text.length;
 
-    return holdMyText(megaBox) + ansiEscapes.cursorHide;
+    return secondaryColor(
+      "*".repeat(totalWidth) +
+      "\n" +
+      holdMyText(megaBox) +
+      ansiEscapes.cursorHide +
+      "\n" +
+      "*".repeat(totalWidth)
+    );
   }
 );
 
@@ -175,12 +183,12 @@ export function getCardinals(
       : (text: string) => text;
   return chalk.white(
     n("    ▲    \n") +
-    n(`  ${w("▾")} N ${e("▾")}  \n`) +
-    w("◄ W") +
-    m(" ■ ") +
-    e("E ►\n") +
-    s(`  ${w("▴")} S ${e("▴")}  \n`) +
-    s("    ▼    ")
+      n(`  ${w("▾")} N ${e("▾")}  \n`) +
+      w("◄ W") +
+      m(" ■ ") +
+      e("E ►\n") +
+      s(`  ${w("▴")} S ${e("▴")}  \n`) +
+      s("    ▼    ")
   );
 }
 
@@ -217,7 +225,7 @@ export function holdMyText(text: string) {
   const textWidth = removeFormatting(alignedText[0]).text.length;
   let lHand = leftHand;
   let rHand = rightHand;
-  const lHandHeight = lHand.length
+  const lHandHeight = lHand.length;
 
   if (textHeight >= lHand.length) {
     // Add empty lines at the top of the side pieces to compensate for the higher text
@@ -234,12 +242,5 @@ export function holdMyText(text: string) {
     alignedText.join("\n")
   );
   const holdingHands = alignTextSideBySide(rHandAndText, rHand.join("\n"));
-  const width = removeFormatting(holdingHands.split("\n")[0]).text.length;
-  return (
-    secondaryColor("*".repeat(width)) +
-    "\n" +
-    secondaryColor(holdingHands) +
-    "\n" +
-    secondaryColor("*".repeat(width))
-  );
+  return holdingHands;
 }

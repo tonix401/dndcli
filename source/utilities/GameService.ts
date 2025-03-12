@@ -22,7 +22,7 @@ import {
   secondaryColor,
 } from "@utilities/ConsoleService.js";
 import { themedSelect } from "@utilities/MenuService.js";
-import { EnemyMove, EnemyMoveType, IEnemy } from "@utilities/IEnemy.js";
+import { EnemyMove, IEnemy } from "@utilities/IEnemy.js";
 import Config from "./Config.js";
 import { dungeonMinigame } from "@components/DungeonMinigame.js";
 
@@ -393,13 +393,13 @@ export async function promptForChoice(narrative: string): Promise<string> {
  * Difficulty should be the level of the player, or relative to it
  */
 export function getRandomEnemy(difficulty: number): IEnemy {
-  const maxhp = Math.floor(difficulty * getRandomNumber(0.75, 1.25));
-  const hp = getEnemyHp(maxhp);
+  const maxhp = difficulty > 10 ? Math.floor(difficulty * getRandomNumber(0.75, 1.25)) : 10;
+  const hp = getRandomNumber(maxhp * 0.5, maxhp);
   const name = getEnemyName(difficulty);
 
-  let enemy: IEnemy = {
-    maxhp: maxhp,
+  const enemy: IEnemy = {
     hp: hp,
+    maxhp: maxhp,
     name: name,
     attack: Math.floor(difficulty * getRandomNumber(0.75, 1.25)),
     defense: Math.floor(difficulty * getRandomNumber(0.75, 1.25)),
@@ -428,12 +428,6 @@ function getEnemyName(difficulty: number): string {
   return getRandomItemFromArray(enemies[randomizedDifficulty]);
 }
 
-function getEnemyHp(maxhp: number) {
-  const isWounded = Math.random() < 0.5;
-  const hp = isWounded ? Math.floor(maxhp * getRandomNumber(0.5, 1)) : maxhp;
-  return hp;
-}
-
 function getEnemyMoves(): IEnemy["moves"] {
   let moves: EnemyMove[] = [];
   for (let i = 0; i < 4; i++) {
@@ -447,5 +441,5 @@ function getRandomItemFromArray<T>(arr: T[]): T {
 }
 
 function getRandomNumber(min: number, max: number): number {
-  return Math.random() * (max - min + 1) + min;
+  return Math.floor(Math.random() * (max - min)) + min;
 }
