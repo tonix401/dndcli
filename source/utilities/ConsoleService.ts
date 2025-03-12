@@ -587,3 +587,29 @@ export async function playAnimation(
   }
   totalClear();
 }
+
+/**
+ * Sanitizes a JSON string to fix common formatting issues
+ */
+export function sanitizeJsonString(jsonString: string): string {
+  // Remove any leading/trailing non-JSON content
+  let sanitized = jsonString.trim();
+
+  // Try to extract just the JSON object if there's text around it
+  const jsonMatch = sanitized.match(/\{[\s\S]*\}/);
+  if (jsonMatch) {
+    sanitized = jsonMatch[0];
+  }
+
+  // Fix the '+' before numbers issue
+  sanitized = sanitized.replace(/:\s*\+(\d+)/g, ": $1");
+
+  // Fix any other common JSON formatting issues
+  sanitized = sanitized
+    .replace(/,\s*}/g, "}") // Remove trailing commas
+    .replace(/,\s*]/g, "]") // Remove trailing commas in arrays
+    .replace(/[']/g, '"') // Replace single quotes with double quotes
+    .replace(/\\'/g, "'"); // Fix escaped single quotes
+
+  return sanitized;
+}

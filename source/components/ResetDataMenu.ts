@@ -9,6 +9,7 @@ import {
   secondaryColor,
 } from "@utilities/ConsoleService.js";
 import { saveDataToFile } from "@utilities/StorageService.js";
+import { resetGameState } from "@utilities/SaveLoadService.js";
 
 /**
  * Menu component that handles resetting different types of data
@@ -18,6 +19,7 @@ export async function resetDataMenu(): Promise<void> {
     { name: getTerm("characterData"), value: "characterData" },
     { name: getTerm("settingsData"), value: "settingsData" },
     { name: getTerm("logs"), value: "logs" },
+    { name: getTerm("saveStateData"), value: "saveStateData" },
   ];
 
   const choices = await checkbox(
@@ -52,10 +54,15 @@ export async function resetDataMenu(): Promise<void> {
   if (choices.includes("logs")) {
     clearLogs();
   }
+  if (choices.includes("saveStateData")) {
+    await resetGameState();
+  }
 
   console.log(
     `${getTerm("resetDone")}: ${
-      choices.length === 0 ? getTerm("none") : choices.map(choice => getTerm(choice)).join(", ")
+      choices.length === 0
+        ? getTerm("none")
+        : choices.map((choice) => getTerm(choice)).join(", ")
     }`
   );
   await pressEnter();
