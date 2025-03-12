@@ -3,7 +3,7 @@ import {
   alignText,
   alignTextAsTable,
   boxItUp,
-  getTextInRoomAsciiIfNotTooLong,
+  getTextOnBackground,
   pressEnter,
   primaryColor,
   secondaryColor,
@@ -71,9 +71,7 @@ export async function inspectCharacter() {
   const formattedBodyTable = secondaryColor(alignText(bodyTable, "center"));
 
   console.log(
-    getTextInRoomAsciiIfNotTooLong(
-      boxItUp(formattedTitle + "\n" + formattedBodyTable)
-    )
+    getTextOnBackground(boxItUp(formattedTitle + "\n" + formattedBodyTable))
   );
 
   await pressEnter({ allowLeft: true });

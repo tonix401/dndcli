@@ -12,7 +12,7 @@ export function getAllThemeOverrides(): Record<string, IThemeOverride> {
 const getThemes = (): Record<string, IThemeOverride> => {
   return {
     pirate: {
-      name: { de: "Pirat", en: "Pirate" },
+      name: { de: "Pirat", en: "Pirate", ch: "Pirat" },
       primaryColor: "#FFFFFF",
       secondaryColor: "#FF0000",
       cursor: "☠️ ",
@@ -21,7 +21,7 @@ const getThemes = (): Record<string, IThemeOverride> => {
       errorColor: "#8B0000",
     },
     frog: {
-      name: { de: "Frosch", en: "Frog" },
+      name: { de: "Frosch", en: "Frog", ch: "Frosch" },
       primaryColor: "#00FF00",
       secondaryColor: "#00B000",
       cursor: "🐸",
@@ -31,7 +31,7 @@ const getThemes = (): Record<string, IThemeOverride> => {
       errorColor: "#FF4500",
     },
     hacker: {
-      name: { de: "Hacker", en: "Hacker" },
+      name: { de: "Hacker", en: "Hacker", ch: "Hacker" },
       primaryColor: "#00FF00",
       secondaryColor: "#444444",
       cursor: chalk.whiteBright("0"),
@@ -41,23 +41,23 @@ const getThemes = (): Record<string, IThemeOverride> => {
       errorColor: "#FF5555",
     },
     fire: {
-      name: { de: "Feuer", en: "Fire" },
+      name: { de: "Feuer", en: "Fire", ch: "Feuer" },
       primaryColor: "#ff3a00",
       secondaryColor: "#ff7e00",
       cursor: "🔥",
     },
     neon: {
-      name: { de: "Neon", en: "Neon" },
+      name: { de: "Neon", en: "Neon", ch: "Neon" },
       prefix: "😎",
       primaryColor: "#FF00DD",
       secondaryColor: "#00FF00",
-      cursor: "(👉ﾟヮﾟ)👉",
+      cursor: "(⊙_◎)",
       accentColor: "#00FFFF",
       backgroundColor: "#222222",
       errorColor: "#FF1493",
     },
     unicorn: {
-      name: { de: "Einhorn", en: "Unicorn" },
+      name: { de: "Einhorn", en: "Unicorn", ch: "Einhorn" },
       primaryColor: "#FF69B4",
       secondaryColor: "#FFD700",
       cursor: "🦄",
@@ -67,7 +67,7 @@ const getThemes = (): Record<string, IThemeOverride> => {
       errorColor: "#FF4500",
     },
     galaxy: {
-      name: { de: "Galaxie", en: "Galaxy" },
+      name: { de: "Galaxie", en: "Galaxy", ch: "Galaxie" },
       primaryColor: "#4B0082",
       secondaryColor: "#8A2BE2",
       prefix: "🌒",
@@ -83,7 +83,7 @@ const getThemes = (): Record<string, IThemeOverride> => {
       errorColor: "#FF0000",
     },
     random: {
-      name: { de: "Zufällig", en: "Random" },
+      name: { de: "Zufällig", en: "Random", ch: "Zufällig" },
       prefix: "🎲",
       cursor: getRandomItemFromArray([
         "🎯",
@@ -104,7 +104,7 @@ const getThemes = (): Record<string, IThemeOverride> => {
       errorColor: getRandomColor(),
     },
     standard: {
-      name: { de: "Standard", en: "Standard" },
+      name: { de: "Standard", en: "Standard", ch: "Standard" },
     },
   };
 };

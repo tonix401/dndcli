@@ -1,6 +1,7 @@
 import {
   alignText,
   alignTextAsTable,
+  alignTextSideBySide,
   boxItUp,
   overlayTextOnLineAndFormat,
   primaryColor,
@@ -9,6 +10,7 @@ import {
 } from "@utilities/ConsoleService.js";
 import ICharacter from "@utilities/ICharacter.js";
 import { IEnemy } from "@utilities/IEnemy.js";
+import { getTerm } from "@utilities/LanguageService.js";
 import chalk from "chalk";
 
 /**
@@ -64,11 +66,14 @@ export function getCombatStatusBar(
     enemy.name,
     alignTextAsTable([enemyBar], "", " ", healthBarMinLength).text,
   ];
-  const titleArr: [string, string] = ["Combat", ""];
 
   const table = alignTextAsTable([heroArr, enemyArr], "", "   ");
+  const tableWithMana = alignTextSideBySide(
+    table.text,
+    ` ${getTerm("mana")}: ${character.abilities.mana}`
+  );
 
-  const boxLines = boxItUp(table.text).split("\n");
+  const boxLines = boxItUp(tableWithMana).split("\n");
 
   backgroundLines.map((line, index) => {
     if (index > 1) {
@@ -91,7 +96,7 @@ export function getCombatStatusBar(
  * @param barLength - The length of the health bar (default: 20).
  * @returns The formatted health bar string.
  */
-export function getHealthBar(
+function getHealthBar(
   current: number,
   max: number,
   fullColor: { r: number; g: number; b: number } = { r: 0, g: 255, b: 0 },

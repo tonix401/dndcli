@@ -1,7 +1,7 @@
 import { getDungeon, setDungeon } from "@utilities/CacheService.js";
 import {
   boxItUp,
-  getTextInRoomAsciiIfNotTooLong,
+  getTextOnBackground,
   totalClear,
 } from "@utilities/ConsoleService.js";
 import {

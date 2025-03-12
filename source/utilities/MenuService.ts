@@ -42,7 +42,7 @@ export const inputValidators = {
   name: (input: string) => {
     const normalizedInput = input.trim().toLowerCase();
     const minLength = 2;
-    const maxLength = 25;
+    const maxLength = 18;
     if (normalizedInput.length === 0) return getTerm("nameRequired");
     if (normalizedInput.length < minLength)
       return getTerm("tooShort") + minLength;
