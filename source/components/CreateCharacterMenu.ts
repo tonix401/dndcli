@@ -5,7 +5,7 @@ import {
   pressEnter,
   primaryColor,
   secondaryColor,
-  totalClear
+  totalClear,
 } from "@utilities/ConsoleService.js";
 import { rollDiceTotal } from "@utilities/DiceService.js";
 import Config from "@utilities/Config.js";
@@ -16,8 +16,9 @@ import {
 import ICharacter from "@utilities/ICharacter.js";
 import { saveDataToFile } from "@utilities/StorageService.js";
 import { getLanguage } from "@utilities/CacheService.js";
-import { inputValidators, themedInput } from "@utilities/MenuService.js";
+import { inputValidators } from "@utilities/MenuService.js";
 import { themedSelectInRoom } from "./ThemedSelectInRoom.js";
+import { themedInput } from "./ThemedInput.js";
 
 export async function createCharacterMenu(): Promise<void> {
   try {
@@ -25,7 +26,12 @@ export async function createCharacterMenu(): Promise<void> {
 
     // Get character name using themed prompt
     const namePrompt = primaryColor(getTerm("namePrompt"));
-    charData.name = await themedInput({ message: namePrompt,  validate: inputValidators.name });
+    charData.name = await themedInput({
+      message: namePrompt,
+      validate: inputValidators.name,
+      canGoBack: true,
+    });
+    if (charData.name === "goBack") return;
 
     // Get character class
     totalClear();
@@ -49,7 +55,9 @@ export async function createCharacterMenu(): Promise<void> {
       ],
     });
 
-    charData.abilitiesList = Config.START_CHARACTER_ABILITIES[charData.class] || ["default"]
+    charData.abilitiesList = Config.START_CHARACTER_ABILITIES[
+      charData.class
+    ] || ["default"];
 
     if (statMethod === "default") {
       // Map class to default stats if available

@@ -12,8 +12,8 @@ import {
 import { getTerm, Language } from "@utilities/LanguageService.js";
 import { Separator } from "@inquirer/prompts";
 import config from "@utilities/Config.js";
-import { themedInput, themedSelect } from "@utilities/MenuService.js";
 import { themedSelectInRoom } from "./ThemedSelectInRoom.js";
+import { themedInput } from "./ThemedInput.js";
 
 const getSettingsOptions = () => {
   const theme = getTheme();

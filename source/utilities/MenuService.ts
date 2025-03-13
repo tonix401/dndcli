@@ -117,43 +117,6 @@ export async function themedSelect<Value = string>(
   );
 }
 
-/**
- * A version of the input from inquirer that used the custom theme and current colors
- * @param config The same config input from inquirer/prompt uses
- * @returns The value of the input the user entered
- */
-export async function themedInput(config: {
-  message: string;
-  default?: string;
-  required?: boolean;
-  validate?: (value: string) => boolean | string | Promise<string | boolean>;
-}): Promise<string> {
-  const theme = {
-    prefix: getTheme().prefix,
-    style: {
-      message: (text: string) => primaryColor(chalk.bold(text)),
-    },
-    helpMode: "never",
-  };
-  return await input({ ...config, theme }, { clearPromptOnDone: true });
-}
-
-/**
- * A version of the password from inquirer that used the custom theme and current colors
- * @param config The same config password from inquirer/prompt uses
- * @returns The value of the password the user entered
- */
-export function themedPassword(config: { message: string }): Promise<string> {
-  const theme = {
-    prefix: getTheme().prefix,
-    style: {
-      message: (text: string) => primaryColor(chalk.bold(text)),
-    },
-    helpMode: "never",
-  };
-  return password({ ...config, theme, mask: "*" }, { clearPromptOnDone: true });
-}
-
 export type SelectTheme = {
   icon: { cursor: string };
   style: {

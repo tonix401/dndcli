@@ -15,7 +15,7 @@ const getThemes = (): Record<string, IThemeOverride> => {
       name: { de: "Pirat", en: "Pirate", ch: "Pirat" },
       primaryColor: "#FFFFFF",
       secondaryColor: "#FF0000",
-      cursor: "☠️ ",
+      cursor: "🦜",
       accentColor: "#FFD700",
       backgroundColor: "#000000",
       errorColor: "#8B0000",
@@ -51,7 +51,7 @@ const getThemes = (): Record<string, IThemeOverride> => {
       prefix: "😎",
       primaryColor: "#FF00DD",
       secondaryColor: "#00FF00",
-      cursor: "(⊙_◎)",
+      cursor: "(⌐■_■)",
       accentColor: "#00FFFF",
       backgroundColor: "#222222",
       errorColor: "#FF1493",
@@ -71,7 +71,7 @@ const getThemes = (): Record<string, IThemeOverride> => {
       primaryColor: "#4B0082",
       secondaryColor: "#8A2BE2",
       prefix: "🌒",
-      cursor: "⭐",
+      cursor: "☆",
     },
     noir: {
       name: { de: "Noir", en: "Noir" },
@@ -85,18 +85,20 @@ const getThemes = (): Record<string, IThemeOverride> => {
     random: {
       name: { de: "Zufällig", en: "Random", ch: "Zufällig" },
       prefix: "🎲",
-      cursor: getRandomItemFromArray([
-        "🎯",
-        "🎰",
-        "🃏",
-        "🎱",
-        "🎮",
-        "🎭",
-        "🍀",
-        "🎩",
-        "🔮",
-        "❓",
-      ]),
+      cursor:
+        Math.random() > 0.01
+          ? getRandomItemFromArray([
+              "🎮",
+              "🎯",
+              "🃏",
+              "🎰",
+              "🎱",
+              "🎭",
+              "🔮",
+              "🍀",
+              "🎩",
+            ])
+          : "💸",
       primaryColor: getRandomColor(),
       secondaryColor: getRandomColor(),
       accentColor: getRandomColor(),
@@ -117,7 +119,7 @@ function getRandomColor(): string {
   const letters = "0123456789ABCDEF";
   let color = "#";
   for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
+    color += letters[Math.round(Math.random() * 16)];
   }
   return color;
 }
@@ -127,6 +129,6 @@ function getRandomColor(): string {
  * @param arr The array to get a random item from
  * @returns A random item from the array
  */
-function getRandomItemFromArray<T>(arr: T[]): T {
+export function getRandomItemFromArray<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
