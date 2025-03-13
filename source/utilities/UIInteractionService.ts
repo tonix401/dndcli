@@ -1,4 +1,3 @@
-import inquirer from "inquirer";
 import { GameState } from "src/gameState.js";
 import { log } from "./LogService.js";
 import { sanitizeJsonString } from "./ConsoleService.js";
@@ -7,7 +6,6 @@ import { themedSelect } from "./MenuService.js";
 import { generateChatNarrative } from "./AIService.js";
 import { primaryColor, secondaryColor } from "./ConsoleService.js";
 import chalk from "chalk";
-import { getTheme } from "./CacheService.js";
 
 /**
  * Extracts choices from narrative text and prompts the user to select one.
