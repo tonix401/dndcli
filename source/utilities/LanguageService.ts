@@ -207,24 +207,24 @@ const terms: Record<string, ITerm> = {
 
   // #region Character Classes
   swordsman: {
-    de: "⚔️ Schwertkämpfer",
-    en: "⚔️ Sword fighter",
-    ch: "⚔️ Schwärtchämpfer",
+    de: "Schwertkämpfer",
+    en: "Sword fighter",
+    ch: "Schwärtchämpfer",
   },
   archer: {
-    de: "🏹 Bogenschütze",
-    en: "🏹 Archer",
-    ch: "🏹 Bogeschütz",
+    de: "Bogenschütze",
+    en: "Archer",
+    ch: "Bogeschütz",
   },
   mage: {
-    de: "🧙 Magier",
-    en: "🧙 Mage",
-    ch: "🧙 Zauberer",
+    de: "Magier",
+    en: "Mage",
+    ch: "Zauberer",
   },
   thief: {
-    de: "🗡️ Dieb",
-    en: "🗡️ Thief",
-    ch: "🗡️ Dieb",
+    de: "Dieb",
+    en: "Thief",
+    ch: "Dieb",
   },
   // #endregion
 

@@ -20,39 +20,43 @@ import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
 import { getErrorMessage } from "@resources/generalScreens/errorMessage.js";
 
 const getMenuOptions = () => [
-  { name: getTerm("createCharacter"), value: "1" },
-  { name: getTerm("inspectCharacter"), value: "2" },
-  { name: getTerm("inspectInventory"), value: "6" },
-  { name: getTerm("startCampaign"), value: "3" },
-  { name: getTerm("settings"), value: "4" },
-  { name: getTerm("devMenu"), value: "5" },
+  { name: getTerm("createCharacter"), value: "createChar" },
+  { name: getTerm("inspectCharacter"), value: "inspectChar" },
+  { name: getTerm("inspectInventory"), value: "inspectInv" },
+  { name: getTerm("startCampaign"), value: "startCampaign" },
+  { name: getTerm("settings"), value: "settings" },
+  { name: getTerm("devMenu"), value: "devMenu" },
   { name: getTerm("tutorial"), value: "tutorial" },
   { name: getTerm("exit"), value: "goBack" },
 ];
 
+/**
+ * Handles the user's choice in the main menu
+ * @param choice The choice made by the user in the menu
+ */
 async function handleMenuChoice(choice: string) {
   try {
     switch (choice) {
-      case "1":
+      case "createChar":
         log("Index: Creating new Character");
         await createCharacterMenu();
         break;
-      case "2":
+      case "inspectChar":
         log("Index: Inspecting Character");
         await inspectCharacter();
         break;
-      case "3":
+      case "startCampaign":
         log("Index: Campaign Start");
         await startCampaign();
         break;
-      case "4":
+      case "settings":
         log("Index: Opening Settings");
         await settingsMenu();
         break;
-      case "5":
+      case "devMenu":
         await secretDevMenu();
         break;
-      case "6":
+      case "inspectInv":
         await inspectInventory();
         break;
       case "tutorial":
@@ -104,17 +108,15 @@ async function main() {
   }
 }
 
+/**
+ * Exits the program and clears the console
+ */
 export async function exitProgram() {
   totalClear();
   log("Index: Program ended");
   await skippableSlowWrite(secondaryColor(getTerm("goodbye")));
-  process.exit(1);
+  process.exit(0);
 }
-
-process.on("SIGINT", async () => {
-  log("Index: SIGINT received", "Error");
-  totalClear();
-});
 
 ///////////////////////////////////////////// MAIN PROGRAM /////////////////////////////////////////////////
 
@@ -122,7 +124,7 @@ main().catch(async (error) => {
   totalClear();
   log("Index: Error in main function, " + error, "Error");
   console.log(getErrorMessage(error.message || error));
-  process.exit(1);
+  process.exit(0);
 });
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
