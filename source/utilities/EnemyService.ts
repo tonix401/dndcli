@@ -50,7 +50,7 @@ export function getRandomEnemyByPlayerLevel(playerLevel: number): IEnemy {
 export function getRandomEnemy(difficulty: number): IEnemy {
   const maxhp =
     difficulty > 10 ? Math.floor(difficulty * getRandomNumber(0.75, 1.25)) : 10;
-  const hp = getRandomNumber(maxhp * 0.5, maxhp);
+  const hp = Math.round(getRandomNumber(maxhp * 0.5, maxhp));
   const name = getEnemyName(difficulty);
 
   const enemy: IEnemy = {

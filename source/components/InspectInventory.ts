@@ -6,14 +6,16 @@ import {
   getTextOnBackground,
   pressEnter,
   primaryColor,
-  skippableSlowWrite,
   totalClear,
 } from "@utilities/ConsoleService.js";
 import { getDataFromFile } from "@utilities/StorageService.js";
+import Config from "@utilities/Config.js";
+import { getErrorMessage } from "@resources/generalScreens/errorMessage.js";
 
 export async function inspectInventory() {
   totalClear();
-  const charData: ICharacter | null = getDataFromFile("character");
+  const charData: ICharacter =
+    getDataFromFile("character") ?? Config.START_CHARACTER;
 
   if (!charData) {
     console.log(getTerm("noCharacter"));
@@ -22,7 +24,7 @@ export async function inspectInventory() {
   }
 
   if (charData.inventory.length === 0) {
-    await skippableSlowWrite(getTerm("empty"));
+    console.log(getErrorMessage(getTerm("empty")));
     await pressEnter();
     return;
   }

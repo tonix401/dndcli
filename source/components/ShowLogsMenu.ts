@@ -49,8 +49,6 @@ async function showLogsScreen() {
   totalClear();
   const logData = getLogData();
 
-  const oneHourAgo = new Date(Date.now() - 3600000);
-
   if (!logData) {
     // results in a no logs message
     logFormattedLogs();
@@ -58,16 +56,9 @@ async function showLogsScreen() {
     return;
   }
 
-  const filteredLogs = logData
-    .split("\n")
-    .filter((line) => {
-      const match = line.match(/(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?/i);
-      if (!match) return false;
-      const [hours, minutes, seconds] = match.slice(1).map(Number);
-      const logDate = new Date();
-      logDate.setHours(hours, minutes, seconds, 0);
-      return logDate >= oneHourAgo;
-    })
+  const logLines = logData.split("\n");
+  const filteredLogs = logLines
+    .filter((_log: string, index: number) => index >= logLines.length - 51)
     .join("\n");
 
   logFormattedLogs(filteredLogs);

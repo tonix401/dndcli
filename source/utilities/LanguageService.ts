@@ -71,6 +71,11 @@ const terms: Record<string, ITerm> = {
     en: "Save and go back",
     ch: "Spichere und zrugg",
   },
+  checkTheLogs: {
+    de: "Überprüfe die Logs für weitere Informationen",
+    en: "Check the logs for more information",
+    ch: "Überprüef d'Logs für meh Informatione",
+  },
   // #endregion
 
   // #region Setup + Tutorial

@@ -121,7 +121,7 @@ process.on("SIGINT", async () => {
 main().catch(async (error) => {
   totalClear();
   log("Index: Error in main function, " + error, "Error");
-  console.log(getErrorMessage(error));
+  console.log(getErrorMessage(error.message || error));
   process.exit(1);
 });
 

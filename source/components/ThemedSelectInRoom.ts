@@ -115,8 +115,13 @@ export const themedSelectInRoom = createPrompt(
       []
     );
 
+    const message = [prefix, primaryColor(config.message)]
+      .filter(Boolean)
+      .join(" ");
+
     const maxItemLength =
       Math.max(
+        removeFormatting(message).text.length,
         ...items
           .filter((item) => !Separator.isSeparator(item))
           .map(
@@ -125,9 +130,8 @@ export const themedSelectInRoom = createPrompt(
                 .length
           )
       ) +
-      theme.cursor.length +
+      removeFormatting(theme.cursor).text.length +
       1;
-    const message = primaryColor(config.message);
 
     const page = usePagination({
       items,
@@ -158,9 +162,7 @@ export const themedSelectInRoom = createPrompt(
     return getTextOnBackground(
       boxItUp(
         alignText(
-          `${[prefix, message].filter(Boolean).join(" ")}\n${page}${
-            ansiEscapes.cursorHide
-          }`,
+          `${message}\n${page}${ansiEscapes.cursorHide}`,
           "left",
           "",
           maxItemLength
