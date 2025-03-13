@@ -1,4 +1,3 @@
-import chalk from "chalk";
 import { IEnemy } from "@utilities/IEnemy.js";
 import { getDungeon } from "@utilities/CacheService.js";
 import {
@@ -8,7 +7,6 @@ import {
 } from "@utilities/ConsoleService.js";
 import { getDataFromFile } from "./StorageService.js";
 import { getRandomEnemy } from "./EnemyService.js";
-import { log } from "./LogService.js";
 
 export enum RoomTypes {
   START = "START",

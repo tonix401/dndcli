@@ -4,7 +4,6 @@ import chalk from "chalk";
 import { getTerm } from "@utilities/LanguageService.js";
 import { getTheme } from "@utilities/CacheService.js";
 import ansiRegex from "ansi-regex";
-import getTemplateRoomAscii from "@resources/templates/templates.js";
 import util from "util";
 import boxen from "boxen";
 import getEmptyAscii from "@resources/rooms/emptyAscii.js";
@@ -146,7 +145,7 @@ export function accentColor(text: string) {
   return chalk.hex(getTheme().accentColor)(text);
 }
 export function errorColor(text: string) {
-  return errorColor(text);
+  return chalk.hex(getTheme().errorColor)(text);
 }
 
 /**
@@ -439,7 +438,7 @@ export function getTextInRoomAsciiAtIndexIfNotTooLong(
   x: number,
   y: number
 ): string {
-  const room = getTemplateRoomAscii();
+  const room = getEmptyAscii();
   const roomLines = room.split("\n").filter((line) => line.length > 0);
   const textLines = text.split("\n").filter((line) => line.length > 0);
   // Add padding lines if needed

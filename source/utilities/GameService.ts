@@ -22,6 +22,7 @@ import {
   secondaryColor,
   pressEnter,
 } from "@utilities/ConsoleService.js";
+import { EnemyMove, IEnemy } from "@utilities/IEnemy.js";
 import {
   getArcGuidelines,
   getChapterTitle,
@@ -575,6 +576,61 @@ export async function startCampaign(): Promise<void> {
   }
 }
 
+/**
+ * Generates a random enemy based on the difficulty level.
+ * Difficulty should be the level of the player, or relative to it
+ */
+export function getRandomEnemy(difficulty: number): IEnemy {
+  const maxhp = difficulty > 10 ? Math.floor(difficulty * getRandomNumber(0.75, 1.25)) : 10;
+  const hp = getRandomNumber(maxhp * 0.5, maxhp);
+  const name = getEnemyName(difficulty);
+
+  const enemy: IEnemy = {
+    hp: hp,
+    maxhp: maxhp,
+    name: name,
+    attack: Math.floor(difficulty * getRandomNumber(0.75, 1.25)),
+    defense: Math.floor(difficulty * getRandomNumber(0.75, 1.25)),
+    xpReward: Math.floor(difficulty * getRandomNumber(0.75, 1.25) * 10),
+    moves: getEnemyMoves(),
+    isDefending: false,
+  };
+
+  return enemy;
+}
+
+function getEnemyName(difficulty: number): string {
+  const enemies = Config.ENEMY_NAMES_ARRAY;
+
+  const randomizedDifficulty = Math.floor(
+    (difficulty * getRandomNumber(0.95, 1.05)) / 25
+  );
+
+  if (randomizedDifficulty < 0) {
+    return "Small Slime";
+  }
+  if (randomizedDifficulty > 4) {
+    return "Ancient Dragon";
+  }
+
+  return getRandomItemFromArray(enemies[randomizedDifficulty]);
+}
+
+function getEnemyMoves(): IEnemy["moves"] {
+  let moves: EnemyMove[] = [];
+  for (let i = 0; i < 4; i++) {
+    moves.push(getRandomItemFromArray(Config.ENEMY_MOVES_ARRAY));
+  }
+  return moves;
+}
+
+function getRandomItemFromArray<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function getRandomNumber(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min)) + min;
+}
 //TODO: Implement the missing terms T_T
 //TODO: Add the shop mechanic
 //TODO: Rework the inventory mechanics
