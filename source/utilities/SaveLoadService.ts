@@ -2,6 +2,7 @@
 import fs from "fs-extra";
 import path from "path";
 import { GameState } from "../src/gameState.js";
+import { log } from "./LogService.js";
 
 // Define the storage directory and file path.
 const SAVE_DIR = path.join(process.cwd(), "storage");
@@ -70,5 +71,21 @@ export async function loadGameState(): Promise<GameState | null> {
   } catch (error) {
     console.error("Error loading game state:", error);
     return null;
+  }
+}
+
+export async function resetGameState(): Promise<void> {
+  try {
+    await ensureSaveDirectory();
+    const exists = await fs.pathExists(SAVE_FILE_PATH);
+
+    if (exists) {
+      await fs.remove(SAVE_FILE_PATH);
+      log(`Game state reset: Save file deleted successfully`, "Info ");
+    } else {
+      log(`Game state reset: No save file found to delete`, "Info ");
+    }
+  } catch (error) {
+    log(`Error resetting game state: ${error}`, "Error");
   }
 }
