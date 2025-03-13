@@ -15,9 +15,9 @@ import { titleScreen } from "@components/TitleScreen.js";
 import Config from "@utilities/Config.js";
 import { getDataFromFile } from "@utilities/StorageService.js";
 import { startCampaign } from "@utilities/GameService.js";
-import { themedSelect } from "@utilities/MenuService.js";
 import { tutorial } from "@components/Tutorial.js";
 import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
+import { getErrorMessage } from "@resources/generalScreens/errorMessage.js";
 
 const getMenuOptions = () => [
   { name: getTerm("createCharacter"), value: "1" },
@@ -85,6 +85,14 @@ async function handleMenuChoice(choice: string) {
  * The main menu and game loop of the app
  */
 async function main() {
+  log("Index: Program started");
+
+  const settings = getDataFromFile("settings");
+  setLanguage(settings?.language || "de");
+  setTheme(settings?.theme || Config.STANDARD_THEME);
+
+  await titleScreen();
+
   while (true) {
     totalClear();
     const choice = await themedSelectInRoom({
@@ -103,28 +111,18 @@ export async function exitProgram() {
   process.exit(1);
 }
 
-process.on("uncaughtException", async (error) => {
-  log("Index: " + error.message, "Error");
-  let choice = "exit";
-  if (choice === "backToMainMenu") {
-    await main();
-  } else if (choice === "goBack") {
-    await exitProgram();
-  }
+process.on("SIGINT", async () => {
+  log("Index: SIGINT received", "Error");
+  totalClear();
 });
 
 ///////////////////////////////////////////// MAIN PROGRAM /////////////////////////////////////////////////
-log("Index: Program started");
 
-const settings = getDataFromFile("settings");
-setLanguage(settings?.language || "de");
-setTheme(settings?.theme || Config.STANDARD_THEME);
-
-await titleScreen().catch((error) => {
-  log(error);
-});
-await main().catch((error) => {
-  log(error);
+main().catch(async (error) => {
+  totalClear();
+  log("Index: Error in main function, " + error, "Error");
+  console.log(getErrorMessage(error));
+  process.exit(1);
 });
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
