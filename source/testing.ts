@@ -3,9 +3,6 @@ import { themedPasswordInput } from "@components/ThemedPasswordInput.js";
 
 async function test() {
   ///////////////////////
-  console.log(
-    await themedInput({ message: "password:", canGoBack: true })
-  );
 
   /////////////////////////
 }
