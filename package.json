@@ -23,7 +23,7 @@
     "fs-extra": "^11.3.0",
     "inquirer": "^12.4.1",
     "node-fetch": "^3.3.2",
-    "openai": "^4.86.1",
+    "openai": "^4.87.3",
     "ora": "^8.2.0",
     "whatwg-url": "14.1.1"
   },

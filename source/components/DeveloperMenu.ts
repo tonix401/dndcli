@@ -24,6 +24,29 @@ import { IEnemy } from "@utilities/IEnemy.js";
 import { getRandomEnemy } from "@utilities/EnemyService.js";
 import { themedSelectInRoom } from "./ThemedSelectInRoom.js";
 import { dungeonMinigame } from "./DungeonMinigame.js";
+import { handleShopInteraction } from "@utilities/ShopService.js";
+
+// ----------------- Test Shop Function -----------------
+
+async function testShop() {
+  let character: ICharacter = getDataFromFile("character");
+  if (!character) {
+    console.log(primaryColor(getTerm("noCharacter")));
+    await pressEnter();
+    return;
+  }
+
+  if (!character.inventory) {
+    const startingItems = getStartingItems(character.class);
+    character.inventory = startingItems.inventory;
+    character.equippedItems = startingItems.equipped;
+  }
+  if (!character.currency) {
+    character.currency = 100;
+  }
+
+  await handleShopInteraction(character);
+}
 
 // ----------------- (Temporary) Test Combat Section -----------------
 
@@ -41,7 +64,9 @@ async function testCombat() {
 
   // Ensure character has required properties
   if (!character.inventory) {
-    character.inventory = getStartingItems(character.class);
+    const startingItems = getStartingItems(character.class);
+    character.inventory = startingItems.inventory;
+    character.equippedItems = startingItems.equipped;
   }
   if (!character.abilities) {
     character.abilities = {
@@ -120,6 +145,10 @@ export async function secretDevMenu() {
       value: "testCombat",
     },
     {
+      name: "Test Shop",
+      value: "testShop",
+    },
+    {
       name: "Test Dungeon",
       value: "testDungeon",
     },
@@ -168,6 +197,9 @@ export async function secretDevMenu() {
           break;
         case "testCombat":
           await testCombat();
+          break;
+        case "testShop":
+          await testShop();
           break;
         case "testDungeon":
           await dungeonMinigame();

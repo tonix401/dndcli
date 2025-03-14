@@ -16,6 +16,12 @@ export interface Chapter {
   completedObjectives: string[];
   pendingObjectives: string[];
   characters: string[];
+  locations: string[];
+  metadata: {
+    lastIntent?: string;
+    lastTone?: string;
+    [key: string]: any;
+  };
 }
 
 export interface Character {
@@ -44,6 +50,7 @@ export interface IGameState {
   characterTraits: CharacterTrait[];
   themes: Set<string>;
   maxHistoryItems?: number;
+  [key: string]: any;
 }
 
 //TODO: Migration in progress
