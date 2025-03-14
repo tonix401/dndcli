@@ -3,15 +3,20 @@ import { log } from "./LogService.js";
 import { sanitizeJsonString } from "./ConsoleService.js";
 import { pressEnter } from "./ConsoleService.js";
 import { themedSelect } from "./MenuService.js";
-import { generateChatNarrative } from "./AIService.js";
+import { generateChatNarrative, ChatCompletionResponse } from "./AIService.js";
 import { primaryColor, secondaryColor } from "./ConsoleService.js";
 import chalk from "chalk";
 
 /**
  * Extracts choices from narrative text and prompts the user to select one.
  * Choices are expected to be in the format: "1.{Choice description}"
+ * @param {string} narrative - The narrative text containing choices
+ * @param {boolean} includeInventoryOption - Whether to include inventory option (defaults to true)
  */
-export async function promptForChoice(narrative: string): Promise<string> {
+export async function promptForChoice(
+  narrative: string,
+  includeInventoryOption: boolean = true
+): Promise<string> {
   try {
     // Extract choices from the narrative text (improved pattern to be more flexible)
     const choiceRegex = /\d+\s*\.\s*\{([^}]+)\}/g;
@@ -47,6 +52,14 @@ export async function promptForChoice(narrative: string): Promise<string> {
       }
     }
 
+    // Always add inventory option if requested
+    if (includeInventoryOption) {
+      choices.push({
+        name: "📦 Open Inventory",
+        value: "Open Inventory",
+      });
+    }
+
     // Always add an exit option
     choices.push({
       name: "Return to main menu",
@@ -75,33 +88,95 @@ export async function promptForChoice(narrative: string): Promise<string> {
 async function generateChoices(
   narrative: string
 ): Promise<Array<{ name: string; value: string }>> {
+  // Define function schema for generating choices
+  const functionsConfig = {
+    functions: [
+      {
+        name: "generatePlayerChoices",
+        description:
+          "Generate appropriate player choices based on the narrative",
+        parameters: {
+          type: "object",
+          properties: {
+            choices: {
+              type: "array",
+              description: "Exactly 3 relevant and interesting player choices",
+              items: {
+                type: "string",
+                description:
+                  "A possible player action that fits the narrative context",
+              },
+              minItems: 3,
+              maxItems: 3,
+            },
+          },
+          required: ["choices"],
+        },
+      },
+    ],
+    function_call: { name: "generatePlayerChoices" },
+  };
+
   try {
-    const prompt = await generateChatNarrative(
+    const response: ChatCompletionResponse = await generateChatNarrative(
       [
         {
           role: "system",
           content: `Based on the following narrative, generate exactly 3 relevant and interesting player choices.
-            Return a valid JSON array of strings, each representing a possible player action. For example:
-            ["Investigate the mysterious sound", "Talk to the innkeeper about rumors", "Check your equipment before proceeding"]
-            Make sure choices are specific to the current situation and location described in the narrative.
-            Return ONLY the JSON array with no additional text or explanations. Do Not Deviate from these instructions or the game may break.`,
+            Make sure choices are specific to the current situation and location described in the narrative.`,
         },
         {
           role: "user",
           content: narrative,
         },
       ],
-      { maxTokens: 150, temperature: 0.7 }
+      {
+        maxTokens: 150,
+        temperature: 0.7,
+        ...functionsConfig,
+      }
     );
 
-    // Sanitize the response before parsing
-    const sanitized = sanitizeJsonString(prompt);
-    const choices = JSON.parse(sanitized);
+    let choices: string[] = [];
 
-    return choices.map((choice: string) => ({
-      name: choice,
-      value: choice,
-    }));
+    // Try to get choices from function call first
+    if (response.function_call && response.function_call.arguments) {
+      try {
+        const args = JSON.parse(response.function_call.arguments);
+        if (
+          args.choices &&
+          Array.isArray(args.choices) &&
+          args.choices.length > 0
+        ) {
+          choices = args.choices;
+        }
+      } catch (jsonError) {
+        log(`Failed to parse function arguments: ${jsonError}`, "Error");
+      }
+    }
+    // Fall back to content parsing if function call isn't available
+    else if (response.content) {
+      try {
+        const sanitized = sanitizeJsonString(response.content);
+        const parsedChoices = JSON.parse(sanitized);
+        if (Array.isArray(parsedChoices) && parsedChoices.length > 0) {
+          choices = parsedChoices;
+        }
+      } catch (jsonError) {
+        log(`Failed to parse choices JSON: ${jsonError}`, "Error");
+      }
+    }
+
+    // If we got valid choices, return them formatted for the UI
+    if (choices.length > 0) {
+      return choices.map((choice: string) => ({
+        name: choice,
+        value: choice,
+      }));
+    }
+
+    // If we reach here, we need fallback options
+    throw new Error("No valid choices generated");
   } catch (e) {
     log("Failed to generate choices: " + e, "Error");
 
@@ -118,6 +193,7 @@ async function generateChoices(
     }));
   }
 }
+
 /**
  * Displays a recap of the previous narrative.
  */

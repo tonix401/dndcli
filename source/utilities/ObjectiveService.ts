@@ -1,6 +1,8 @@
 import { GameState } from "src/gameState.js";
 import { getTheme } from "./CacheService.js";
 import chalk from "chalk";
+import { sanitizeJsonString } from "./ConsoleService.js";
+import { log } from "./LogService.js";
 import { generateChatNarrative } from "./AIService.js";
 
 /**
@@ -10,33 +12,80 @@ export async function extractInitialObjectives(
   narrative: string,
   gameState: GameState
 ): Promise<void> {
-  const objectivesPrompt = await generateChatNarrative(
-    [
-      {
-        role: "system",
-        content: `Based on the following narrative, identify 2-3 key objectives that 
-        the player should accomplish. Return just a JSON array of strings, each representing 
-        a clear objective. For example: ["Find the ancient artifact in the caves", 
-        "Discover who murdered the village elder"]`,
-      },
-      {
-        role: "user",
-        content: narrative,
-      },
-    ],
-    { maxTokens: 150, temperature: 0.3 }
-  );
-
   try {
-    const objectives = JSON.parse(objectivesPrompt);
-    if (Array.isArray(objectives)) {
-      objectives.forEach((objective) => {
-        gameState.addObjective(objective);
-      });
+    // Define the function schema for initial objectives
+    const functionsConfig = {
+      functions: [
+        {
+          name: "createInitialObjectives",
+          description: "Create initial objectives based on the narrative",
+          parameters: {
+            type: "object",
+            properties: {
+              objectives: {
+                type: "array",
+                description: "List of 2-3 clear objectives for the player",
+                items: {
+                  type: "string",
+                },
+              },
+            },
+            required: ["objectives"],
+          },
+        },
+      ],
+      function_call: { name: "createInitialObjectives" },
+    };
+
+    const response = await generateChatNarrative(
+      [
+        {
+          role: "system",
+          content: `Based on the following narrative, identify 2-3 key objectives that 
+          the player should accomplish.`,
+        },
+        {
+          role: "user",
+          content: narrative,
+        },
+      ],
+      {
+        maxTokens: 150,
+        temperature: 0.3,
+        ...functionsConfig,
+      }
+    );
+
+    // Try to get objectives from function call first
+    if (response.function_call && response.function_call.arguments) {
+      try {
+        const args = JSON.parse(response.function_call.arguments);
+        const objectives = args.objectives;
+        if (Array.isArray(objectives)) {
+          objectives.forEach((objective) => {
+            gameState.addObjective(objective);
+          });
+        }
+      } catch (jsonError) {
+        log(`Failed to parse function arguments: ${jsonError}`, "Error");
+      }
+    }
+    // Fall back to content parsing if function call isn't available
+    else if (response.content) {
+      try {
+        const sanitized = sanitizeJsonString(response.content);
+        const objectives = JSON.parse(sanitized);
+        if (Array.isArray(objectives)) {
+          objectives.forEach((objective) => {
+            gameState.addObjective(objective);
+          });
+        }
+      } catch (jsonError) {
+        log(`Failed to parse objectives JSON: ${jsonError}`, "Error");
+      }
     }
   } catch (e) {
-    // Silently fail if parsing error
-    console.error("Failed to extract initial objectives:", e);
+    log(`Failed to extract initial objectives: ${e}`, "Error");
   }
 }
 
@@ -50,28 +99,70 @@ export async function extractNewObjectives(
   // Don't extract objectives from player choices
   if (narrative.startsWith("Player choice:")) return;
 
-  const objectivesPrompt = await generateChatNarrative(
-    [
-      {
-        role: "system",
-        content: `Based on the following narrative, identify any new objectives that 
-        may have been introduced. Return a JSON object with two arrays:
-        {
-          "newObjectives": ["New objective 1", "New objective 2"],
-          "completedObjectives": ["Completed objective 1"]
-        }
-        If no new objectives or completions, return empty arrays.`,
-      },
-      {
-        role: "user",
-        content: narrative,
-      },
-    ],
-    { maxTokens: 150, temperature: 0.3 }
-  );
-
   try {
-    const result = JSON.parse(objectivesPrompt);
+    // Define the function schema for new objectives
+    const functionsConfig = {
+      functions: [
+        {
+          name: "updateObjectives",
+          description: "Update objectives based on the narrative",
+          parameters: {
+            type: "object",
+            properties: {
+              newObjectives: {
+                type: "array",
+                description: "New objectives introduced in this narrative",
+                items: {
+                  type: "string",
+                },
+              },
+              completedObjectives: {
+                type: "array",
+                description: "Objectives that were completed in this narrative",
+                items: {
+                  type: "string",
+                },
+              },
+            },
+            required: ["newObjectives", "completedObjectives"],
+          },
+        },
+      ],
+      function_call: { name: "updateObjectives" },
+    };
+
+    const response = await generateChatNarrative(
+      [
+        {
+          role: "system",
+          content: `Based on the following narrative, identify any new objectives and completed objectives.`,
+        },
+        {
+          role: "user",
+          content: narrative,
+        },
+      ],
+      {
+        maxTokens: 150,
+        temperature: 0.3,
+        ...functionsConfig,
+      }
+    );
+
+    let result;
+
+    // Try to get objectives from function call first
+    if (response.function_call && response.function_call.arguments) {
+      result = JSON.parse(response.function_call.arguments);
+    }
+    // Fall back to content parsing if function call isn't available
+    else if (response.content) {
+      const sanitized = sanitizeJsonString(response.content);
+      result = JSON.parse(sanitized);
+    } else {
+      // No valid response
+      return;
+    }
 
     if (result.newObjectives && Array.isArray(result.newObjectives)) {
       result.newObjectives.forEach((objective: string) => {
@@ -111,8 +202,7 @@ export async function extractNewObjectives(
       });
     }
   } catch (e) {
-    // Silently fail if parsing error
-    console.error("Failed to extract new objectives:", e);
+    log(`Failed to extract new objectives: ${e}`, "Error");
   }
 }
 
@@ -123,37 +213,77 @@ export async function checkObjectiveCompletion(
   choice: string,
   gameState: GameState
 ): Promise<void> {
-  const completionPrompt = await generateChatNarrative(
-    [
-      {
-        role: "system",
-        content: `Given the player's choice and these pending objectives, determine if any objectives
-        are now completed. Return a JSON array of indices of completed objectives, or an empty array if none.
-        Pending objectives: ${JSON.stringify(
-          gameState.getCurrentChapter().pendingObjectives
-        )}`,
-      },
-      {
-        role: "user",
-        content: choice,
-      },
-    ],
-    { maxTokens: 100, temperature: 0.2 }
-  );
-
   try {
-    const completedIndices = JSON.parse(completionPrompt);
+    const pendingObjectives = gameState.getCurrentChapter().pendingObjectives;
+
+    // Define the function schema for objective completion
+    const functionsConfig = {
+      functions: [
+        {
+          name: "checkObjectiveCompletion",
+          description:
+            "Check which objectives are completed by the player's choice",
+          parameters: {
+            type: "object",
+            properties: {
+              completedIndices: {
+                type: "array",
+                description: "Indices of completed objectives (zero-based)",
+                items: {
+                  type: "integer",
+                },
+              },
+            },
+            required: ["completedIndices"],
+          },
+        },
+      ],
+      function_call: { name: "checkObjectiveCompletion" },
+    };
+
+    const response = await generateChatNarrative(
+      [
+        {
+          role: "system",
+          content: `Given the player's choice and these pending objectives, determine if any objectives
+          are now completed.
+          Pending objectives: ${JSON.stringify(pendingObjectives)}`,
+        },
+        {
+          role: "user",
+          content: choice,
+        },
+      ],
+      {
+        maxTokens: 100,
+        temperature: 0.2,
+        ...functionsConfig,
+      }
+    );
+
+    let completedIndices;
+
+    // Try to get completed indices from function call first
+    if (response.function_call && response.function_call.arguments) {
+      const args = JSON.parse(response.function_call.arguments);
+      completedIndices = args.completedIndices;
+    }
+    // Fall back to content parsing if function call isn't available
+    else if (response.content) {
+      const sanitized = sanitizeJsonString(response.content);
+      completedIndices = JSON.parse(sanitized);
+    } else {
+      // No valid response
+      return;
+    }
+
     if (Array.isArray(completedIndices) && completedIndices.length > 0) {
       // We need to complete from end to start to not mess up indices
       completedIndices.sort((a, b) => b - a);
 
       for (const index of completedIndices) {
-        if (
-          index >= 0 &&
-          index < gameState.getCurrentChapter().pendingObjectives.length
-        ) {
-          const objective =
-            gameState.getCurrentChapter().pendingObjectives[index];
+        if (index >= 0 && index < pendingObjectives.length) {
+          const objective = pendingObjectives[index];
           gameState.completeObjective(objective);
           console.log(
             chalk
@@ -164,8 +294,7 @@ export async function checkObjectiveCompletion(
       }
     }
   } catch (e) {
-    // Silently fail if parsing error
-    console.error("Failed to check objective completion:", e);
+    log(`Failed to check objective completion: ${e}`, "Error");
   }
 }
 

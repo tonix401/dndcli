@@ -5,10 +5,21 @@ import { GameState } from "src/gameState.js";
 import { detectNarrativeLoop } from "./NarrativeService.js";
 import { enforceStoryRequirements } from "./ObjectiveService.js";
 import { sanitizeJsonString } from "./ConsoleService.js";
+import { log } from "./LogService.js";
 
 export interface ChatCompletionRequestMessage {
   role: "system" | "user" | "assistant";
   content: string;
+}
+
+export interface FunctionCallResult {
+  name: string;
+  arguments: string;
+}
+
+export interface ChatCompletionResponse {
+  content: string | null;
+  function_call?: FunctionCallResult;
 }
 
 class ChatGenerationError extends Error {
@@ -37,6 +48,12 @@ export interface GenerateTextOptions {
   maxTokens?: number;
   temperature?: number;
   topP?: number;
+  functions?: Array<{
+    name: string;
+    description?: string;
+    parameters: Record<string, unknown>;
+  }>;
+  function_call?: { name: string } | "auto" | "none";
 }
 
 /**
@@ -48,7 +65,7 @@ export interface GenerateTextOptions {
 export async function generateChatNarrative(
   messages: ChatCompletionRequestMessage[],
   options?: GenerateTextOptions
-): Promise<string> {
+): Promise<ChatCompletionResponse> {
   ensureConfig();
 
   if (!messages?.length) {
@@ -56,27 +73,44 @@ export async function generateChatNarrative(
   }
 
   try {
-    const response = await openai.chat.completions.create({
-      model: options?.model || "gpt-3.5-turbo",
+    // Prepare API request parameters
+    const requestParams: any = {
+      model: options?.model || "gpt-4o",
       messages,
       max_tokens: options?.maxTokens ?? 2048,
       temperature: options?.temperature ?? 0.85,
       top_p: options?.topP ?? 0.7,
-    });
+    };
 
-    const content = response.choices[0]?.message?.content;
-    if (!content) {
-      throw new ChatGenerationError(
-        "No valid response content received from OpenAI API"
-      );
+    // Add function calling parameters if provided
+    if (options?.functions) {
+      requestParams.functions = options.functions;
+    }
+    if (options?.function_call) {
+      requestParams.function_call = options.function_call;
     }
 
-    return content.trim();
+    // Make API call
+    const response = await openai.chat.completions.create(requestParams);
+
+    const messageResponse = response.choices[0]?.message;
+
+    // Return structured response with content and function_call if available
+    return {
+      content: messageResponse?.content ?? null,
+      function_call: messageResponse?.function_call
+        ? {
+            name: messageResponse.function_call.name,
+            arguments: messageResponse.function_call.arguments,
+          }
+        : undefined,
+    };
   } catch (error) {
     if (error instanceof ChatGenerationError) {
       throw error;
     }
     if (error instanceof Error) {
+      log(`Failed to generate chat narrative: ${error.message}`, "Error");
       throw new ChatGenerationError(
         `Failed to generate chat narrative: ${error.message}`
       );
@@ -85,6 +119,23 @@ export async function generateChatNarrative(
       "An unknown error occurred while generating chat narrative"
     );
   }
+}
+
+/**
+ * Legacy version of generateChatNarrative that returns only the text content.
+ * This is used as a fallback in case something with the function calling breaks
+ */
+export async function generateChatText(
+  messages: ChatCompletionRequestMessage[],
+  options?: GenerateTextOptions
+): Promise<string> {
+  const response = await generateChatNarrative(messages, options);
+  if (!response.content) {
+    throw new ChatGenerationError(
+      "No valid response content received from OpenAI API"
+    );
+  }
+  return response.content.trim();
 }
 
 /**
@@ -105,6 +156,49 @@ export async function generateEnemyFromNarrative(
   const combatSection =
     narrative.split("COMBAT ENCOUNTER:")[1]?.split("\n")[0] || narrative;
 
+  // Define function schema for enemy generation
+  const enemyGenerationFunction = {
+    name: "generateEnemy",
+    description:
+      "Generate a balanced enemy for combat based on player stats and narrative context",
+    parameters: {
+      type: "object",
+      properties: {
+        name: {
+          type: "string",
+          description: "Enemy name based on narrative context",
+        },
+        hp: {
+          type: "integer",
+          description: `Enemy HP between ${Math.floor(
+            Number(characterData.abilities.maxhp) * 0.5
+          )}-${Math.floor(Number(characterData.abilities.maxhp) * 1.5)}`,
+        },
+        attack: {
+          type: "integer",
+          description: `Attack value between ${Math.max(
+            1,
+            Number(characterData.abilities.strength) - 2
+          )}-${Number(characterData.abilities.strength) + 3}`,
+        },
+        defense: {
+          type: "integer",
+          description: `Defense value between 1-${Math.max(
+            2,
+            Number(characterData.abilities.strength) - 1
+          )}`,
+        },
+        xpReward: {
+          type: "integer",
+          description: `XP reward between ${
+            10 + Number(characterData.level) * 3
+          }-${20 + Number(characterData.level) * 5}`,
+        },
+      },
+      required: ["name", "hp", "attack", "defense", "xpReward"],
+    },
+  };
+
   const messages: ChatCompletionRequestMessage[] = [
     {
       role: "system",
@@ -119,24 +213,7 @@ export async function generateEnemyFromNarrative(
       - Enemy HP should be 50-150% of player's maxhp
       - Attack should be balanced against player's strength
       - Defense should be lower than player's strength to ensure damage is possible
-      - XP reward should scale with enemy difficulty and player level
-      
-      Response must be in JSON format with fields:
-      - name: string (based on narrative context)
-      - hp: number (${Math.floor(
-        Number(characterData.abilities.maxhp) * 0.5
-      )}-${Math.floor(Number(characterData.abilities.maxhp) * 1.5)})
-      - attack: number (${Math.max(
-        1,
-        Number(characterData.abilities.strength) - 2
-      )}-${Number(characterData.abilities.strength) + 3})
-      - defense: number (1-${Math.max(
-        2,
-        Number(characterData.abilities.strength) - 1
-      )})
-      - xpReward: number (${10 + Number(characterData.level) * 3}-${
-        20 + Number(characterData.level) * 5
-      })`,
+      - XP reward should scale with enemy difficulty and player level`,
     },
     {
       role: "user",
@@ -148,8 +225,24 @@ export async function generateEnemyFromNarrative(
     const response = await generateChatNarrative(messages, {
       temperature: 0.7,
       maxTokens: 150,
+      functions: [enemyGenerationFunction],
+      function_call: { name: "generateEnemy" },
     });
-    const enemy = JSON.parse(response);
+
+    let enemy;
+
+    // Try to get enemy data from function call result first
+    if (response.function_call && response.function_call.arguments) {
+      enemy = JSON.parse(response.function_call.arguments);
+    }
+    // Fall back to parsing content if function call is not available
+    else if (response.content) {
+      enemy = JSON.parse(sanitizeJsonString(response.content));
+    }
+    // Default enemy if parsing fails
+    else {
+      throw new Error("Failed to generate enemy data");
+    }
 
     const hp = Math.min(
       Math.max(
@@ -181,6 +274,7 @@ export async function generateEnemyFromNarrative(
       ),
     };
   } catch (error) {
+    log(`Failed to generate enemy: ${error}`, "Error");
     const hp = Math.floor(Number(characterData.abilities.maxhp) * 0.75);
 
     // Fallback enemy with balanced stats based on player
@@ -281,32 +375,78 @@ export async function analyzePlayerChoice(
   choice: string,
   gameState: GameState
 ): Promise<void> {
-  const analysis = await generateChatNarrative(
-    [
-      {
-        role: "system",
-        content: `Analyze this player choice and determine what it reveals about 
-        the character's traits and relationships. Answer in JSON format with:
-        {
-          "traits": {"trait1": -2 to 2, "trait2": -2 to 2},
-          "relationships": {"character1": -2 to 2, "character2": -2 to 2},
-          "themes": ["theme1", "theme2"]
-        }
-        Do NOT use + signs before positive numbers as this breaks JSON parsing.
-        Keep the response concise with 1-3 traits, 0-2 relationships, and 1-2 themes.`,
+  // Define function for choice analysis
+  const analysisFunction = {
+    name: "analyzePlayerChoice",
+    description:
+      "Analyze player choice to determine traits, relationships and themes",
+    parameters: {
+      type: "object",
+      properties: {
+        traits: {
+          type: "object",
+          description:
+            "Character traits affected by this choice, with values from -2 to 2",
+          additionalProperties: { type: "number" },
+        },
+        relationships: {
+          type: "object",
+          description:
+            "Character relationships affected by this choice, with values from -2 to 2",
+          additionalProperties: { type: "number" },
+        },
+        themes: {
+          type: "array",
+          description: "Thematic elements present in this choice",
+          items: { type: "string" },
+        },
       },
-      {
-        role: "user",
-        content: choice,
-      },
-    ],
-    { maxTokens: 150, temperature: 0.4 }
-  );
+      required: ["traits", "themes"],
+    },
+  };
 
   try {
-    // Add preprocessing to sanitize JSON before parsing
-    const sanitizedAnalysis = sanitizeJsonString(analysis);
-    const result = JSON.parse(sanitizedAnalysis);
+    const response = await generateChatNarrative(
+      [
+        {
+          role: "system",
+          content: `Analyze this player choice and determine what it reveals about 
+          the character's traits and relationships. Answer in JSON format with:
+          {
+            "traits": {"trait1": -2 to 2, "trait2": -2 to 2},
+            "relationships": {"character1": -2 to 2, "character2": -2 to 2},
+            "themes": ["theme1", "theme2"]
+          }
+          Do NOT use + signs before positive numbers as this breaks JSON parsing.
+          Keep the response concise with 1-3 traits, 0-2 relationships, and 1-2 themes.`,
+        },
+        {
+          role: "user",
+          content: choice,
+        },
+      ],
+      {
+        maxTokens: 150,
+        temperature: 0.4,
+        functions: [analysisFunction],
+        function_call: { name: "analyzePlayerChoice" },
+      }
+    );
+
+    let result;
+
+    // Try to get analysis from function call first
+    if (response.function_call && response.function_call.arguments) {
+      result = JSON.parse(response.function_call.arguments);
+    }
+    // Fall back to content parsing if function call isn't available
+    else if (response.content) {
+      const sanitizedAnalysis = sanitizeJsonString(response.content);
+      result = JSON.parse(sanitizedAnalysis);
+    } else {
+      // If neither is available, exit silently
+      return;
+    }
 
     // Update character traits based on choice
     if (result.traits) {
@@ -357,7 +497,7 @@ export async function analyzePlayerChoice(
     }
   } catch (e) {
     // Handle parsing error silently - don't break game flow
-    console.error("Failed to analyze player choice:", e);
+    log(`Failed to analyze player choice: ${e}`, "Error");
   }
 }
 
