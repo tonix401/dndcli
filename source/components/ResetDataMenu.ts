@@ -1,6 +1,11 @@
 import { checkbox } from "@inquirer/prompts";
 import { getTerm } from "@utilities/LanguageService.js";
-import { getTheme, setLanguage, setTheme } from "@utilities/CacheService.js";
+import {
+  resetCachedGameState,
+  getTheme,
+  setLanguage,
+  setTheme,
+} from "@utilities/CacheService.js";
 import Config from "@utilities/Config.js";
 import { clearLogs } from "@utilities/LogService.js";
 import {
@@ -9,7 +14,6 @@ import {
   secondaryColor,
 } from "@utilities/ConsoleService.js";
 import { saveDataToFile } from "@utilities/StorageService.js";
-import { resetGameState } from "@utilities/SaveLoadService.js";
 
 /**
  * Menu component that handles resetting different types of data
@@ -55,7 +59,7 @@ export async function resetDataMenu(): Promise<void> {
     clearLogs();
   }
   if (choices.includes("saveStateData")) {
-    await resetGameState();
+    await resetCachedGameState();
   }
 
   console.log(
