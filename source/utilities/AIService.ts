@@ -640,3 +640,8 @@ export function getEnhancedAIInstructions(gameState: GameState): string {
 
   return enhancedInstructions;
 }
+
+export function getOpenAI(): OpenAI {
+  ensureConfig();
+  return openai;
+}

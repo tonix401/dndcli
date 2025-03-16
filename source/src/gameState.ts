@@ -29,6 +29,7 @@ import {
   Character,
   CharacterTrait,
 } from "@utilities/IGameState.js";
+import { StoryPaceKey } from "@utilities/GameService.js";
 
 // Re-export interfaces from IGameState so importing code doesn't need to change
 export { ConversationMessage, Chapter };
@@ -49,6 +50,7 @@ export class GameState implements IGameState {
   characterTraits: CharacterTrait[] = [];
   themes: Set<string> = new Set();
   readonly maxHistoryItems: number = 50;
+  storyPace: StoryPaceKey = "FAST";
   [key: string]: any;
 
   constructor() {
@@ -63,7 +65,13 @@ export class GameState implements IGameState {
       metadata: {},
     };
   }
+  getStoryPace(): StoryPaceKey {
+    return this.storyPace;
+  }
 
+  setStoryPace(pace: StoryPaceKey): void {
+    this.storyPace = pace;
+  }
   // Getters and Setters for theme.
   getTheme(): string | null {
     return null;

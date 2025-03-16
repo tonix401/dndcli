@@ -1,7 +1,7 @@
 import { getTerm, Language } from "@utilities/LanguageService.js";
 import { ITheme } from "@utilities/ITheme.js";
 import { IThemeOverride } from "@utilities/IThemeOveride.js";
-import Config from "@utilities/Config.js";
+import Config, { StoryPaceKey } from "@utilities/Config.js";
 import {
   Dungeon,
   initiateDungeonMapWithHallways,
@@ -61,43 +61,17 @@ if (gameState) {
     narrativeHistory: gameState.narrativeHistory || [],
     conversationHistory: gameState.conversationHistory || [],
     choices: gameState.choices || [],
-    currentChapter: gameState.currentChapter || {
-      title: "Chapter 1: The Beginning",
-      summary: "Your adventure begins",
-      arc: "introduction",
-      completedObjectives: [],
-      pendingObjectives: [],
-      characters: [],
-      locations: [],
-      metadata: {},
-    },
+    currentChapter:
+      gameState.currentChapter || Config.DEFAULT_GAME_STATE.currentChapter,
     chapters: gameState.chapters || [],
     characterTraits: gameState.characterTraits || [],
   };
 } else {
-  cachedGameState = {
-    theme: null,
-    narrativeHistory: [],
-    conversationHistory: [],
-    choices: [],
-    plotStage: 1,
-    plotSummary: "",
-    currentChapter: {
-      title: "Chapter 1: The Beginning",
-      summary: "Your adventure begins",
-      arc: "introduction",
-      completedObjectives: [],
-      pendingObjectives: [],
-      characters: [],
-      locations: [],
-      metadata: {},
-    },
-    chapters: [],
-    characters: new Map(),
-    characterTraits: [],
-    themes: new Set(),
-    maxHistoryItems: 50,
-  };
+  // Use the default game state structure from Config
+  cachedGameState = JSON.parse(JSON.stringify(Config.DEFAULT_GAME_STATE));
+  // Need to reconstruct Map and Set since they don't survive JSON conversion
+  cachedGameState.characters = new Map();
+  cachedGameState.themes = new Set();
 }
 // #endregion
 // #region Getters
@@ -415,29 +389,12 @@ export function getThemes(): string[] {
  * Creates a fresh game state object
  */
 export function createNewGameState(): IGameState {
-  return {
-    theme: null,
-    narrativeHistory: [],
-    conversationHistory: [],
-    choices: [],
-    plotStage: 1,
-    plotSummary: "",
-    currentChapter: {
-      title: "Chapter 1: The Beginning",
-      summary: "Your adventure begins",
-      arc: "introduction",
-      completedObjectives: [],
-      pendingObjectives: [],
-      characters: [],
-      locations: [],
-      metadata: {},
-    },
-    chapters: [],
-    characters: new Map(),
-    characterTraits: [],
-    themes: new Set(),
-    maxHistoryItems: 50,
-  };
+  // Use the default game state from Config
+  const freshState = JSON.parse(JSON.stringify(Config.DEFAULT_GAME_STATE));
+  // Need to reconstruct Map and Set since they don't survive JSON conversion
+  freshState.characters = new Map();
+  freshState.themes = new Set();
+  return freshState;
 }
 
 export function resetCachedGameState(): void {
@@ -465,6 +422,15 @@ function save() {
   };
 
   saveDataToFile("gameState", serializableGameState);
-  log("Cache Service: Settings and GameState saved");
 }
 // #endregion
+
+export function setStoryPace(pace: StoryPaceKey): void {
+  cachedGameState.storyPace = pace;
+  log("Cache Service: Story pace updated to " + Config.STORY_PACE[pace].name);
+  save();
+}
+
+export function getStoryPace(): StoryPaceKey {
+  return (cachedGameState.storyPace || "FAST") as StoryPaceKey;
+}

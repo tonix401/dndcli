@@ -7,6 +7,7 @@ import { Language } from "@utilities/LanguageService.js";
 import { IAbility } from "@utilities/IAbility.js";
 import { LogTypes } from "./LogService.js";
 import { EnemyMove } from "@utilities/IEnemy.js";
+import { IGameState } from "@utilities/IGameState.js";
 
 // #region Paths
 // Base directory (assumes process.cwd() is the project root)
@@ -632,6 +633,261 @@ const ENEMY_MOVES_ARRAY: EnemyMove[] = [
 ];
 // #endregion
 
+// #region Game State
+/**
+ * Default structure for game state
+ */
+const DEFAULT_GAME_STATE: IGameState = {
+  theme: null,
+  narrativeHistory: [],
+  conversationHistory: [],
+  choices: [],
+  plotStage: 1,
+  plotSummary: "",
+  currentChapter: {
+    title: "Chapter 1: The Beginning",
+    summary: "Your adventure begins",
+    arc: "introduction",
+    completedObjectives: [],
+    pendingObjectives: [],
+    characters: [],
+    locations: [],
+    metadata: {},
+  },
+  chapters: [],
+  characters: new Map(),
+  characterTraits: [],
+  themes: new Set(),
+  maxHistoryItems: 50,
+  storyPace: "FAST",
+};
+
+/**
+ * Story pace settings
+ */
+const STORY_PACE = {
+  FAST: {
+    name: "Fast",
+    narrativeLength: "short",
+    detailLevel: "low",
+    eventFrequency: "high",
+  },
+  MEDIUM: {
+    name: "Medium",
+    narrativeLength: "moderate",
+    detailLevel: "moderate",
+    eventFrequency: "moderate",
+  },
+  SLOW: {
+    name: "Slow",
+    narrativeLength: "long",
+    detailLevel: "high",
+    eventFrequency: "low",
+  },
+};
+// #endregion
+
+// #region Game Service
+/**
+ * Story pace options control the speed of narrative progression
+ */
+const STORY_PACE_OPTIONS = {
+  FAST: {
+    name: "Fast",
+    multiplier: 0.5,
+    description: "Rapid story progression with fewer exchanges required",
+  },
+  MEDIUM: {
+    // Changed from NORMAL to MEDIUM
+    name: "Medium",
+    multiplier: 1.0,
+    description: "Standard pacing with balanced narrative development",
+  },
+  SLOW: {
+    // Changed from DETAILED to SLOW
+    name: "Detailed",
+    multiplier: 1.5,
+    description: "Extended pacing with more thorough story development",
+  },
+};
+
+/**
+ * Schema for narrative generation function configuration
+ */
+const NARRATIVE_GENERATION_SCHEMA = {
+  functions: [
+    {
+      name: "generateNarrative",
+      description: "Generate the next narrative scene in the adventure",
+      parameters: {
+        type: "object",
+        properties: {
+          narrative: {
+            type: "string",
+            description:
+              "The main narrative content describing the scene, events, and characters",
+          },
+          choices: {
+            type: "array",
+            description:
+              "Exactly 3 choices the player can make, in format: 'Action description'",
+            items: {
+              type: "string",
+            },
+            minItems: 3,
+            maxItems: 3,
+          },
+          specialEvent: {
+            type: "object",
+            description: "Optional special event details",
+            properties: {
+              type: {
+                type: "string",
+                enum: ["combat", "dungeon", "dice_roll", "none"],
+                description: "Type of special event in this narrative",
+              },
+              details: {
+                type: "string",
+                description: "Additional details about the special event",
+              },
+            },
+          },
+        },
+        required: ["narrative", "choices"],
+      },
+    },
+  ],
+  function_call: { name: "generateNarrative" },
+};
+// #endregion
+
+// #region Objective Service
+/**
+ * Configuration for objective management in the game
+ */
+const OBJECTIVE_CONFIG = {
+  // Maximum number of pending objectives allowed before pruning
+  MAX_PENDING_OBJECTIVES: 7,
+
+  // Narrative threshold before pruning can occur
+  PRUNE_NARRATIVE_THRESHOLD: 15,
+
+  // Minimum objectives to have before considering pruning
+  MIN_OBJECTIVES_FOR_PRUNING: 5,
+
+  // What percentage of objectives to keep when pruning (adjusted by pace)
+  OBJECTIVE_RETENTION_RATE: 0.7,
+};
+
+/**
+ * Base requirements for story progression by arc
+ */
+const ARC_REQUIREMENTS = {
+  introduction: {
+    minNarrative: 5,
+    minObjectives: 1,
+  },
+  "rising-action": {
+    minNarrative: 10,
+    minObjectives: 2,
+  },
+  climax: {
+    minNarrative: 15,
+    minObjectives: 3,
+  },
+  "falling-action": {
+    minNarrative: 20,
+    minObjectives: 4,
+  },
+  resolution: {
+    minNarrative: 25,
+    minObjectives: 5,
+  },
+};
+
+/**
+ * Function schemas for AI objective extraction and management
+ */
+const OBJECTIVE_FUNCTION_SCHEMAS = {
+  initialObjectives: {
+    functions: [
+      {
+        name: "createInitialObjectives",
+        description: "Create initial objectives based on the narrative",
+        parameters: {
+          type: "object",
+          properties: {
+            objectives: {
+              type: "array",
+              description: "List of 2-3 clear objectives for the player",
+              items: {
+                type: "string",
+              },
+            },
+          },
+          required: ["objectives"],
+        },
+      },
+    ],
+    function_call: { name: "createInitialObjectives" },
+  },
+
+  updateObjectives: {
+    functions: [
+      {
+        name: "updateObjectives",
+        description: "Update objectives based on the narrative",
+        parameters: {
+          type: "object",
+          properties: {
+            newObjectives: {
+              type: "array",
+              description: "New objectives introduced in this narrative",
+              items: {
+                type: "string",
+              },
+            },
+            completedObjectives: {
+              type: "array",
+              description: "Objectives that were completed in this narrative",
+              items: {
+                type: "string",
+              },
+            },
+          },
+          required: ["newObjectives", "completedObjectives"],
+        },
+      },
+    ],
+    function_call: { name: "updateObjectives" },
+  },
+
+  checkCompletion: {
+    functions: [
+      {
+        name: "checkObjectiveCompletion",
+        description:
+          "Check which objectives are completed by the player's choice",
+        parameters: {
+          type: "object",
+          properties: {
+            completedIndices: {
+              type: "array",
+              description: "Indices of completed objectives (zero-based)",
+              items: {
+                type: "integer",
+              },
+            },
+          },
+          required: ["completedIndices"],
+        },
+      },
+    ],
+    function_call: { name: "checkObjectiveCompletion" },
+  },
+};
+// #endregion
+
 export default {
   // Paths
   ROOT_DIR,
@@ -669,4 +925,22 @@ export default {
 
   // AI-Prompts
   ORIGIN_STORIES,
+
+  // Game State
+  DEFAULT_GAME_STATE,
+  STORY_PACE,
+
+  // Game Service
+  STORY_PACE_OPTIONS,
+  NARRATIVE_GENERATION_SCHEMA,
+
+  // Objective Service
+  OBJECTIVE_CONFIG,
+  ARC_REQUIREMENTS,
+  OBJECTIVE_FUNCTION_SCHEMAS,
 };
+
+// Export types directly to be used elsewhere
+export type StoryPaceKey = keyof typeof STORY_PACE;
+export type StoryPaceOptionsKey = keyof typeof STORY_PACE_OPTIONS;
+export type ArcType = keyof typeof ARC_REQUIREMENTS;
