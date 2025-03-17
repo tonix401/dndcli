@@ -2,8 +2,8 @@
 import fs from "fs-extra";
 import path from "path";
 import { IGameState } from "@utilities/IGameState.js";
-import { createNewGameState } from "./CacheService.js";
-import { log } from "./LogService.js";
+import { createNewGameState } from "@utilities/CacheService.js";
+import { log } from "@utilities/LogService.js";
 // Define the storage directory and file path.
 const SAVE_DIR = path.join(process.cwd(), "storage");
 const SAVE_FILE_PATH = path.join(SAVE_DIR, "gamestate.json");

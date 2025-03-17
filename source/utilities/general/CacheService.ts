@@ -7,7 +7,7 @@ import {
   initiateDungeonMapWithHallways,
 } from "@utilities/DungeonService.js";
 import { log } from "@utilities/LogService.js";
-import { getDataFromFile, saveDataToFile } from "./StorageService.js";
+import { getDataFromFile, saveDataToFile } from "@utilities/StorageService.js";
 import {
   IGameState,
   ConversationMessage,

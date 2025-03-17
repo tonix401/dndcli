@@ -5,7 +5,7 @@ import {
   primaryColor,
   secondaryColor,
 } from "@utilities/ConsoleService.js";
-import { getDataFromFile } from "./StorageService.js";
+import { getDataFromFile } from "@utilities/StorageService.js";
 import { getRandomEnemy } from "./EnemyService.js";
 
 export enum RoomTypes {

@@ -1,4 +1,4 @@
-import { Language } from "@utilities/LanguageService.js";
+import { Language } from "@utilities/LanguageService.ts";
 import { ITheme } from "@utilities/ITheme.js";
 
 /**

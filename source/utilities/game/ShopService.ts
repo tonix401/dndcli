@@ -3,10 +3,13 @@ import ICharacter from "@utilities/ICharacter.js";
 import { generateRandomItem } from "@utilities/ItemGenerator.js";
 import { addItemToInventory } from "@utilities/InventoryService.js";
 import { saveDataToFile } from "@utilities/StorageService.js";
-import { primaryColor, secondaryColor } from "@utilities/ConsoleService.js";
-import { themedSelectInRoom } from "@components/General/ThemedSelectInRoom.js";
-import { pressEnter } from "@utilities/ConsoleService.js";
-import chalk from "chalk";
+import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
+import {
+  accentColor,
+  pressEnter,
+  primaryColor,
+  secondaryColor,
+} from "@utilities/ConsoleService.js";
 
 /**
  * Generate items for a shop based on player level and location
@@ -79,7 +82,7 @@ export async function handleShopInteraction(
 
   let exitShop = false;
   while (!exitShop) {
-    console.log(chalk.yellow("\n=== MERCHANT SHOP ==="));
+    console.log(accentColor("\n=== MERCHANT SHOP ==="));
     console.log(primaryColor(`Gold: ${character.currency}`));
 
     const options = [

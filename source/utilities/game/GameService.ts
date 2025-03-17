@@ -47,7 +47,7 @@ import {
   displayRecap,
 } from "@utilities/UIInteractionService.js";
 import { determineNextArc } from "@utilities/NarrativeService.js";
-import Config, { StoryPaceOptionsKey } from "./Config.js";
+import Config, { StoryPaceOptionsKey } from "@utilities/Config.js";
 import {
   useItem,
   addItemToInventory,

@@ -6,7 +6,7 @@ import {
 } from "@utilities/ConsoleService.js";
 import { getTerm } from "@utilities/LanguageService.js";
 import { clearLogs, getLogData, log } from "@utilities/LogService.js";
-import { themedSelectInRoom } from "../General/ThemedSelectInRoom.js";
+import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
 
 export async function showLogsMenu() {
   const logMenuChoices = [

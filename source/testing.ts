@@ -5,7 +5,7 @@ import path from "path";
 async function test() {
   ///////////////////////
 
-  const dir = path.join(Config.RESOURCES_DIR, "animations")
+  const dir = path.join(Config.RESOURCES_DIR, "animations");
 
   function getFilesInDir(dir: string) {
     return fs.readdirSync(dir).filter((file) => {

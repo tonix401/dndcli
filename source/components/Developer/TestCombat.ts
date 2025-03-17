@@ -3,7 +3,7 @@ import {
   pressEnter,
   primaryColor,
 } from "@utilities/ConsoleService.js";
-import { getRandomEnemy } from "@utilities/EnemyService.js";
+import { getRandomEnemy } from "@utilities/GameService.js";
 import ICharacter from "@utilities/ICharacter.js";
 import { IEnemy } from "@utilities/IEnemy.js";
 import { getStartingItems } from "@utilities/InventoryService.js";

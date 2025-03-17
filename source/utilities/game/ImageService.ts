@@ -9,13 +9,10 @@
  * @version 1.0.0-ONHOLD
  */
 
-import { getOpenAI } from "./AIService.js";
-import { log } from "./LogService.js";
-import fetch from "node-fetch";
+import { getOpenAI } from "@utilities/AIService.js";
+import { log } from "@utilities/LogService.js";
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
-import os from "os";
 import { createCanvas, loadImage } from "canvas";
 import crypto from "crypto";
 

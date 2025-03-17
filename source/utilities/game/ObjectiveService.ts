@@ -1,11 +1,11 @@
 import { GameState } from "src/gameState.js";
-import { getTheme } from "./CacheService.js";
+import { getTheme } from "@utilities/CacheService.js";
 import chalk from "chalk";
-import { sanitizeJsonString } from "./ConsoleService.js";
-import { log } from "./LogService.js";
+import { sanitizeJsonString } from "@utilities/ConsoleService.js";
+import { log } from "@utilities/LogService.js";
 import { generateChatNarrative } from "./AIService.js";
-import { StoryPaceOptionsKey } from "./Config.js";
-import Config from "./Config.js";
+import { StoryPaceOptionsKey } from "@utilities/Config.js";
+import Config from "@utilities/Config.js";
 
 /**
  * Helper function to determine if two objectives are similar

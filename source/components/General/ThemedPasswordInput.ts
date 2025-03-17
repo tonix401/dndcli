@@ -65,7 +65,9 @@ export const themedPasswordInput = createPrompt<string, PasswordConfig>(
       getTextOnBackground(
         boxItUp(
           ansiEscapes.cursorHide +
-            secondaryColor([prefix, message, chalk.white(formattedRunes)].join(" "))
+            secondaryColor(
+              [prefix, message, chalk.white(formattedRunes)].join(" ")
+            )
         ),
         getPasswordBackground()
       )

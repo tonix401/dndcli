@@ -1,5 +1,5 @@
-import { EnemyMove, EnemyMoveType, IEnemy } from "@utilities/IEnemy.js";
-import Config from "./Config.js";
+import { EnemyMove, IEnemy } from "@utilities/IEnemy.js";
+import Config from "@utilities/Config.js";
 
 /**
  * Generates a random enemy scaled to the player's level

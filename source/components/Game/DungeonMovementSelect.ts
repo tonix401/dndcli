@@ -132,11 +132,11 @@ export const dungeonMovementSelect = createPrompt(
 
     return secondaryColor(
       "*".repeat(totalWidth) +
-      "\n" +
-      holdMyText(megaBox) +
-      ansiEscapes.cursorHide +
-      "\n" +
-      "*".repeat(totalWidth)
+        "\n" +
+        holdMyText(megaBox) +
+        ansiEscapes.cursorHide +
+        "\n" +
+        "*".repeat(totalWidth)
     );
   }
 );

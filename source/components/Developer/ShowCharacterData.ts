@@ -5,9 +5,9 @@ import config from "@utilities/Config.js";
 import ICharacter from "@utilities/ICharacter.js";
 import Config from "@utilities/Config.js";
 import { getDataFromFile, saveDataToFile } from "@utilities/StorageService.js";
+import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
+import { themedInput } from "@components/ThemedInput.js";
 import { inputValidators } from "@utilities/MenuService.js";
-import { themedSelectInRoom } from "../General/ThemedSelectInRoom.js";
-import { themedInput } from "../General/ThemedInput.js";
 
 const getCharacterOptions = (character: ICharacter) => {
   // Calculate inventory sum

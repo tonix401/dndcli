@@ -74,7 +74,7 @@ async function changeLanguageMenu() {
     {
       name: getTerm("ch"),
       value: "ch",
-    }
+    },
   ];
   const chosenLang: Language | string = await themedSelectInRoom({
     message: `${getTerm("language")}`,
