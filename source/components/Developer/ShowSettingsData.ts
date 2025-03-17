@@ -5,15 +5,12 @@ import {
   setLanguage,
   setTheme,
 } from "@utilities/CacheService.js";
-import {
-  primaryColor,
-  totalClear,
-} from "@utilities/ConsoleService.js";
+import { primaryColor, totalClear } from "@utilities/ConsoleService.js";
 import { getTerm, Language } from "@utilities/LanguageService.js";
 import { Separator } from "@inquirer/prompts";
 import config from "@utilities/Config.js";
-import { themedSelectInRoom } from "./ThemedSelectInRoom.js";
-import { themedInput } from "./ThemedInput.js";
+import { themedSelectInRoom } from "../General/ThemedSelectInRoom.js";
+import { themedInput } from "../General/ThemedInput.js";
 
 const getSettingsOptions = () => {
   const theme = getTheme();
