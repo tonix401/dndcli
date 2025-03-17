@@ -54,6 +54,7 @@ import {
   generateLootDrop,
 } from "@utilities/InventoryService.js";
 import { showEquipmentMenu } from "@utilities/EquipmentService.js";
+import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
 
 export const STORY_PACE = Config.STORY_PACE_OPTIONS;
 
@@ -112,10 +113,6 @@ async function handleItemUsage(characterData: any): Promise<void> {
     { name: "Equip/Unequip Items", value: "equip" },
     { name: "Return to Adventure", value: "return" },
   ];
-
-  const { themedSelectInRoom } = await import(
-    "@components/General/ThemedSelectInRoom.js"
-  );
 
   // Show main inventory menu
   const menuChoice = await themedSelectInRoom({
@@ -903,9 +900,6 @@ export async function startCampaign(): Promise<void> {
       log("No character data found. Please create a character first.", "Error");
       return;
     }
-    const { themedSelectInRoom } = await import(
-      "@components/General/ThemedSelectInRoom.js"
-    );
     const paceChoice = await themedSelectInRoom({
       message: chalk.hex(getTheme().accentColor)("Choose your story pace:"),
       choices: Object.entries(STORY_PACE).map(([key, value]) => ({
