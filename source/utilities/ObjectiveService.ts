@@ -4,6 +4,28 @@ import chalk from "chalk";
 import { sanitizeJsonString } from "./ConsoleService.js";
 import { log } from "./LogService.js";
 import { generateChatNarrative } from "./AIService.js";
+import { StoryPaceOptionsKey } from "./Config.js";
+import Config from "./Config.js";
+
+/**
+ * Helper function to determine if two objectives are similar
+ */
+function isSimilarObjective(obj1: string, obj2: string): boolean {
+  // Normalize both strings
+  const normalize = (str: string) => str.toLowerCase().replace(/[^\w\s]/g, "");
+  const str1 = normalize(obj1);
+  const str2 = normalize(obj2);
+
+  // Check for direct inclusion
+  if (str1.includes(str2) || str2.includes(str1)) return true;
+
+  // Check for significant word overlap (over 60%)
+  const words1 = str1.split(/\s+/).filter((w) => w.length > 3);
+  const words2 = str2.split(/\s+/).filter((w) => w.length > 3);
+  const commonWords = words1.filter((w) => words2.includes(w));
+
+  return commonWords.length >= Math.min(words1.length, words2.length) * 0.6;
+}
 
 /**
  * Extract potential objectives from the intro narrative
@@ -13,30 +35,6 @@ export async function extractInitialObjectives(
   gameState: GameState
 ): Promise<void> {
   try {
-    // Define the function schema for initial objectives
-    const functionsConfig = {
-      functions: [
-        {
-          name: "createInitialObjectives",
-          description: "Create initial objectives based on the narrative",
-          parameters: {
-            type: "object",
-            properties: {
-              objectives: {
-                type: "array",
-                description: "List of 2-3 clear objectives for the player",
-                items: {
-                  type: "string",
-                },
-              },
-            },
-            required: ["objectives"],
-          },
-        },
-      ],
-      function_call: { name: "createInitialObjectives" },
-    };
-
     const response = await generateChatNarrative(
       [
         {
@@ -52,7 +50,7 @@ export async function extractInitialObjectives(
       {
         maxTokens: 150,
         temperature: 0.3,
-        ...functionsConfig,
+        ...Config.OBJECTIVE_FUNCTION_SCHEMAS.initialObjectives,
       }
     );
 
@@ -99,43 +97,40 @@ export async function extractNewObjectives(
   // Don't extract objectives from player choices
   if (narrative.startsWith("Player choice:")) return;
 
+  // Don't add new objectives if we already have too many pending ones
+  if (
+    gameState.getCurrentChapter().pendingObjectives.length >=
+    Config.OBJECTIVE_CONFIG.MAX_PENDING_OBJECTIVES
+  ) {
+    return;
+  }
+
   try {
-    // Define the function schema for new objectives
-    const functionsConfig = {
-      functions: [
-        {
-          name: "updateObjectives",
-          description: "Update objectives based on the narrative",
-          parameters: {
-            type: "object",
-            properties: {
-              newObjectives: {
-                type: "array",
-                description: "New objectives introduced in this narrative",
-                items: {
-                  type: "string",
-                },
-              },
-              completedObjectives: {
-                type: "array",
-                description: "Objectives that were completed in this narrative",
-                items: {
-                  type: "string",
-                },
-              },
-            },
-            required: ["newObjectives", "completedObjectives"],
-          },
-        },
-      ],
-      function_call: { name: "updateObjectives" },
+    // Get current arc for AI context
+    const currentArc = gameState.getCurrentChapter().arc;
+    const narrativeCount = gameState.getNarrativeHistory().length;
+
+    // Base requirements by arc (referenced from enforceStoryRequirements)
+    const arcRequirements = Config.ARC_REQUIREMENTS;
+
+    const requirements = arcRequirements[currentArc] || {
+      minNarrative: 10,
+      minObjectives: 2,
     };
 
     const response = await generateChatNarrative(
       [
         {
           role: "system",
-          content: `Based on the following narrative, identify any new objectives and completed objectives.`,
+          content: `Based on the following narrative, identify any new objectives and completed objectives.
+          IMPORTANT GUIDELINES:
+          - Early in the story, focus on creating clear objectives
+          - As the story progresses, focus more on completing existing objectives rather than creating new ones
+          - Only add critically important new objectives after ${Math.round(
+            requirements.minNarrative / 2
+          )} narrative exchanges
+          - Current narrative count: ${narrativeCount}
+          - Current phase: ${currentArc}`,
         },
         {
           role: "user",
@@ -145,7 +140,7 @@ export async function extractNewObjectives(
       {
         maxTokens: 150,
         temperature: 0.3,
-        ...functionsConfig,
+        ...Config.OBJECTIVE_FUNCTION_SCHEMAS.updateObjectives,
       }
     );
 
@@ -173,9 +168,7 @@ export async function extractNewObjectives(
         ];
 
         if (
-          !existingObjectives.some(
-            (obj) => obj.toLowerCase() === objective.toLowerCase()
-          )
+          !existingObjectives.some((obj) => isSimilarObjective(obj, objective))
         ) {
           gameState.addObjective(objective);
         }
@@ -190,10 +183,8 @@ export async function extractNewObjectives(
         // Find similar objectives by substring matching
         const pendingObjectives =
           gameState.getCurrentChapter().pendingObjectives;
-        const matchingObjective = pendingObjectives.find(
-          (obj) =>
-            obj.toLowerCase().includes(objective.toLowerCase()) ||
-            objective.toLowerCase().includes(obj.toLowerCase())
+        const matchingObjective = pendingObjectives.find((obj) =>
+          isSimilarObjective(obj, objective)
         );
 
         if (matchingObjective) {
@@ -216,31 +207,6 @@ export async function checkObjectiveCompletion(
   try {
     const pendingObjectives = gameState.getCurrentChapter().pendingObjectives;
 
-    // Define the function schema for objective completion
-    const functionsConfig = {
-      functions: [
-        {
-          name: "checkObjectiveCompletion",
-          description:
-            "Check which objectives are completed by the player's choice",
-          parameters: {
-            type: "object",
-            properties: {
-              completedIndices: {
-                type: "array",
-                description: "Indices of completed objectives (zero-based)",
-                items: {
-                  type: "integer",
-                },
-              },
-            },
-            required: ["completedIndices"],
-          },
-        },
-      ],
-      function_call: { name: "checkObjectiveCompletion" },
-    };
-
     const response = await generateChatNarrative(
       [
         {
@@ -257,7 +223,7 @@ export async function checkObjectiveCompletion(
       {
         maxTokens: 100,
         temperature: 0.2,
-        ...functionsConfig,
+        ...Config.OBJECTIVE_FUNCTION_SCHEMAS.checkCompletion,
       }
     );
 
@@ -285,16 +251,62 @@ export async function checkObjectiveCompletion(
         if (index >= 0 && index < pendingObjectives.length) {
           const objective = pendingObjectives[index];
           gameState.completeObjective(objective);
-          console.log(
+          /* console.log(
             chalk
               .hex(getTheme().accentColor)
               .bold(`\n✅ Objective completed: ${objective}`)
-          );
+          ); */
         }
       }
     }
   } catch (e) {
     log(`Failed to check objective completion: ${e}`, "Error");
+  }
+}
+
+export function pruneStaleObjectives(gameState: GameState): void {
+  const currentChapter = gameState.getCurrentChapter();
+  const narrativeCount = gameState.getNarrativeHistory().length;
+
+  // Create a mapping to convert from StoryPaceKey to multiplier
+  const paceMultipliers = {
+    FAST: 0.5,
+    MEDIUM: 1.0,
+    SLOW: 1.5,
+  };
+
+  const paceMultiplier = paceMultipliers[gameState.getStoryPace()] || 1.0;
+
+  // Only prune if we have many objectives and are well into the story
+  // Faster pace means prune earlier (lower threshold)
+  const narrativeThreshold = Math.ceil(
+    Config.OBJECTIVE_CONFIG.PRUNE_NARRATIVE_THRESHOLD * paceMultiplier
+  );
+
+  if (
+    currentChapter.pendingObjectives.length >
+      Config.OBJECTIVE_CONFIG.MIN_OBJECTIVES_FOR_PRUNING &&
+    narrativeCount > narrativeThreshold
+  ) {
+    // Keep more objectives for detailed pace, fewer for fast
+    const toKeep = Math.max(
+      3,
+      Math.ceil(
+        currentChapter.pendingObjectives.length *
+          (Config.OBJECTIVE_CONFIG.OBJECTIVE_RETENTION_RATE / paceMultiplier)
+      )
+    );
+
+    // Remove the oldest objectives (they're likely no longer relevant)
+    while (currentChapter.pendingObjectives.length > toKeep) {
+      const removedObjective = currentChapter.pendingObjectives.shift();
+      if (removedObjective) {
+        // If removeObjective method doesn't exist, you can modify the array directly
+        if (typeof gameState.removeObjective === "function") {
+          gameState.removeObjective(removedObjective);
+        }
+      }
+    }
   }
 }
 
@@ -312,19 +324,30 @@ export function enforceStoryRequirements(gameState: GameState): {
     gameState.getCurrentChapter().completedObjectives.length;
   const requiredElementsMissing: string[] = [];
 
-  // Base requirements by arc
-  const arcRequirements = {
-    introduction: { minNarrative: 5, minObjectives: 1 },
-    "rising-action": { minNarrative: 10, minObjectives: 2 },
-    climax: { minNarrative: 15, minObjectives: 3 },
-    "falling-action": { minNarrative: 20, minObjectives: 4 },
-    resolution: { minNarrative: 25, minObjectives: 5 },
+  // Create a mapping to convert from StoryPaceKey to multiplier
+  const paceMultipliers = {
+    FAST: 0.5,
+    MEDIUM: 1.0,
+    SLOW: 1.5,
   };
 
+  const paceMultiplier = paceMultipliers[gameState.getStoryPace()] || 1.0;
+
   // Get requirements for current arc
-  const requirements = arcRequirements[currentArc] || {
+  const baseRequirements = Config.ARC_REQUIREMENTS[
+    currentArc as keyof typeof Config.ARC_REQUIREMENTS
+  ] || {
     minNarrative: 10,
     minObjectives: 2,
+  };
+
+  // Adjust requirements based on pace
+  const requirements = {
+    minNarrative: Math.ceil(baseRequirements.minNarrative * paceMultiplier),
+    minObjectives: Math.max(
+      1,
+      Math.ceil(baseRequirements.minObjectives * paceMultiplier)
+    ),
   };
 
   // Check for combat encounters in appropriate arcs

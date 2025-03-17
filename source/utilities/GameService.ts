@@ -24,19 +24,20 @@ import {
   secondaryColor,
   pressEnter,
 } from "@utilities/ConsoleService.js";
-import { EnemyMove, IEnemy } from "@utilities/IEnemy.js";
 import {
   getArcGuidelines,
   getChapterTitle,
   validateChapterProgression,
   detectNarrativeLoop,
   getEnhancedAIInstructions,
+  getArcTransitionGuidance,
 } from "@utilities/NarrativeService.js";
 import {
   enforceStoryRequirements,
   extractNewObjectives,
   extractInitialObjectives,
   checkObjectiveCompletion,
+  pruneStaleObjectives,
 } from "@utilities/ObjectiveService.js";
 import { dungeonMinigame } from "@components/DungeonMinigame.js";
 import { analyzePlayerChoice } from "@utilities/CharacterAnalysisService.js";
@@ -45,7 +46,7 @@ import {
   displayRecap,
 } from "@utilities/UIInteractionService.js";
 import { determineNextArc } from "@utilities/NarrativeService.js";
-import Config from "./Config.js";
+import Config, { StoryPaceOptionsKey } from "./Config.js";
 import {
   useItem,
   addItemToInventory,
@@ -53,58 +54,10 @@ import {
 } from "@utilities/InventoryService.js";
 import { showEquipmentMenu } from "@utilities/EquipmentService.js";
 
-/**
- * Define the narrative generation function schema
- */
-const narrativeGenerationFunctionConfig = {
-  functions: [
-    {
-      name: "generateNarrative",
-      description: "Generate the next narrative scene in the adventure",
-      parameters: {
-        type: "object",
-        properties: {
-          narrative: {
-            type: "string",
-            description:
-              "The main narrative content describing the scene, events, and characters",
-          },
-          choices: {
-            type: "array",
-            description:
-              "Exactly 3 choices the player can make, in format: 'Action description'",
-            items: {
-              type: "string",
-            },
-            minItems: 3,
-            maxItems: 3,
-          },
-          specialEvent: {
-            type: "object",
-            description: "Optional special event details",
-            properties: {
-              type: {
-                type: "string",
-                enum: ["combat", "dungeon", "dice_roll", "none"],
-                description: "Type of special event in this narrative",
-              },
-              details: {
-                type: "string",
-                description: "Additional details about the special event",
-              },
-            },
-          },
-        },
-        required: ["narrative", "choices"],
-      },
-    },
-  ],
-  function_call: { name: "generateNarrative" },
-};
+export const STORY_PACE = Config.STORY_PACE_OPTIONS;
 
-/**
- * Function to handle item usage in the main campaign
- */
+export type StoryPaceKey = StoryPaceOptionsKey;
+
 /**
  * Function to handle item usage in the main campaign
  */
@@ -333,7 +286,7 @@ Starting Instructions:
         {
           maxTokens: 2048,
           temperature: 0.8,
-          ...narrativeGenerationFunctionConfig,
+          ...Config.NARRATIVE_GENERATION_SCHEMA,
         }
       );
 
@@ -445,14 +398,15 @@ Starting Instructions:
   // Main narrative loop.
   while (true) {
     try {
-      /*       displayStatusBar(characterData); */
+      pruneStaleObjectives(gameState);
 
       // Check if we should advance to a new chapter
       if (gameState.shouldAdvanceChapter()) {
         const validation = validateChapterProgression(gameState);
 
         if (validation.canProgress) {
-          const nextArc = determineNextArc(gameState.getCurrentChapter().arc);
+          const currentArc = gameState.getCurrentChapter().arc;
+          const nextArc = determineNextArc(currentArc);
           // Get chapter count another way instead of accessing private property
           const currentChapterTitle = gameState.getCurrentChapter().title;
           const chapterMatch = currentChapterTitle.match(/Chapter (\d+):/);
@@ -461,9 +415,15 @@ Starting Instructions:
             : 0;
           const chapterNumber = currentChapterNum + 1;
 
+          // Use the arc transition guidance instead of generic text
+          const transitionGuidance = getArcTransitionGuidance(
+            currentArc,
+            nextArc
+          );
+
           gameState.beginNewChapter(
             `Chapter ${chapterNumber}: ${getChapterTitle(nextArc)}`,
-            `The adventure continues with new challenges and revelations.`,
+            transitionGuidance,
             nextArc
           );
 
@@ -569,7 +529,7 @@ Starting Instructions:
         {
           maxTokens: 500,
           temperature: 0.7,
-          ...narrativeGenerationFunctionConfig,
+          ...Config.NARRATIVE_GENERATION_SCHEMA,
         }
       );
 
@@ -668,7 +628,7 @@ Starting Instructions:
             {
               maxTokens: 500,
               temperature: 0.7,
-              ...narrativeGenerationFunctionConfig,
+              ...Config.NARRATIVE_GENERATION_SCHEMA,
             }
           );
 
@@ -942,6 +902,16 @@ export async function startCampaign(): Promise<void> {
       log("No character data found. Please create a character first.", "Error");
       return;
     }
+    const { themedSelectInRoom } = await import(
+      "@components/ThemedSelectInRoom.js"
+    );
+    const paceChoice = await themedSelectInRoom({
+      message: chalk.hex(getTheme().accentColor)("Choose your story pace:"),
+      choices: Object.entries(STORY_PACE).map(([key, value]) => ({
+        name: `${value.name} - ${value.description}`,
+        value: key,
+      })),
+    });
     if (
       !Array.isArray(characterData.inventory) ||
       characterData.inventory.length === 0
@@ -1019,6 +989,7 @@ export async function startCampaign(): Promise<void> {
     `;
     console.log(test);
     const gameState = new GameState();
+    gameState.setStoryPace(paceChoice as StoryPaceKey);
     await campaignLoop(gameState, characterData);
   } catch (error) {
     log(
