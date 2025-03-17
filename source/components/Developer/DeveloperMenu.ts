@@ -5,22 +5,22 @@ import {
   totalClear,
 } from "@utilities/ConsoleService.js";
 import { getTerm } from "@utilities/LanguageService.js";
-import { flipATable } from "@components/OminousFlip.js";
 import {
   checkPasswordScreen,
   setPasswordScreen,
 } from "@utilities/PasswordService.js";
-import { showSettingsData } from "@components/ShowSettingsData.js";
-import { showLogsMenu } from "@components/ShowLogsMenu.js";
-import { showCharacterData } from "@components/ShowCharacterData.js";
-import { resetDataMenu } from "@components/ResetDataMenu.js";
-import { getDataFromFile } from "@utilities/StorageService.js";
-import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
-import { dungeonMinigame } from "@components/DungeonMinigame.js";
-import { testImageGeneration } from "./TestImageGeneration.js";
 import { handleShopInteraction } from "@utilities/ShopService.js";
 import Config from "@utilities/Config.js";
+import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
+import { showSettingsData } from "./ShowSettingsData.js";
+import { showCharacterData } from "./ShowCharacterData.js";
+import { showLogsMenu } from "./ShowLogsMenu.js";
+import { resetDataMenu } from "./ResetDataMenu.js";
+import { flipATable } from "./OminousFlip.js";
 import { testCombat } from "./TestCombat.js";
+import { getDataFromFile } from "@utilities/StorageService.js";
+import { dungeonMinigame } from "@components/DungeonMinigame.js";
+import { testImageGeneration } from "./TestImageGeneration.js";
 import { testAnimations } from "./TestAnimations.js";
 
 async function _showWorkInProgress() {
