@@ -114,7 +114,7 @@ async function handleItemUsage(characterData: any): Promise<void> {
   ];
 
   const { themedSelectInRoom } = await import(
-    "@components/ThemedSelectInRoom.js"
+    "@components/General/ThemedSelectInRoom.js"
   );
 
   // Show main inventory menu
@@ -904,7 +904,7 @@ export async function startCampaign(): Promise<void> {
       return;
     }
     const { themedSelectInRoom } = await import(
-      "@components/ThemedSelectInRoom.js"
+      "@components/General/ThemedSelectInRoom.js"
     );
     const paceChoice = await themedSelectInRoom({
       message: chalk.hex(getTheme().accentColor)("Choose your story pace:"),

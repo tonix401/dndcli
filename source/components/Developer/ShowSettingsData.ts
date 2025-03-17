@@ -9,7 +9,7 @@ import { primaryColor, totalClear } from "@utilities/ConsoleService.js";
 import { getTerm, Language } from "@utilities/LanguageService.js";
 import { Separator } from "@inquirer/prompts";
 import config from "@utilities/Config.js";
-import { themedSelectInRoom } from "@utilities/ThemedSelectInRoom.js";
+import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
 import { themedInput } from "@components/ThemedInput.js";
 
 const getSettingsOptions = () => {
