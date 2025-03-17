@@ -1,5 +1,5 @@
-import { getEnlargeWindowAscii } from "../resources/generalScreens/enlargeWindowAscii.js";
-import getTitleAscii from "../resources/generalScreens/titleAscii.js";
+import { getEnlargeWindowAscii } from "@resources/generalScreens/enlargeWindowAscii.js";
+import getTitleAscii from "@resources/generalScreens/titleAscii.js";
 import {
   pressEnter,
   secondaryColor,

@@ -4,17 +4,14 @@ import { generateRandomItem } from "@utilities/ItemGenerator.js";
 import { addItemToInventory } from "@utilities/InventoryService.js";
 import { saveDataToFile } from "@utilities/StorageService.js";
 import { primaryColor, secondaryColor } from "@utilities/ConsoleService.js";
-import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
+import { themedSelectInRoom } from "@components/General/ThemedSelectInRoom.js";
 import { pressEnter } from "@utilities/ConsoleService.js";
 import chalk from "chalk";
 
 /**
  * Generate items for a shop based on player level and location
  */
-function generateShopInventory(
-  playerLevel: number,
-  shopType: string = "general"
-): IItem[] {
+function generateShopInventory(playerLevel: number): IItem[] {
   const inventory: IItem[] = [];
   const itemCount = 5 + Math.floor(Math.random() * 5); // 5-10 items
 
@@ -46,12 +43,15 @@ function generateShopInventory(
     inventory.push(item);
   }
 
-  // Add shop-specific specialty items
-  if (shopType === "magic") {
-    // Add magic-focused items
-  } else if (shopType === "blacksmith") {
-    // Add weapons and armor
-  }
+  // TODO: Add more complex items based on shop type
+  /**
+   * Add shop-specific specialty items
+   * if (shopType === "magic") {
+   *   // Add magic-focused items
+   * } else if (shopType === "blacksmith") {
+   *   // Add weapons and armor
+   * }
+   */
 
   return inventory;
 }

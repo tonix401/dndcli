@@ -1,22 +1,22 @@
 import { getTerm } from "@utilities/LanguageService.js";
-import { createCharacterMenu } from "@components/CreateCharacterMenu.js";
-import { inspectCharacter } from "@components/InspectCharacter.js";
+import { createCharacterMenu } from "@components/General/CreateCharacterMenu.js";
+import { inspectCharacter } from "@components/General/InspectCharacter.js";
 import {
   secondaryColor,
   skippableSlowWrite,
   totalClear,
 } from "@utilities/ConsoleService.js";
 import { log } from "@utilities/LogService.js";
-import { settingsMenu } from "@components/SettingsMenu.js";
+import { settingsMenu } from "@components/General/SettingsMenu.js";
 import { setLanguage, setTheme } from "@utilities/CacheService.js";
 import { secretDevMenu } from "@components/DeveloperMenu.js";
-import { inspectInventory } from "@components/InspectInventory.js";
+import { inspectInventory } from "@components/General/InspectInventory.js";
 import { titleScreen } from "@components/TitleScreen.js";
 import Config from "@utilities/Config.js";
 import { getDataFromFile } from "@utilities/StorageService.js";
 import { startCampaign } from "@utilities/GameService.js";
 import { tutorial } from "@components/Tutorial.js";
-import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
+import { themedSelectInRoom } from "@components/General/ThemedSelectInRoom.js";
 import { getErrorMessage } from "@resources/generalScreens/errorMessage.js";
 
 const getMenuOptions = () => [
@@ -123,8 +123,8 @@ export async function exitProgram() {
 main().catch(async (error) => {
   totalClear();
   log("Index: Error in main function, " + error, "Error");
-  console.log(getErrorMessage(error.message || error));
-  process.exit(0);
+  console.log(getErrorMessage(error));
+  process.exit(1);
 });
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -8,11 +8,11 @@ import {
 import { Room, RoomTypes } from "@utilities/DungeonService.js";
 import { getTerm } from "@utilities/LanguageService.js";
 import { log } from "@utilities/LogService.js";
-import getTreasureAscii from "../resources/rooms/treasureAscii.js";
-import getEmptyAscii from "../resources/rooms/emptyAscii.js";
-import getTrapAscii from "../resources/rooms/trapAscii.js";
-import getEnemyAscii from "../resources/rooms/enemyAscii.js";
-import getBossAscii from "../resources/rooms/bossAscii.js";
+import getTreasureAscii from "../../resources/rooms/treasureAscii.js";
+import getEmptyAscii from "../../resources/rooms/emptyAscii.js";
+import getTrapAscii from "../../resources/rooms/trapAscii.js";
+import getEnemyAscii from "../../resources/rooms/enemyAscii.js";
+import getBossAscii from "../../resources/rooms/bossAscii.js";
 import { themedSelect } from "@utilities/MenuService.js";
 import { runCombat } from "src/combat.js";
 import { getDataFromFile, saveDataToFile } from "@utilities/StorageService.js";
@@ -20,9 +20,9 @@ import { getDungeon } from "@utilities/CacheService.js";
 import { generateRandomItem } from "@utilities/ItemGenerator.js";
 import Config from "@utilities/Config.js";
 import getClosedTreasureAscii from "@resources/rooms/closedTreasureAscii.js";
-import { themedInput } from "./ThemedInput.js";
+import { themedInput } from "../General/ThemedInput.js";
 
-const getYesNo = () =>[
+const getYesNo = () => [
   { name: getTerm("yes"), value: true },
   { name: getTerm("no"), value: false },
 ];
