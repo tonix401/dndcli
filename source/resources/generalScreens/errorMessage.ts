@@ -4,8 +4,9 @@ import {
   primaryColor,
   secondaryColor,
 } from "@utilities/ConsoleService.js";
+import { getTerm } from "@utilities/LanguageService.js";
 
-export function getErrorMessage(error: Error) {
+export function getErrorMessage(errorMessage: string) {
   const background = secondaryColor(
     [
       "*******************************************************************************",
@@ -18,7 +19,11 @@ export function getErrorMessage(error: Error) {
     ].join("\n")
   );
 
-  const errorMessage = primaryColor(boxItUp(error.message ?? error));
+  if (errorMessage.length > 55) {
+    errorMessage = errorMessage.split("").slice(0, 55).join("") + "...";
+  }
 
-  return getTextOnBackground(errorMessage, background);
+  errorMessage = "Error: " + errorMessage + "\n" + getTerm("checkTheLogs");
+  const messageBox = primaryColor(boxItUp(errorMessage ?? "Unknown Error"));
+  return getTextOnBackground(messageBox, background);
 }

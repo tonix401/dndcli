@@ -5,7 +5,7 @@ import {
   pressEnter,
   primaryColor,
   secondaryColor,
-  totalClear
+  totalClear,
 } from "@utilities/ConsoleService.js";
 import { rollDiceTotal } from "@utilities/DiceService.js";
 import Config from "@utilities/Config.js";
@@ -16,8 +16,9 @@ import {
 import ICharacter from "@utilities/ICharacter.js";
 import { saveDataToFile } from "@utilities/StorageService.js";
 import { getLanguage } from "@utilities/CacheService.js";
-import { inputValidators, themedInput } from "@utilities/MenuService.js";
+import { inputValidators } from "@utilities/MenuService.js";
 import { themedSelectInRoom } from "./ThemedSelectInRoom.js";
+import { themedInput } from "./ThemedInput.js";
 
 export async function createCharacterMenu(): Promise<void> {
   try {
@@ -25,7 +26,12 @@ export async function createCharacterMenu(): Promise<void> {
 
     // Get character name using themed prompt
     const namePrompt = primaryColor(getTerm("namePrompt"));
-    charData.name = await themedInput({ message: namePrompt,  validate: inputValidators.name });
+    charData.name = await themedInput({
+      message: namePrompt,
+      validate: inputValidators.name,
+      canGoBack: true,
+    });
+    if (charData.name === "goBack") return;
 
     // Get character class
     totalClear();
@@ -49,7 +55,9 @@ export async function createCharacterMenu(): Promise<void> {
       ],
     });
 
-    charData.abilitiesList = Config.START_CHARACTER_ABILITIES[charData.class] || ["default"]
+    charData.abilitiesList = Config.START_CHARACTER_ABILITIES[
+      charData.class
+    ] || ["default"];
 
     if (statMethod === "default") {
       // Map class to default stats if available
@@ -120,7 +128,9 @@ export async function createCharacterMenu(): Promise<void> {
 
     // Set metadata and starting items
     charData.lastPlayed = new Date().toLocaleDateString("de-DE");
-    charData.inventory = getStartingItems(charData.class);
+    const startingItems = getStartingItems(charData.class);
+    charData.inventory = startingItems.inventory;
+    charData.equippedItems = startingItems.equipped;
 
     // Add a random starting currency using a dice roll mechanic.
     // For example, roll 2 six-sided dice and multiply the total by 10 to determine gold coins.
@@ -150,13 +160,38 @@ export async function validateOrigin(origin: string): Promise<string> {
     "You are given a character origin and you have to validate it.\n" +
     "Make sure the origin is not too long and fits the fantasy theme.\n" +
     "If the story is longer then a sentence and fantasy related it is automatically valid.\n" +
-    "If the origin is valid, return only the word 'Valid'.\n" +
-    "If the origin is invalid, return 'Invalid. This origin story is <reason why it's invalid>'.\n" +
-    "You should make jokes and be witty, but dont say more than one or two short sentences\n" +
     "IT IS REALLY IMPORTANT THAT YOU RESPOND IN " +
     getTerm(getLanguage()) +
-    "\nIf the origin story is non existent or giberish do not create your own but explain it in your answer.\n" +
-    "The origin to validate is:";
+    "\n" +
+    "If the origin story is non existent or giberish do not create your own but explain it in your answer.";
+
+  // Define validation function schema
+  const functionsConfig = {
+    functions: [
+      {
+        name: "validateOrigin",
+        description:
+          "Validate if a character origin is appropriate for a fantasy game",
+        parameters: {
+          type: "object",
+          properties: {
+            isValid: {
+              type: "boolean",
+              description: "Whether the origin story is valid",
+            },
+            reason: {
+              type: "string",
+              description:
+                "If invalid, the reason why. Should be witty and brief. MUST BE IN " +
+                getTerm(getLanguage()),
+            },
+          },
+          required: ["isValid"],
+        },
+      },
+    ],
+    function_call: { name: "validateOrigin" },
+  };
 
   const messages: ChatCompletionRequestMessage[] = [
     { role: "system", content: systemMessage },
@@ -167,8 +202,33 @@ export async function validateOrigin(origin: string): Promise<string> {
     const response = await generateChatNarrative(messages, {
       maxTokens: 80,
       temperature: 0.3,
+      ...functionsConfig,
     });
-    return response.trim();
+
+    if (response.function_call?.arguments) {
+      try {
+        const result = JSON.parse(response.function_call.arguments);
+        if (result.isValid) {
+          return "Valid";
+        } else {
+          // Return in the same format you had before
+          return `Invalid. This origin story is ${result.reason}`;
+        }
+      } catch (error) {
+        log(
+          "Create Character Menu: Error parsing function call arguments",
+          "Error"
+        );
+        return "Valid"; // Fallback if JSON parsing fails
+      }
+    }
+
+    // Fallback to text response if function calling fails
+    if (response.content) {
+      return response.content.trim();
+    }
+
+    return "Valid"; // Ultimate fallback XD
   } catch (err) {
     log("Create Character Menu: " + err, "Error");
     return "Valid"; // Fallback in case of AI service failure

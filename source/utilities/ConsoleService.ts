@@ -11,6 +11,7 @@ import fs from "fs-extra";
 import Config from "./Config.js";
 import path from "path";
 import { themedSingleKeyPrompt } from "@utilities/MenuService.js";
+import ansiEscapes from "ansi-escapes";
 
 /**
  * Clears the console completely, without leaving any annoying scroll-up buffer behind
@@ -79,6 +80,7 @@ export async function skippableSlowWrite(
     }
   });
 
+  process.stdout.write(ansiEscapes.cursorHide);
   const ansiPattern = ansiRegex();
   const lines = message.split("\n");
 
@@ -172,7 +174,7 @@ export async function pressEnter(config?: {
       right: true,
     };
   }
-
+  process.stdout.write(ansiEscapes.cursorHide);
   return await themedSingleKeyPrompt({
     message: message,
     keybindings: keybindings,
@@ -577,7 +579,7 @@ export async function playAnimation(
   for (let index = 0; index < loops; index++) {
     for (const frameIndex in parsed.frames) {
       totalClear();
-      // escape character to try and hide the cursor
+      process.stdout.write(ansiEscapes.cursorHide);
       console.log(
         "\u001B[?25l" + secondaryColor(parsed.frames[frameIndex].join("\n"))
       );

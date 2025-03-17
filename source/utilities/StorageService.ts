@@ -2,8 +2,9 @@ import { configDotenv } from "dotenv";
 import Config from "@utilities/Config.js";
 import { log } from "@utilities/LogService.js";
 import fs from "fs-extra";
-import { inputValidators, themedInput } from "@utilities/MenuService.js";
+import { inputValidators } from "@utilities/MenuService.js";
 import { getTerm } from "@utilities/LanguageService.js";
+import { themedInput } from "@components/ThemedInput.js";
 
 const files = {
   character: Config.CHARACTER_FILE,

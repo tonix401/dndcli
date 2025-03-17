@@ -3,6 +3,7 @@ import {
   pressEnter,
   primaryColor,
   totalClear,
+  secondaryColor,
 } from "@utilities/ConsoleService.js";
 import { getTerm } from "@utilities/LanguageService.js";
 import chalk from "chalk";
@@ -24,6 +25,88 @@ import { IEnemy } from "@utilities/IEnemy.js";
 import { getRandomEnemy } from "@utilities/EnemyService.js";
 import { themedSelectInRoom } from "./ThemedSelectInRoom.js";
 import { dungeonMinigame } from "./DungeonMinigame.js";
+import { handleShopInteraction } from "@utilities/ShopService.js";
+import {
+  generateSceneImage,
+  canGenerateImage,
+} from "@utilities/ImageService.js";
+import { themedInput } from "./ThemedInput.js";
+
+// ----------------- Test Image Generation Function -----------------
+
+async function testImageGeneration() {
+  console.log(primaryColor("Testing image generation..."));
+
+  // Check if we can generate images (quota limit)
+  if (!(await canGenerateImage())) {
+    console.log(
+      chalk.redBright("Image generation quota reached. Try again later.")
+    );
+    await pressEnter();
+    return;
+  }
+
+  // Ask for custom prompt or use default
+  const useCustom = await themedSelectInRoom({
+    message: "Choose image prompt source:",
+    choices: [
+      { name: "Use default test prompt", value: "default" },
+      { name: "Enter custom prompt", value: "custom" },
+    ],
+  });
+
+  let prompt =
+    "A medieval fantasy castle on a hill with dragons flying in the sky";
+
+  if (useCustom === "custom") {
+    prompt = await themedInput({
+      message: primaryColor("Enter your image prompt: "),
+    });
+    if (!prompt || prompt.trim().length < 5) {
+      console.log(
+        secondaryColor("Prompt too short, using default prompt instead.")
+      );
+      prompt =
+        "A medieval fantasy castle on a hill with dragons flying in the sky";
+    }
+  }
+
+  console.log(primaryColor("Generating image from prompt:"));
+  console.log(secondaryColor(prompt));
+  console.log(primaryColor("This may take a few moments..."));
+
+  try {
+    const asciiArt = await generateSceneImage(prompt);
+    console.log(chalk.green(asciiArt));
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.log(chalk.redBright(`Error generating image: ${errorMessage}`));
+  }
+
+  await pressEnter();
+}
+
+// ----------------- Test Shop Function -----------------
+
+async function testShop() {
+  let character: ICharacter = getDataFromFile("character");
+  if (!character) {
+    console.log(primaryColor(getTerm("noCharacter")));
+    await pressEnter();
+    return;
+  }
+
+  if (!character.inventory) {
+    const startingItems = getStartingItems(character.class);
+    character.inventory = startingItems.inventory;
+    character.equippedItems = startingItems.equipped;
+  }
+  if (!character.currency) {
+    character.currency = 1000000000;
+  }
+
+  await handleShopInteraction(character);
+}
 
 // ----------------- (Temporary) Test Combat Section -----------------
 
@@ -41,7 +124,9 @@ async function testCombat() {
 
   // Ensure character has required properties
   if (!character.inventory) {
-    character.inventory = getStartingItems(character.class);
+    const startingItems = getStartingItems(character.class);
+    character.inventory = startingItems.inventory;
+    character.equippedItems = startingItems.equipped;
   }
   if (!character.abilities) {
     character.abilities = {
@@ -120,8 +205,16 @@ export async function secretDevMenu() {
       value: "testCombat",
     },
     {
+      name: "Test Shop",
+      value: "testShop",
+    },
+    {
       name: "Test Dungeon",
       value: "testDungeon",
+    },
+    {
+      name: "Test Image Generation",
+      value: "testImage",
     },
     {
       name: getTerm("goBack"),
@@ -169,8 +262,14 @@ export async function secretDevMenu() {
         case "testCombat":
           await testCombat();
           break;
+        case "testShop":
+          await testShop();
+          break;
         case "testDungeon":
           await dungeonMinigame();
+          break;
+        case "testImage":
+          await testImageGeneration();
           break;
         case "goBack":
           return;

@@ -5,6 +5,7 @@ import {
   generateEnemyFromNarrative,
   ChatCompletionRequestMessage,
   summarizeImportantEvents,
+  ChatCompletionResponse,
 } from "@utilities/AIService.js";
 import { rollDice } from "@utilities/DiceService.js";
 import { log } from "@utilities/LogService.js";
@@ -16,6 +17,7 @@ import { getDataFromFile, saveDataToFile } from "@utilities/StorageService.js";
 import { GameState } from "src/gameState.js";
 import { runCombat } from "src/combat.js";
 import { getTerm } from "@utilities/LanguageService.js";
+import { getEquippedStatBonuses } from "@utilities/EquipmentService.js";
 import {
   pause,
   primaryColor,
@@ -29,12 +31,14 @@ import {
   validateChapterProgression,
   detectNarrativeLoop,
   getEnhancedAIInstructions,
+  getArcTransitionGuidance,
 } from "@utilities/NarrativeService.js";
 import {
   enforceStoryRequirements,
   extractNewObjectives,
   extractInitialObjectives,
   checkObjectiveCompletion,
+  pruneStaleObjectives,
 } from "@utilities/ObjectiveService.js";
 import { dungeonMinigame } from "@components/DungeonMinigame.js";
 import { analyzePlayerChoice } from "@utilities/CharacterAnalysisService.js";
@@ -43,7 +47,128 @@ import {
   displayRecap,
 } from "@utilities/UIInteractionService.js";
 import { determineNextArc } from "@utilities/NarrativeService.js";
-import Config from "./Config.js";
+import Config, { StoryPaceOptionsKey } from "./Config.js";
+import {
+  useItem,
+  addItemToInventory,
+  generateLootDrop,
+} from "@utilities/InventoryService.js";
+import { showEquipmentMenu } from "@utilities/EquipmentService.js";
+
+export const STORY_PACE = Config.STORY_PACE_OPTIONS;
+
+export type StoryPaceKey = StoryPaceOptionsKey;
+
+/**
+ * Function to handle item usage in the main campaign
+ */
+async function handleItemUsage(characterData: any): Promise<void> {
+  if (!characterData.inventory || characterData.inventory.length === 0) {
+    console.log(secondaryColor("Your inventory is empty."));
+    await pressEnter();
+    return;
+  }
+
+  // Display current equipped items
+  console.log(primaryColor("\n=== EQUIPPED ITEMS ==="));
+  if (
+    !characterData.equippedItems ||
+    characterData.equippedItems.length === 0
+  ) {
+    console.log(secondaryColor("(No items equipped)"));
+  } else {
+    characterData.equippedItems.forEach((item: any, index: number) => {
+      console.log(
+        primaryColor(`${index + 1}. ${item.name} - ${item.description}`)
+      );
+      // Display item stats if available
+      if (item.stats) {
+        const statsList = Object.entries(item.stats)
+          .map(([stat, value]) => `+${value} ${stat}`)
+          .join(", ");
+        console.log(secondaryColor(`   ${statsList}`));
+      }
+    });
+  }
+
+  console.log(primaryColor("\n=== INVENTORY ==="));
+  characterData.inventory.forEach((item: any, index: number) => {
+    const itemType = item.consumable === false ? "Equipment" : "Consumable";
+    const itemRarity = item.rarity ? `[${item.rarity}]` : "";
+    console.log(
+      primaryColor(
+        `${index + 1}. ${item.name} ${itemRarity} (x${
+          item.quantity
+        }) - ${itemType}`
+      )
+    );
+    console.log(secondaryColor(`   ${item.description}`));
+  });
+  console.log("");
+
+  // Main inventory menu options
+  const menuOptions = [
+    { name: "Use an Item", value: "use" },
+    { name: "Equip/Unequip Items", value: "equip" },
+    { name: "Return to Adventure", value: "return" },
+  ];
+
+  const { themedSelectInRoom } = await import(
+    "@components/ThemedSelectInRoom.js"
+  );
+
+  // Show main inventory menu
+  const menuChoice = await themedSelectInRoom({
+    message: "What would you like to do?",
+    choices: menuOptions,
+  });
+
+  if (menuChoice === "return") {
+    return;
+  }
+
+  if (menuChoice === "equip") {
+    await showEquipmentMenu(characterData);
+    return;
+  }
+
+  // If they chose to use an item, show item selection
+  const inventoryChoices = characterData.inventory.map(
+    (item: any, index: number) => {
+      const consumableText = item.consumable === false ? " (Equipment)" : "";
+      return {
+        name: `${item.name} (x${item.quantity}) - ${item.description}${consumableText}`,
+        value: index,
+      };
+    }
+  );
+
+  // Add back option
+  inventoryChoices.push({
+    name: "Return",
+    value: -1,
+  });
+
+  // Show item selection menu
+  const selectedIdx = await themedSelectInRoom({
+    message: "Choose an item to use:",
+    choices: inventoryChoices,
+  });
+
+  if (selectedIdx === -1) {
+    return; // User selected "Return"
+  }
+
+  // Use the selected item
+  const result = await useItem(characterData, selectedIdx as number);
+  console.log(
+    result.success
+      ? primaryColor(result.message)
+      : secondaryColor(result.message)
+  );
+
+  await pressEnter();
+}
 
 /**
  * Main campaign loop.
@@ -73,10 +198,21 @@ export async function campaignLoop(
       characterData.inventory = getStartingItems(characterData.class);
     }
 
+    const equipBonuses = getEquippedStatBonuses(characterData);
+    const effectiveStats = {
+      maxhp: characterData.abilities.maxhp + (equipBonuses.maxhp || 0),
+      strength: characterData.abilities.strength + (equipBonuses.strength || 0),
+      mana: characterData.abilities.mana + (equipBonuses.mana || 0),
+      dexterity:
+        characterData.abilities.dexterity + (equipBonuses.dexterity || 0),
+      charisma: characterData.abilities.charisma + (equipBonuses.charisma || 0),
+      luck: characterData.abilities.luck + (equipBonuses.luck || 0),
+    };
+
     // Start with an introduction if no narrative yet.
     if (gameState.getNarrativeHistory().length === 0) {
       /*   displayStatusBar(characterData); */
-      const introNarrative = await generateChatNarrative(
+      const introResponse = await generateChatNarrative(
         [
           {
             role: "system",
@@ -103,9 +239,6 @@ Player Actions & In-Game Syntax:
   1.{Search the area}
   2.{Talk to the local}
   3.{Return to main menu}) to indicate the next available actions.
-- This format is critical: the word CHOICES: on its own line, it should only be the word CHOICES:,nothing more and nothing less, followed by exactly three numbered options.
-  - Each choice must start with a number, followed by period, then curly braces with no spaces.
-  - NEVER include choice options directly in your narrative text - they must ONLY appear after the CHOICES: marker.
 
 Character Sheet & Tracking:
 - At the very start of the game, output the full character sheet, including:
@@ -130,7 +263,6 @@ Character Sheet & Tracking:
     )
     .join(", ")}
 - Always update and display the character sheet after each narrative response, including any changes from events, combat, or transactions.
-- Always display additional details such as Proficiency Points, Ability Score Improvements, and Weapon Proficiencies as per AD&D 2e rules.
 
 Rules & Mechanics:
 - Strictly adhere to AD&D 2e rules for all events, combat, and skill checks.
@@ -142,9 +274,6 @@ Response Structure:
 - Begin by outputting the full character sheet and an introductory narrative that sets the scene.
 - In non-combat scenes, conclude with exactly three numbered in-game choices (using curly braces) for what the player can do next.
 - For combat or dungeon sequences, follow the special encounter formatting instructions (i.e., "COMBAT ENCOUNTER:" or "START DUNGEON:") and transition smoothly between scenes once the encounter concludes.
-- This format is critical: the word CHOICES: on its own line, it should only be the word CHOICES:,nothing more and nothing less, followed by exactly three numbered options.
-- Each choice must start with a number, followed by period, then curly braces with no spaces.
-- NEVER include choice options directly in your narrative text - they must ONLY appear after the CHOICES: marker.
 - Please respond in clear, concise ${getTerm(
               getLanguage()
             )} STICK TO THIS LANGUAGE AND DO NOT CHANGE BASED ON THIS.
@@ -155,8 +284,39 @@ Starting Instructions:
           `,
           },
         ],
-        { maxTokens: 500, temperature: 0.8 }
+        {
+          maxTokens: 2048,
+          temperature: 0.8,
+          ...Config.NARRATIVE_GENERATION_SCHEMA,
+        }
       );
+
+      let introNarrative = "";
+      let choices = [];
+
+      // Process response based on whether it used function calling
+      if (introResponse.function_call?.arguments) {
+        try {
+          const args = JSON.parse(introResponse.function_call.arguments);
+          introNarrative = args.narrative;
+          choices = args.choices
+            .map((choice: string, index: number) => `${index + 1}.{${choice}}`)
+            .join("\n");
+        } catch (e) {
+          log(`Error parsing intro function arguments: ${e}`, "Error");
+          // Fall back to content
+          introNarrative = introResponse.content || "";
+        }
+      } else {
+        // Use the traditional content approach
+        introNarrative = introResponse.content || "";
+      }
+
+      // Format for compatibility with existing code
+      if (!introNarrative.includes("CHOICES:") && choices.length > 0) {
+        introNarrative += "\n\nCHOICES:\n" + choices;
+      }
+
       const narrativeParts = introNarrative.split("CHOICES:");
       const storyText = narrativeParts[0].trim();
       console.log("\n" + secondaryColor(storyText) + "\n");
@@ -210,17 +370,44 @@ Starting Instructions:
     return; // Return to prevent further execution
   }
 
+  // Add progress tracking for better player feedback
+  const progressBar = (current: number, max: number): string => {
+    const filledChar = "█";
+    const emptyChar = "░";
+    const percentage = Math.floor((current / max) * 10);
+    return filledChar.repeat(percentage) + emptyChar.repeat(10 - percentage);
+  };
+
+  // Display objective progress when appropriate
+  const showObjectiveProgress = () => {
+    const completedCount =
+      gameState.getCurrentChapter().completedObjectives.length;
+    const totalCount =
+      completedCount + gameState.getCurrentChapter().pendingObjectives.length;
+    if (totalCount > 0) {
+      console.log(
+        chalk.hex(getTheme().accentColor)(
+          `Chapter progress: ${completedCount}/${totalCount} ${progressBar(
+            completedCount,
+            totalCount
+          )}`
+        )
+      );
+    }
+  };
+
   // Main narrative loop.
   while (true) {
     try {
-      /*       displayStatusBar(characterData); */
+      pruneStaleObjectives(gameState);
 
       // Check if we should advance to a new chapter
       if (gameState.shouldAdvanceChapter()) {
         const validation = validateChapterProgression(gameState);
 
         if (validation.canProgress) {
-          const nextArc = determineNextArc(gameState.getCurrentChapter().arc);
+          const currentArc = gameState.getCurrentChapter().arc;
+          const nextArc = determineNextArc(currentArc);
           // Get chapter count another way instead of accessing private property
           const currentChapterTitle = gameState.getCurrentChapter().title;
           const chapterMatch = currentChapterTitle.match(/Chapter (\d+):/);
@@ -229,9 +416,15 @@ Starting Instructions:
             : 0;
           const chapterNumber = currentChapterNum + 1;
 
+          // Use the arc transition guidance instead of generic text
+          const transitionGuidance = getArcTransitionGuidance(
+            currentArc,
+            nextArc
+          );
+
           gameState.beginNewChapter(
             `Chapter ${chapterNumber}: ${getChapterTitle(nextArc)}`,
-            `The adventure continues with new challenges and revelations.`,
+            transitionGuidance,
             nextArc
           );
 
@@ -330,11 +523,71 @@ Starting Instructions:
       const spinner = ora(
         chalk.hex(getTheme().accentColor)("Generating next scene...")
       ).start();
-      let narrative = await generateChatNarrative(messages, {
-        maxTokens: 500,
-        temperature: 0.7,
-      });
+
+      // Generate narrative with function calling
+      const response: ChatCompletionResponse = await generateChatNarrative(
+        messages,
+        {
+          maxTokens: 500,
+          temperature: 0.7,
+          ...Config.NARRATIVE_GENERATION_SCHEMA,
+        }
+      );
+
       spinner.succeed(chalk.hex(getTheme().accentColor)("Scene generated."));
+
+      // Process the response
+      let narrative = "";
+      let specialEvent = { type: "none", details: "" };
+
+      // Check if function calling was used and parse the result
+      if (response.function_call?.arguments) {
+        try {
+          const args = JSON.parse(response.function_call.arguments);
+
+          // Get the narrative content
+          narrative = args.narrative;
+
+          // Process player choices
+          if (args.choices && Array.isArray(args.choices)) {
+            // Add CHOICES: marker and format options as expected
+            narrative +=
+              "\n\nCHOICES:\n" +
+              args.choices
+                .map(
+                  (choice: string, index: number) => `${index + 1}.{${choice}}`
+                )
+                .join("\n");
+          }
+
+          // Extract special event information
+          if (args.specialEvent && args.specialEvent.type !== "none") {
+            specialEvent = args.specialEvent;
+
+            // Add appropriate markers for special events at the beginning of narrative
+            if (
+              specialEvent.type === "combat" &&
+              !narrative.toLowerCase().includes("combat encounter:")
+            ) {
+              narrative = "COMBAT ENCOUNTER: " + narrative;
+            } else if (
+              specialEvent.type === "dungeon" &&
+              !narrative.toLowerCase().includes("start dungeon:")
+            ) {
+              narrative = "START DUNGEON: " + narrative;
+            }
+          }
+        } catch (e) {
+          log(`Error parsing function arguments: ${e}`, "Error");
+          // Fallback to content if function parsing fails
+          narrative = response.content || "Error generating narrative";
+        }
+      } else {
+        // Fallback to regular content if no function call
+        narrative = response.content || "Error generating narrative";
+      }
+
+      // Check for endings and handle them
       if (
         narrative.toLowerCase().includes("the end") ||
         narrative.toLowerCase().includes("congratulations") ||
@@ -364,7 +617,7 @@ Starting Instructions:
           });
 
           // Re-generate without the ending
-          narrative = await generateChatNarrative(
+          const regenerateResponse = await generateChatNarrative(
             [
               ...messages,
               {
@@ -376,8 +629,50 @@ Starting Instructions:
             {
               maxTokens: 500,
               temperature: 0.7,
+              ...Config.NARRATIVE_GENERATION_SCHEMA,
             }
           );
+
+          // Process regenerated response
+          if (regenerateResponse.function_call?.arguments) {
+            try {
+              const args = JSON.parse(
+                regenerateResponse.function_call.arguments
+              );
+              narrative = args.narrative;
+
+              if (args.choices && Array.isArray(args.choices)) {
+                narrative +=
+                  "\n\nCHOICES:\n" +
+                  args.choices
+                    .map(
+                      (choice: string, index: number) =>
+                        `${index + 1}.{${choice}}`
+                    )
+                    .join("\n");
+              }
+
+              if (args.specialEvent && args.specialEvent.type !== "none") {
+                specialEvent = args.specialEvent;
+
+                if (
+                  specialEvent.type === "combat" &&
+                  !narrative.toLowerCase().includes("combat encounter:")
+                ) {
+                  narrative = "COMBAT ENCOUNTER: " + narrative;
+                } else if (
+                  specialEvent.type === "dungeon" &&
+                  !narrative.toLowerCase().includes("start dungeon:")
+                ) {
+                  narrative = "START DUNGEON: " + narrative;
+                }
+              }
+            } catch (e) {
+              narrative = regenerateResponse.content || narrative;
+            }
+          } else {
+            narrative = regenerateResponse.content || narrative;
+          }
         }
       }
 
@@ -394,10 +689,31 @@ Starting Instructions:
       const storyText = narrativeParts[0].trim();
       console.log("\n" + secondaryColor(storyText) + "\n");
 
-      // Handle special encounters
-      if (narrative.toLowerCase().includes("start dungeon:")) {
+      // Handle special encounters based on either narrative text or special event flags
+      if (
+        narrative.toLowerCase().includes("start dungeon:") ||
+        specialEvent.type === "dungeon"
+      ) {
         try {
           await dungeonMinigame();
+          // Add loot drops after dungeons
+          const loot = generateLootDrop(characterData.level);
+          if (loot.length > 0) {
+            console.log(primaryColor("\nYou found some items!"));
+            loot.forEach((item) => {
+              const added = addItemToInventory(characterData, item);
+              if (added) {
+                console.log(
+                  primaryColor(`Found: ${item.name} (${item.rarity})`)
+                );
+              } else {
+                console.log(
+                  secondaryColor("Your inventory is full. Item left behind.")
+                );
+              }
+            });
+            saveDataToFile("character", characterData);
+          }
         } catch (error) {
           log(
             `Error in dungeon minigame: ${
@@ -410,7 +726,10 @@ Starting Instructions:
               "There was an issue with the dungeon. Press Enter to continue your journey...",
           });
         }
-      } else if (narrative.toLowerCase().includes("combat encounter:")) {
+      } else if (
+        narrative.toLowerCase().includes("combat encounter:") ||
+        specialEvent.type === "combat"
+      ) {
         await pressEnter({
           message: "Press Enter when you're ready for combat...",
         });
@@ -441,14 +760,22 @@ Starting Instructions:
             );
             if (Math.random() < 0.5) {
               const newItem = generateRandomItem(Number(characterData.level));
-              console.log(
-                primaryColor(
-                  `You found a new item: ${newItem.name} (Rarity: ${newItem.rarity}).`
-                )
-              );
-              characterData.inventory.push(newItem);
+              const added = addItemToInventory(characterData, newItem);
+              if (added) {
+                console.log(
+                  primaryColor(
+                    `You found a new item: ${newItem.name} (Rarity: ${newItem.rarity}).`
+                  )
+                );
+              } else {
+                console.log(
+                  secondaryColor(
+                    "Your inventory is full. The item was left behind."
+                  )
+                );
+              }
+              saveDataToFile("character", characterData);
             }
-            saveDataToFile("character", characterData);
           }
         } catch (error) {
           log(
@@ -461,7 +788,10 @@ Starting Instructions:
         await pressEnter({
           message: "Press Enter to continue your journey...",
         });
-      } else if (narrative.toLowerCase().includes("roll a d20")) {
+      } else if (
+        narrative.toLowerCase().includes("roll a d20") ||
+        specialEvent.type === "dice_roll"
+      ) {
         console.log(secondaryColor("A dice roll is required..."));
         const [rollResult] = rollDice(20, 1);
         console.log(secondaryColor(`You rolled: ${rollResult}`));
@@ -471,6 +801,23 @@ Starting Instructions:
         });
       }
 
+      // Add shop encounter detection
+      if (
+        narrative.toLowerCase().includes("shop") ||
+        //Temporary removal of merchant detection
+        /*   narrative.toLowerCase().includes("merchant") || */
+        narrative.toLowerCase().includes("store") ||
+        specialEvent.type === "shop"
+      ) {
+        console.log(
+          primaryColor("\nYou've encountered a merchant willing to trade.")
+        );
+        const { handleShopInteraction } = await import(
+          "@utilities/ShopService.js"
+        );
+        await handleShopInteraction(characterData);
+      }
+
       await pressEnter({
         message:
           "Take a moment to reflect on this scene and then choose your next action.",
@@ -478,6 +825,12 @@ Starting Instructions:
       let choice;
       try {
         choice = await promptForChoice(narrative);
+
+        // Check if player selected the inventory option
+        if (choice === "Open Inventory") {
+          await handleItemUsage(characterData);
+          continue;
+        }
       } catch (error) {
         log(
           `Error processing choice: ${
@@ -550,6 +903,16 @@ export async function startCampaign(): Promise<void> {
       log("No character data found. Please create a character first.", "Error");
       return;
     }
+    const { themedSelectInRoom } = await import(
+      "@components/ThemedSelectInRoom.js"
+    );
+    const paceChoice = await themedSelectInRoom({
+      message: chalk.hex(getTheme().accentColor)("Choose your story pace:"),
+      choices: Object.entries(STORY_PACE).map(([key, value]) => ({
+        name: `${value.name} - ${value.description}`,
+        value: key,
+      })),
+    });
     if (
       !Array.isArray(characterData.inventory) ||
       characterData.inventory.length === 0
@@ -561,7 +924,73 @@ export async function startCampaign(): Promise<void> {
     }
 
     console.log(chalk.hex(getTheme().accentColor)("Starting campaign..."));
+    const test = `
+
+
+
+                .. @.....................................................................................................@ ....         
+                .. @@....................................................................................................@ ....         
+                .. ..@...................................................................................................@@. ..         
+                   ..@....................................................................................................@....         
+             ..    @.....................................................................................................@ ....         
+                .  @.@@@.................................................................................................@ ....         
+                . . @. ..................................................................................................@ ....         
+                ...  @@@.................................................................................................@ ....         
+                ..  @@...................................................................................................@  ..          
+                ...  @...................................................................................................@ ....         
+                   .@@@@. @..............................................................................................@ ...     .    
+                        ....................................................................@@...........................@ ...          
+                    .. @..................................................................@@@@@@.........................@ ...      .   
+                    @@ @................................................................@@@@.   @@........................@.  .         
+             .. . @@.@ @...............................................................@   ..     @......................@@. ..         
+               .. @....@...............................................................@  .       @......................@ . ..         
+               .   @...................................................................@        .. @.....................@ . ..         
+                . @@..................................................................@@           @@@...................@ . ..  .      
+                . @@..................................................................@   .    ... .@ @@.................@ . . .        
+  ..             .@@.................................................................@@                 @.................@. ..         
+    .           .....................................................................@@                 @@@..............@@....         
+                ...................................................................@@@@                    @.............@ ....         
+                .................................................................@@@ .  .            .     @@............@ ....         
+                ................................................................@@@.......                  @............@ ....         
+                ..@.............................................................@@@      .                  @@...........@   ..         
+                . @...............................................................@     . .       .          @...........@   ..     .   
+                 .@@.............................................................@@.                  .      @...........@@  ..         
+                 .@...............................................................@  ..                      @............@. ..         
+                 .@...............................................................@@.        .               @@..........@@....         
+                  @@..............................................................@@.                         @..........@.....         
+                 .@@...............................@@@...........................@                             ..........@@ ..       .  
+                ..@............................................................@@                              @..........   ..         
+                . @............................................................    ....             .           ..........@...          
+                . @............................................................@..                              ..........@ . .         
+                . @@...........................................................@  .                            ...........@.. .         
+                . @@@..........................................................@                                .......... ....         
+                . .@............................................................                                @.........@  ..         
+                .  @.............................................................                                @........@  .          
+                .  @.. ........................................................                                  @........@....         
+            .       ....................................................... ...                                  @........ ....         
+                       ....................................................@ ..                                   @........   .         
+                     @. ...................................................@          .                           ...........           
+                   ......................................................@      ......                            .............         
+                ..  @..................................................@@       ....  .                            ........ . .         
+                ..  @......................................... ......@@ ..  .... ...                                ........  .         
+                ..  ..@.@.....................................@....@@    .......  .. ..                              ........           
+                .        .......................................@@    @...........                                   .... ....          
+                        . ...................................@@@  .@...............                              ..  .....   .          
+                          ... . ...........................@@   @..................                                   ....  ..          
+  .                        .. ..........................@@    ......................   ...                            ...    .          
+                           . ........................@   @ @...@....................                                 ....     .         
+        .                     . @@............@@...@@  @....@.......................                                   .                
+        .                         ..............@@    ..............................                                          .         
+                                 ..........@..     @@....@@@@@..............@.......                                          ...       
+           ...         .            @@@@@@@@.  @....@..@@@@@@@@@@@@@@@.@@@@@@@@@@....   .  .   @@        .                              
+                       .  ..      .......@...@@....@. ..................@@...........      .  @..@          ..                          
+                 .  .....@.      @         .....@@. @. @@@..@...........@......@@@..@        ..@@@      .....                           
+      ..  . ..  ... .... .  .. ........  ...@@@@@@@..@..@@@@ @@...@@.@@@@@@.@@@@ ....        ....        .             .. ..  ...       
+    
+    `;
+    console.log(test);
     const gameState = new GameState();
+    gameState.setStoryPace(paceChoice as StoryPaceKey);
     await campaignLoop(gameState, characterData);
   } catch (error) {
     log(

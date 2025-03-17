@@ -1,6 +1,7 @@
 import { rollDice } from "@utilities/DiceService.js";
 import { inventoryMenu } from "@utilities/InventoryService.js";
 import { generateRandomItem } from "@utilities/ItemGenerator.js";
+import { addItemToInventory } from "@utilities/InventoryService.js";
 import ICharacter from "@utilities/ICharacter.js";
 import { IEnemy } from "@utilities/IEnemy.js";
 import { IAbility } from "@utilities/IAbility.js";
@@ -15,6 +16,7 @@ import { saveDataToFile } from "@utilities/StorageService.js";
 import { pause } from "@utilities/ConsoleService.js";
 import { themedSelect } from "@utilities/MenuService.js";
 import { combatStatusSelect } from "@components/CombatStatusSelect.js";
+import { getEquippedStatBonuses } from "@utilities/EquipmentService.js";
 
 interface CombatResult {
   success: boolean;
@@ -22,15 +24,13 @@ interface CombatResult {
 }
 
 function getStrengthBonus(character: ICharacter): number {
-  let bonus = 0;
-  if (character.inventory && Array.isArray(character.inventory)) {
-    for (const item of character.inventory) {
-      if (item.effect === "boostStrength" && item.quantity > 0) {
-        bonus += 2 * item.quantity;
-      }
-    }
-  }
-  return bonus;
+  const equipBonuses = getEquippedStatBonuses(character);
+  return (character.tempStrengthBuff || 0) + (equipBonuses.strength || 0);
+}
+
+function getDexterityBonus(character: ICharacter): number {
+  const equipBonuses = getEquippedStatBonuses(character);
+  return (character.tempDexterityBuff || 0) + (equipBonuses.dexterity || 0);
 }
 
 async function enemyTurn(enemy: IEnemy, character: ICharacter): Promise<void> {
@@ -57,6 +57,14 @@ async function enemyTurn(enemy: IEnemy, character: ICharacter): Promise<void> {
       1
     );
     damage = Math.floor(damage * (move.multiplier || 1));
+
+    // Apply damage reduction if character is defending
+    if (character.isDefending) {
+      damage = Math.floor(damage * 0.5);
+      character.isDefending = false; // Reset defending status
+      console.log(accentColor("Your defensive stance reduces the damage!"));
+    }
+
     character.hp = Math.max(character.hp - damage, 0);
     console.log(
       accentColor(
@@ -65,29 +73,27 @@ async function enemyTurn(enemy: IEnemy, character: ICharacter): Promise<void> {
     );
   } else if (move.type === "defend") {
     enemy.isDefending = true;
-    console.log(
-      accentColor(
-        `\n${enemy.name} is defending, reducing incoming damage this turn!`
-      )
-    );
+    console.log(accentColor(`\n${enemy.name} ${move.description}`));
   } else if (move.type === "scare") {
-    const scareChance = Math.random();
-    if (scareChance > 0.7) {
+    const [enemyRoll] = rollDice(20, 1);
+    const resistRoll =
+      character.abilities.charisma + Math.floor(character.abilities.luck / 2);
+    if (enemyRoll > resistRoll) {
+      character.losesTurn = true;
       console.log(
         accentColor(
-          `\n${enemy.name}'s taunt terrifies you! You lose your next turn!`
+          `\n${enemy.name}'s ${move.name} terrifies you! You'll lose your next turn.`
         )
       );
-      character.losesTurn = true;
     } else {
       console.log(
         accentColor(
-          `\n${enemy.name} tries to scare you, but you remain unfazed!`
+          `\n${enemy.name} tries to scare you with ${move.name}, but you resist!`
         )
       );
     }
   } else if (move.type === "heal") {
-    const healAmount = move.healAmount || 10;
+    const healAmount = move.healAmount || 5;
     enemy.hp = Math.min(enemy.hp + healAmount, enemy.maxhp || 10);
     console.log(accentColor(`\n${enemy.name} heals for ${healAmount} HP!`));
   }
@@ -112,7 +118,11 @@ export async function runCombat(
     }>;
   }
 ): Promise<CombatResult> {
+  // Reset temporary combat buffs
+  character.tempStrengthBuff = 0;
+  character.tempDexterityBuff = 0;
   character.losesTurn = false;
+  character.isDefending = false;
 
   totalClear();
   console.log(
@@ -166,10 +176,14 @@ export async function runCombat(
         await useAbility(character, enemy);
         break;
       case "Item":
-        await inventoryMenu(character);
+        await useCombatItem(character, enemy);
         break;
       case "Run":
-        await tryToRunAway(character);
+        const runResult = await tryToRunAway(character);
+        if (runResult && runResult.fled) {
+          return runResult;
+        }
+        break;
     }
 
     if (enemy.hp > 0) {
@@ -192,6 +206,27 @@ export async function runCombat(
   character.xp = character.xp + xpReward;
   console.log(accentColor(`Victory! You gained ${xpReward} XP.`));
 
+  // Generate loot using the imported generateRandomItem function
+  if (Math.random() < 0.7) {
+    const lootItem = generateRandomItem(character.level);
+    const added = addItemToInventory(character, lootItem);
+
+    if (added) {
+      console.log(accentColor(`\n💰 You found: ${lootItem.name}!`));
+      console.log(primaryColor(`   "${lootItem.description}"`));
+      if (lootItem.rarity) {
+        console.log(primaryColor(`   Rarity: ${lootItem.rarity}`));
+      }
+    } else {
+      console.log(
+        accentColor(
+          `\n💰 You found ${lootItem.name}, but your inventory is full!`
+        )
+      );
+    }
+    saveDataToFile("character", character);
+  }
+
   const xpThreshold = character.level * 100;
   if (character.xp >= xpThreshold) {
     character.level = character.level + 1;
@@ -209,20 +244,6 @@ export async function runCombat(
     character.xp = character.xp - xpThreshold;
   }
 
-  // Award an item reward with a 50% chance.
-  if (Math.random() < 0.5) {
-    const newItem = generateRandomItem(character.level);
-    console.log(
-      accentColor(
-        `\nYou found a new item: ${newItem.name} (Rarity: ${newItem.rarity}).`
-      )
-    );
-    character.inventory.push(newItem);
-  }
-
-  // Save updated character data.
-  saveDataToFile("character", character);
-
   await pressEnter();
   return { success: true, fled: false };
 }
@@ -232,16 +253,26 @@ export async function runCombat(
  */
 async function doAttack(character: ICharacter, enemy: IEnemy): Promise<void> {
   await playAnimation("attack.json");
-  const [playerRoll] = rollDice(4, 1);
-  const critMultiplier = playerRoll === 4 ? 2 : 1;
+  const [attackRoll] = rollDice(20, 1);
   const strengthBonus = getStrengthBonus(character);
-  const tempBuff = character.tempStrengthBuff || 0;
-  character.tempStrengthBuff = 0;
-  const baseDamage =
-    character.abilities.strength + playerRoll + strengthBonus + tempBuff;
-  const damage = Math.floor(baseDamage * critMultiplier);
-  console.log(accentColor(`\nYou attack and deal ${damage} damage.`));
-  enemy.hp -= damage;
+
+  let damage =
+    character.abilities.strength + strengthBonus + Math.floor(attackRoll / 5);
+
+  // Check if enemy is defending
+  if (enemy.isDefending) {
+    damage = Math.floor(damage * 0.5);
+    console.log(accentColor("The enemy's defense reduces your damage!"));
+    enemy.isDefending = false;
+  }
+
+  enemy.hp = Math.max(enemy.hp - damage, 0);
+  console.log(
+    accentColor(
+      `\nYou attack ${enemy.name} for ${damage} damage! (Attack roll: ${attackRoll})`
+    )
+  );
+  await pressEnter();
 }
 
 /**
@@ -261,84 +292,119 @@ async function doDefend(character: ICharacter): Promise<void> {
  */
 async function useAbility(character: ICharacter, enemy: IEnemy): Promise<void> {
   if (!character.abilitiesList || character.abilitiesList.length === 0) {
-    console.log(primaryColor("You have no abilities available!"));
+    console.log(accentColor("\nYou don't have any special abilities yet."));
     await pressEnter();
     return;
   }
-  const choices = character.abilitiesList.map(
-    (ability: IAbility, index: number) => ({
-      name: `${ability.name} (Cost: ${ability.manaCost} mana) - ${ability.description}`,
-      value: index,
-    })
-  );
-  const abilityIndexOrGoBack: string = (
-    await themedSelect({
-      canGoBack: true,
-      message: "Choose an ability to use:",
-      choices: choices,
-    })
-  ).toString();
 
-  if (abilityIndexOrGoBack === "goBack") {
-    return;
-  }
+  const abilities = character.abilitiesList.map((ability) => {
+    return {
+      name: `${ability.name} (Mana: ${ability.manaCost}) - ${ability.description}`,
+      value: ability,
+    };
+  });
 
-  const chosenAbility: IAbility =
-    character.abilitiesList[Number(abilityIndexOrGoBack)];
-  if (character.abilities.mana < chosenAbility.manaCost) {
-    console.log(accentColor("Not enough mana!"));
-    await pressEnter();
+  const selectedAbility = await themedSelect<IAbility>({
+    message: "Choose an ability to use:",
+    choices: abilities,
+  });
+
+  // Check if the selected ability is actually the cancel option
+  if (!selectedAbility || selectedAbility === (null as unknown as IAbility))
     return;
-  }
-  character.abilities.mana -= chosenAbility.manaCost;
-  if (chosenAbility.type === "attack") {
-    const [playerRoll] = rollDice(4, 1);
-    const strengthBonus = getStrengthBonus(character);
-    const tempBuff = character.tempStrengthBuff || 0;
-    character.tempStrengthBuff = 0;
-    const baseDamage =
-      character.abilities.strength + playerRoll + strengthBonus + tempBuff;
-    const damage = Math.floor(baseDamage * (chosenAbility.multiplier || 1));
+
+  if (
+    selectedAbility.manaCost > 0 &&
+    character.abilities.mana < selectedAbility.manaCost
+  ) {
     console.log(
-      accentColor(`\nYou use ${chosenAbility.name} and deal ${damage} damage.`)
+      accentColor("\nYou don't have enough mana to use that ability.")
     );
-    enemy.hp -= damage;
-  } else if (chosenAbility.type === "heal") {
-    const healAmount = chosenAbility.healAmount || 0;
+    await pressEnter();
+    return;
+  }
+
+  character.abilities.mana -= selectedAbility.manaCost;
+
+  if (selectedAbility.type === "attack") {
+    const [abilityRoll] = rollDice(20, 1);
+    let damage =
+      character.abilities.strength +
+      Math.floor(abilityRoll / 3) +
+      Math.floor(character.abilities.mana / 2);
+    damage = Math.floor(damage * (selectedAbility.multiplier || 1));
+    enemy.hp = Math.max(enemy.hp - damage, 0);
+    console.log(
+      accentColor(
+        `\nYou use ${selectedAbility.name} on ${enemy.name} for ${damage} damage!`
+      )
+    );
+  } else if (selectedAbility.type === "heal") {
+    const healAmount = selectedAbility.healAmount || 0;
     character.hp = Math.min(
       character.hp + healAmount,
       character.abilities.maxhp
     );
     console.log(
       accentColor(
-        `\nYou use ${chosenAbility.name} and restore ${healAmount} HP.`
+        `\nYou use ${selectedAbility.name} and heal for ${healAmount} HP.`
       )
     );
-  } else if (chosenAbility.type === "buff") {
-    const buff = chosenAbility.buffAmount || 0;
+  } else if (selectedAbility.type === "buff") {
+    const buffAmount = selectedAbility.buffAmount || 0;
+    character.tempStrengthBuff = (character.tempStrengthBuff || 0) + buffAmount;
     console.log(
       accentColor(
-        `\nYou use ${chosenAbility.name} and gain a temporary +${buff} strength boost for your next attack.`
+        `\nYou use ${selectedAbility.name} and gain +${buffAmount} strength for this battle.`
       )
     );
-    character.tempStrengthBuff = buff;
   }
-  await pause(1000);
+
+  await pressEnter();
+}
+
+/**
+ * Use items in combat with the imported inventoryMenu function
+ */
+async function useCombatItem(
+  character: ICharacter,
+  enemy: IEnemy
+): Promise<void> {
+  // Use the imported inventoryMenu function instead of custom implementation
+  // Pass true to indicate we're in combat (if your inventoryMenu accepts this parameter)
+  await inventoryMenu(character, true);
+
+  // Save character data after using the item
+  saveDataToFile("character", character);
+  await pressEnter();
 }
 
 /**
  * Try to run away from combat.
  * This has a chance to succeed based on the character's dexterity.
  */
-async function tryToRunAway(character: ICharacter) {
-  await playAnimation("running.json");
-  const [runRoll] = rollDice(20, 1);
-  const escapeChance = runRoll + character.abilities.dexterity;
-  if (escapeChance > 15) {
-    console.log(accentColor("\nYou manage to escape from combat!"));
-    await pressEnter();
+async function tryToRunAway(
+  character: ICharacter
+): Promise<CombatResult | void> {
+  console.log(accentColor("\nYou try to escape..."));
+  await pause(1000);
+
+  const dexterityBonus = getDexterityBonus(character);
+  const [escapeRoll] = rollDice(20, 1);
+
+  // Calculate escape chance using dexterity + bonuses
+  const escapeChance =
+    character.abilities.dexterity +
+    dexterityBonus +
+    Math.floor(character.abilities.luck / 2);
+
+  if (escapeRoll + escapeChance > 15) {
+    console.log(accentColor("\nYou managed to escape!"));
+    await pause(1000);
     return { success: false, fled: true };
   } else {
-    console.log(accentColor("\nYou fail to escape!"));
+    console.log(accentColor("\nYou failed to escape!"));
+    await pause(1000);
+    return; // Return undefined since the escape failed and combat continues
   }
 }

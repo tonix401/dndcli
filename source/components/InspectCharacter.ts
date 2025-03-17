@@ -12,6 +12,7 @@ import {
 import chalk from "chalk";
 import { getTerm } from "@utilities/LanguageService.js";
 import { getDataFromFile } from "@utilities/StorageService.js";
+import { getEquippedStatBonuses } from "@utilities/EquipmentService.js";
 
 export async function inspectCharacter() {
   totalClear();
@@ -29,19 +30,35 @@ export async function inspectCharacter() {
     0
   );
 
+  const equipBonuses = getEquippedStatBonuses(charData);
+
   // Define title and body texts
   const title = `${charData.name} - ${getTerm("level")} ${
     charData.level
   } ${getTerm(charData.class)}`;
 
   const bodyArray: [string, string][] = [
-    [getTerm("hp"), `${charData.hp} / ${charData.abilities.maxhp}`],
+    [
+      getTerm("hp"),
+      `${charData.hp} / ${
+        charData.abilities.maxhp + (equipBonuses.maxhp || 0)
+      }`,
+    ],
     [getTerm("xp"), `${charData.xp}`],
-    [getTerm("strength"), `${charData.abilities.strength}`],
-    [getTerm("mana"), `${charData.abilities.mana}`],
-    [getTerm("dexterity"), `${charData.abilities.dexterity}`],
-    [getTerm("charisma"), `${charData.abilities.charisma}`],
-    [getTerm("luck"), `${charData.abilities.luck}`],
+    [
+      getTerm("strength"),
+      `${charData.abilities.strength} + ${equipBonuses.strength || 0}`,
+    ],
+    [getTerm("mana"), `${charData.abilities.mana} + ${equipBonuses.mana || 0}`],
+    [
+      getTerm("dexterity"),
+      `${charData.abilities.dexterity} + ${equipBonuses.dexterity || 0}`,
+    ],
+    [
+      getTerm("charisma"),
+      `${charData.abilities.charisma} + ${equipBonuses.charisma || 0}`,
+    ],
+    [getTerm("luck"), `${charData.abilities.luck} + ${equipBonuses.luck || 0}`],
     [getTerm("items"), `${inventorySum}`],
     [getTerm("lastPlayed"), `${charData.lastPlayed}`],
   ];

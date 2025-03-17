@@ -13,13 +13,14 @@ import getEmptyAscii from "../resources/rooms/emptyAscii.js";
 import getTrapAscii from "../resources/rooms/trapAscii.js";
 import getEnemyAscii from "../resources/rooms/enemyAscii.js";
 import getBossAscii from "../resources/rooms/bossAscii.js";
-import { themedInput, themedSelect } from "@utilities/MenuService.js";
+import { themedSelect } from "@utilities/MenuService.js";
 import { runCombat } from "src/combat.js";
 import { getDataFromFile, saveDataToFile } from "@utilities/StorageService.js";
 import { getDungeon } from "@utilities/CacheService.js";
 import { generateRandomItem } from "@utilities/ItemGenerator.js";
 import Config from "@utilities/Config.js";
 import getClosedTreasureAscii from "@resources/rooms/closedTreasureAscii.js";
+import { themedInput } from "./ThemedInput.js";
 
 const getYesNo = () =>[
   { name: getTerm("yes"), value: true },

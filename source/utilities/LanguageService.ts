@@ -71,6 +71,11 @@ const terms: Record<string, ITerm> = {
     en: "Save and go back",
     ch: "Spichere und zrugg",
   },
+  checkTheLogs: {
+    de: "Überprüfe die Logs für weitere Informationen",
+    en: "Check the logs for more information",
+    ch: "Überprüef d'Logs für meh Informatione",
+  },
   // #endregion
 
   // #region Setup + Tutorial
@@ -202,24 +207,24 @@ const terms: Record<string, ITerm> = {
 
   // #region Character Classes
   swordsman: {
-    de: "⚔️ Schwertkämpfer",
-    en: "⚔️ Sword fighter",
-    ch: "⚔️ Schwärtchämpfer",
+    de: "Schwertkämpfer",
+    en: "Sword fighter",
+    ch: "Schwärtchämpfer",
   },
   archer: {
-    de: "🏹 Bogenschütze",
-    en: "🏹 Archer",
-    ch: "🏹 Bogeschütz",
+    de: "Bogenschütze",
+    en: "Archer",
+    ch: "Bogeschütz",
   },
   mage: {
-    de: "🧙 Magier",
-    en: "🧙 Mage",
-    ch: "🧙 Zauberer",
+    de: "Magier",
+    en: "Mage",
+    ch: "Zauberer",
   },
   thief: {
-    de: "🗡️ Dieb",
-    en: "🗡️ Thief",
-    ch: "🗡️ Dieb",
+    de: "Dieb",
+    en: "Thief",
+    ch: "Dieb",
   },
   // #endregion
 
@@ -358,6 +363,126 @@ const terms: Record<string, ITerm> = {
     de: "Anzahl",
     en: "Quantity",
     ch: "Azahl",
+  },
+  // Item types
+  type: {
+    de: "Typ",
+    en: "Type",
+    ch: "Typ",
+  },
+  unknown: {
+    de: "Unbekannt",
+    en: "Unknown",
+    ch: "Unbekannt",
+  },
+  consumable: {
+    de: "Verbrauchsgegenstand",
+    en: "Consumable",
+    ch: "Verbruuchsgegestand",
+  },
+  weapon: {
+    de: "Waffe",
+    en: "Weapon",
+    ch: "Waffe",
+  },
+  armor: {
+    de: "Rüstung",
+    en: "Armor",
+    ch: "Rüschtig",
+  },
+
+  // Equipment actions
+  equip: {
+    de: "Ausrüsten",
+    en: "Equip",
+    ch: "Usrüschte",
+  },
+  unequip: {
+    de: "Ablegen",
+    en: "Unequip",
+    ch: "Ablege",
+  },
+  use: {
+    de: "Benutzen",
+    en: "Use",
+    ch: "Benutze",
+  },
+  slot: {
+    de: "Slot",
+    en: "Slot",
+    ch: "Slot",
+  },
+
+  // Inventory messages
+  inventoryFull: {
+    de: "Dein Inventar ist voll",
+    en: "Your inventory is full",
+    ch: "Dis Inventar isch voll",
+  },
+  itemAdded: {
+    de: "Gegenstand hinzugefügt",
+    en: "Item added",
+    ch: "Gegestand hinzuegfüegt",
+  },
+  itemEquipped: {
+    de: "Gegenstand ausgerüstet",
+    en: "Item equipped",
+    ch: "Gegestand usgrüschtet",
+  },
+  itemUnequipped: {
+    de: "Gegenstand abgelegt",
+    en: "Item unequipped",
+    ch: "Gegestand abgleit",
+  },
+  itemUsed: {
+    de: "Gegenstand benutzt",
+    en: "Item used",
+    ch: "Gegestand brucht",
+  },
+  noEffect: {
+    de: "Keine Wirkung",
+    en: "No effect",
+    ch: "Kei Wirkig",
+  },
+  requiredLevel: {
+    de: "Benötigtes Level",
+    en: "Required Level",
+    ch: "Benötigts Level",
+  },
+  damage: {
+    de: "Schaden",
+    en: "Damage",
+    ch: "Schade",
+  },
+  defense: {
+    de: "Verteidigung",
+    en: "Defense",
+    ch: "Verteidigung",
+  },
+  equipment: {
+    de: "Ausrüstung",
+    en: "Equipment",
+    ch: "Usrüstig",
+  },
+  statBonuses: {
+    de: "Statusboni",
+    en: "Stat bonuses",
+    ch: "Statusboni",
+  },
+  usage: {
+    de: "Verwendung",
+    en: "Usage",
+    ch: "Verwendig",
+  },
+  gold: {
+    de: "Gold",
+    en: "Gold",
+    ch: "Gold",
+  },
+  value: {
+    de: "Wert",
+    en: "Value",
+    ch: "Wert",
   },
   // #endregion
 

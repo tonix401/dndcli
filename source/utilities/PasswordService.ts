@@ -2,8 +2,8 @@ import crypto from "crypto";
 import { getTerm } from "@utilities/LanguageService.js";
 import { getPassword, setPassword } from "@utilities/CacheService.js";
 import { primaryColor, totalClear } from "@utilities/ConsoleService.js";
-import { themedInput, themedPassword } from "@utilities/MenuService.js";
 import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
+import { themedPasswordInput } from "@components/ThemedPasswordInput.js";
 
 /**
  * A Screen to check for a password
@@ -11,9 +11,15 @@ import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
  * @returns If the password was correct
  */
 export async function checkPasswordScreen(attempts: number) {
-  const passwordToCheck = await themedPassword({
+  totalClear();
+  const passwordToCheck = await themedPasswordInput({
     message: getTerm("enterPassword"),
+    canGoBack: true,
   });
+
+  if (passwordToCheck === "goBack") {
+    return false;
+  }
 
   const passwordToCheckHash = crypto
     .createHash("sha256")
@@ -45,10 +51,10 @@ export async function setPasswordScreen() {
   let resultPassword = "";
 
   do {
-    const newPassword = await themedInput({
+    const newPassword = await themedPasswordInput({
       message: getTerm("choosePassword"),
     });
-    const confirmPassword = await themedInput({
+    const confirmPassword = await themedPasswordInput({
       message: getTerm("confirmPassword"),
     });
 

@@ -1,3 +1,5 @@
+import { StoryPaceKey } from "./GameService.js";
+
 export interface ConversationMessage {
   role: "system" | "user" | "assistant";
   content: string;
@@ -16,6 +18,12 @@ export interface Chapter {
   completedObjectives: string[];
   pendingObjectives: string[];
   characters: string[];
+  locations: string[];
+  metadata: {
+    lastIntent?: string;
+    lastTone?: string;
+    [key: string]: any;
+  };
 }
 
 export interface Character {
@@ -44,6 +52,8 @@ export interface IGameState {
   characterTraits: CharacterTrait[];
   themes: Set<string>;
   maxHistoryItems?: number;
+  storyPace: StoryPaceKey;
+  [key: string]: any;
 }
 
 //TODO: Migration in progress
