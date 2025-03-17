@@ -2,10 +2,10 @@ import { OpenAI } from "openai";
 import dotenv from "dotenv";
 import ICharacter from "@utilities/ICharacter.js";
 import { GameState } from "src/gameState.js";
-import { detectNarrativeLoop } from "./NarrativeService.js";
-import { enforceStoryRequirements } from "./ObjectiveService.js";
-import { sanitizeJsonString } from "./ConsoleService.js";
-import { log } from "./LogService.js";
+import { detectNarrativeLoop } from "@utilities/NarrativeService.js";
+import { enforceStoryRequirements } from "@utilities/ObjectiveService.js";
+import { sanitizeJsonString } from "@utilities/ConsoleService.js";
+import { log } from "@utilities/LogService.js";
 
 export interface ChatCompletionRequestMessage {
   role: "system" | "user" | "assistant";

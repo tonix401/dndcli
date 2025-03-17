@@ -37,7 +37,7 @@ import {
 import { getDataFromFile } from "@utilities/StorageService.js";
 import ansiEscapes from "ansi-escapes";
 import chalk from "chalk";
-import { holdMyText } from "./DungeonMovementSelect.js";
+import { holdMyText } from "@components/DungeonMovementSelect.js";
 import { PartialDeep } from "@inquirer/type";
 
 const enemyAscii = [

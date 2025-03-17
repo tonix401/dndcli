@@ -1,11 +1,14 @@
 import { GameState } from "src/gameState.js";
-import { log } from "./LogService.js";
-import { sanitizeJsonString } from "./ConsoleService.js";
-import { pressEnter } from "./ConsoleService.js";
-import { themedSelect } from "./MenuService.js";
-import { generateChatNarrative, ChatCompletionResponse } from "./AIService.js";
-import { primaryColor, secondaryColor } from "./ConsoleService.js";
+import { log } from "@utilities/LogService.js";
+import { sanitizeJsonString } from "@utilities/ConsoleService.js";
+import { pressEnter } from "@utilities/ConsoleService.js";
+import { themedSelect } from "@utilities/MenuService.js";
+import { primaryColor, secondaryColor } from "@utilities/ConsoleService.js";
 import chalk from "chalk";
+import {
+  ChatCompletionResponse,
+  generateChatNarrative,
+} from "@utilities/AIService.js";
 
 /**
  * Extracts choices from narrative text and prompts the user to select one.

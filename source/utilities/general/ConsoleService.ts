@@ -12,6 +12,7 @@ import Config from "./Config.js";
 import path from "path";
 import { themedSingleKeyPrompt } from "@utilities/MenuService.js";
 import ansiEscapes from "ansi-escapes";
+import { IAnimation } from "@utilities/IAnimation.js";
 
 /**
  * Clears the console completely, without leaving any annoying scroll-up buffer behind
@@ -564,7 +565,7 @@ export async function playAnimation(
     throw new Error("No data found in file");
   }
 
-  const parsed = JSON.parse(data);
+  const parsed: IAnimation = JSON.parse(data);
 
   if (!parsed.frames || !parsed.frameTime || !Array.isArray(parsed.frames)) {
     throw new Error(
@@ -579,9 +580,9 @@ export async function playAnimation(
   for (let index = 0; index < loops; index++) {
     for (const frameIndex in parsed.frames) {
       totalClear();
-      process.stdout.write(ansiEscapes.cursorHide);
       console.log(
-        "\u001B[?25l" + secondaryColor(parsed.frames[frameIndex].join("\n"))
+        ansiEscapes.cursorHide +
+          secondaryColor(parsed.frames[frameIndex].join("\n"))
       );
       await pause(parsed.frameTime);
     }

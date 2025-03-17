@@ -1,23 +1,29 @@
 import { getTerm } from "@utilities/LanguageService.js";
-import { createCharacterMenu } from "@components/General/CreateCharacterMenu.js";
-import { inspectCharacter } from "@components/General/InspectCharacter.js";
+import { createCharacterMenu } from "@components/CreateCharacterMenu.js";
+import { inspectCharacter } from "@components/InspectCharacter.js";
 import {
-  secondaryColor,
+  primaryColor,
   skippableSlowWrite,
   totalClear,
 } from "@utilities/ConsoleService.js";
 import { log } from "@utilities/LogService.js";
-import { settingsMenu } from "@components/General/SettingsMenu.js";
-import { setLanguage, setTheme } from "@utilities/CacheService.js";
+import { settingsMenu } from "@components/SettingsMenu.js";
+import {
+  getLanguage,
+  getPassword,
+  getTheme,
+  setLanguage,
+  setTheme,
+} from "@utilities/CacheService.js";
 import { secretDevMenu } from "@components/DeveloperMenu.js";
-import { inspectInventory } from "@components/General/InspectInventory.js";
+import { inspectInventory } from "@components/InspectInventory.js";
 import { titleScreen } from "@components/TitleScreen.js";
-import Config from "@utilities/Config.js";
-import { getDataFromFile } from "@utilities/StorageService.js";
 import { startCampaign } from "@utilities/GameService.js";
 import { tutorial } from "@components/Tutorial.js";
-import { themedSelectInRoom } from "@components/General/ThemedSelectInRoom.js";
+import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
 import { getErrorMessage } from "@resources/generalScreens/errorMessage.js";
+import { getDataFromFile, saveDataToFile } from "@utilities/StorageService.js";
+import Config from "@utilities/Config.js";
 
 const getMenuOptions = () => [
   { name: getTerm("createCharacter"), value: "createChar" },
@@ -35,53 +41,48 @@ const getMenuOptions = () => [
  * @param choice The choice made by the user in the menu
  */
 async function handleMenuChoice(choice: string) {
-  try {
-    switch (choice) {
-      case "createChar":
-        log("Index: Creating new Character");
-        await createCharacterMenu();
-        break;
-      case "inspectChar":
-        log("Index: Inspecting Character");
-        await inspectCharacter();
-        break;
-      case "startCampaign":
-        log("Index: Campaign Start");
-        await startCampaign();
-        break;
-      case "settings":
-        log("Index: Opening Settings");
-        await settingsMenu();
-        break;
-      case "devMenu":
-        await secretDevMenu();
-        break;
-      case "inspectInv":
-        await inspectInventory();
-        break;
-      case "tutorial":
-        await tutorial(false);
-        break;
-      case "goBack":
-        totalClear();
-        const isSure = await themedSelectInRoom({
-          message: getTerm("confirmExit"),
-          choices: [
-            { name: getTerm("yes"), value: "yes" },
-            { name: getTerm("no"), value: "goBack" },
-          ],
-          canGoBack: true,
-          default: "goBack",
-        });
-        if (isSure === "yes") {
-          await exitProgram();
-        }
-      default:
-        log("Index: Unexpected menu choice", "Error");
-    }
-  } catch (error) {
-    await exitProgram();
-    log("Index/handleMenuChoices: User force closed the prompt", "Warn ");
+  switch (choice) {
+    case "createChar":
+      log("Index: Creating new Character");
+      await createCharacterMenu();
+      break;
+    case "inspectChar":
+      log("Index: Inspecting Character");
+      await inspectCharacter();
+      break;
+    case "startCampaign":
+      log("Index: Campaign Start");
+      await startCampaign();
+      break;
+    case "settings":
+      log("Index: Opening Settings");
+      await settingsMenu();
+      break;
+    case "devMenu":
+      await secretDevMenu();
+      break;
+    case "inspectInv":
+      await inspectInventory();
+      break;
+    case "tutorial":
+      await tutorial(false);
+      break;
+    case "goBack":
+      totalClear();
+      const isSure = await themedSelectInRoom({
+        message: getTerm("confirmExit"),
+        choices: [
+          { name: getTerm("yes"), value: "yes" },
+          { name: getTerm("no"), value: "goBack" },
+        ],
+        canGoBack: true,
+        default: "goBack",
+      });
+      if (isSure === "yes") {
+        await exitProgram();
+      }
+    default:
+      log("Index: Unexpected menu choice", "Error");
   }
 }
 
@@ -111,11 +112,16 @@ async function main() {
 /**
  * Exits the program and clears the console
  */
-export async function exitProgram() {
+async function exitProgram() {
   totalClear();
   log("Index: Program ended");
-  await skippableSlowWrite(secondaryColor(getTerm("goodbye")));
-  process.exit(0);
+  saveDataToFile("settings", {
+    language: getLanguage(),
+    theme: getTheme(),
+    password: getPassword(),
+  });
+  await skippableSlowWrite(primaryColor(getTerm("goodbye")));
+  process.exit(1);
 }
 
 ///////////////////////////////////////////// MAIN PROGRAM /////////////////////////////////////////////////

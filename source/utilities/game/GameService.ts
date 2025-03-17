@@ -47,7 +47,7 @@ import {
   displayRecap,
 } from "@utilities/UIInteractionService.js";
 import { determineNextArc } from "@utilities/NarrativeService.js";
-import Config, { StoryPaceOptionsKey } from "./Config.js";
+import Config, { StoryPaceOptionsKey } from "@utilities/Config.js";
 import {
   useItem,
   addItemToInventory,
@@ -114,7 +114,7 @@ async function handleItemUsage(characterData: any): Promise<void> {
   ];
 
   const { themedSelectInRoom } = await import(
-    "@components/General/ThemedSelectInRoom.js"
+    "@components/ThemedSelectInRoom.js"
   );
 
   // Show main inventory menu
@@ -904,7 +904,7 @@ export async function startCampaign(): Promise<void> {
       return;
     }
     const { themedSelectInRoom } = await import(
-      "@components/General/ThemedSelectInRoom.js"
+      "@components/ThemedSelectInRoom.js"
     );
     const paceChoice = await themedSelectInRoom({
       message: chalk.hex(getTheme().accentColor)("Choose your story pace:"),

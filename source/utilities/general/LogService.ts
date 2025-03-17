@@ -11,7 +11,7 @@ export type LogTypes = "Info " | "Warn " | "Error";
 
 /**
  * Logs a formatted message to the log.txt file, depending on the log levels set in the config.
- * The log message is prefixed with the current time and the log type. 
+ * The log message is prefixed with the current time and the log type.
  * @param message The log message
  * @param logType The type of log, default is "Info"
  * @see LogTypes: "Info ", "Warn ", "Error"

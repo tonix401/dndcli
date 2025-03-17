@@ -34,12 +34,15 @@
       "@root/*": ["./source/../../*"],
 
       "@components/*": [
-        "./components/*",
-        "./components/Developer/*",
-        "./components/Game/*",
-        "./components/General/*"
+        "./components/developer/*",
+        "./components/game/*",
+        "./components/general/*"
       ],
-      "@utilities/*": ["./utilities/*", "./types/*"],
+      "@utilities/*": [
+        "./types/*",
+        "./utilities/general/*",
+        "./utilities/game/*"
+      ],
       "@resources/*": ["./resources/*"],
       // this is even more stupid, but it works too
       "@storage/*": ["./source/../storage/*"]

@@ -1,7 +1,7 @@
 import { GameState } from "src/gameState.js";
-import { generateChatNarrative, ChatCompletionResponse } from "./AIService.js";
-import { sanitizeJsonString } from "./ConsoleService.js";
-import { log } from "./LogService.js";
+import { generateChatNarrative, ChatCompletionResponse } from "@utilities/AIService.js";
+import { sanitizeJsonString } from "@utilities/ConsoleService.js";
+import { log } from "@utilities/LogService.js";
 
 /**
  * Analyzes player choices to extract key information for game state
