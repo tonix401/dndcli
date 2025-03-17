@@ -3,7 +3,11 @@ import path from "path";
 import fs from "fs";
 import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
 import { getTerm } from "@utilities/LanguageService.js";
-import { playAnimation } from "@utilities/ConsoleService.js";
+import {
+  playAnimation,
+  pressEnter,
+  totalClear,
+} from "@utilities/ConsoleService.js";
 import { getErrorMessage } from "@resources/generalScreens/errorMessage.js";
 import { log } from "@utilities/LogService.js";
 
@@ -19,6 +23,7 @@ export async function testAnimations() {
   const files = getFilesInDir(dir);
 
   while (true) {
+    totalClear();
     const aniChoice = await themedSelectInRoom({
       message: getTerm("Animations"),
       choices: [
@@ -42,7 +47,8 @@ export async function testAnimations() {
       }
     } catch (error) {
       log("TestAnimations: Error playing animation: " + error);
-      console.log(getErrorMessage("Error playing animation: " + error));
+      console.log(getErrorMessage(error as string));
+      await pressEnter();
     }
   }
 }
