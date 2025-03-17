@@ -35,20 +35,20 @@ export async function testAnimations() {
       ],
     });
 
-    try {
-      if (aniChoice === "goBack") {
-        return;
-      } else if (aniChoice === "all") {
-        for (const file of files) {
-          await playAnimation(file);
-        }
-      } else {
-        await playAnimation(aniChoice);
+    if (aniChoice === "goBack") {
+      return;
+    } else if (aniChoice === "all") {
+      for (const file of files) {
+        await playAnimation(file);
       }
-    } catch (error) {
-      log("TestAnimations: Error playing animation: " + error);
-      console.log(getErrorMessage(error as string));
-      await pressEnter();
+    } else {
+      try {
+        await playAnimation(aniChoice);
+      } catch (error) {
+        log("TestAnimations: Error playing animation: " + error);
+        console.log(getErrorMessage(error as string));
+        await pressEnter();
+      }
     }
   }
 }

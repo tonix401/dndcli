@@ -1,23 +1,42 @@
-## DNDCLI
 
-Programmieren Projekt
+# DnD-CLI
+
+### Authors
+
+- [@tonix401](https://github.com/tonix401) (Tom W.)
+- [@akoSiThaesler](https://github.com/akoSiThaesler) (Julian T.)
 
 ### Description
+A fantasy text adventure game, with following cool features
 
-Programmieren Projekt von Julian Thaesler und Tom Weise, TIF24B
+  Character creation and management
+- Combat system with turn-based mechanics
+- Inventory and equipment management
+- Dungeon exploration
+- AI-generated narrative content with OpenAI integration
+- Story progression with chapter-based objectives
+- Game state persistence across sessions
+- Multiple language support (English, German, Swiss German)
+- Customizable themes and visual elements
+- Developer tools for testing game components
+- Implementations of ascii art
 
-### Installation
+### Setup and Execution
 
-```batch
-npm run setup
+After cloning, install dependencies and Compile TS to JS
+
+```bash
+  npm run setup
 ```
 
-### Usage
+Start the game
 
-```batch
-npm run start
+```bash
+  npm run start
 ```
 
-### License
+### Let's get rollin'
+![test](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdXo5cGg4eHpmZTZqYmtkcWJmdHMzZWozNHMyZDd4dHd4c2NsN2ZsNSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/3oriNPdeu2W1aelciY/giphy.gif)
 
+### Licence
 [MIT](https://choosealicense.com/licenses/mit/)
