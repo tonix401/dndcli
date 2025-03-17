@@ -39,7 +39,7 @@
         "./components/general/*"
       ],
       "@utilities/*": [
-        "./types/*",
+        "./utilities/types/*",
         "./utilities/general/*",
         "./utilities/game/*"
       ],

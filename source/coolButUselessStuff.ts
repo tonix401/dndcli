@@ -4,7 +4,7 @@ import ora from "ora";
 import fetch from "node-fetch";
 import { log } from "@utilities/LogService.js";
 import fs from "fs-extra";
-import { themedInput } from "@components/General/ThemedInput.js";
+import { themedInput } from "@components/ThemedInput.js";
 
 try {
   const text = (await themedInput({ message: "Text eingeben: " })).trim();
