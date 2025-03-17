@@ -102,7 +102,7 @@ async function testShop() {
     character.equippedItems = startingItems.equipped;
   }
   if (!character.currency) {
-    character.currency = 100;
+    character.currency = 1000000000;
   }
 
   await handleShopInteraction(character);

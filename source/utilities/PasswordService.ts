@@ -11,11 +11,13 @@ import { themedPasswordInput } from "@components/ThemedPasswordInput.js";
  * @returns If the password was correct
  */
 export async function checkPasswordScreen(attempts: number) {
+  totalClear();
   const passwordToCheck = await themedPasswordInput({
     message: getTerm("enterPassword"),
+    canGoBack: true,
   });
 
-  if(passwordToCheck === "goBack") {
+  if (passwordToCheck === "goBack") {
     return false;
   }
 
