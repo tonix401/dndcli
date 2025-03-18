@@ -1,20 +1,14 @@
-import Config from "@utilities/Config.js";
-import fs from "fs";
-import path from "path";
+import { shopSelect } from "@components/ShopSelect.js";
 
 async function test() {
   ///////////////////////
 
-  const dir = path.join(Config.RESOURCES_DIR, "animations");
-
-  function getFilesInDir(dir: string) {
-    return fs.readdirSync(dir).filter((file) => {
-      return fs.statSync(path.join(dir, file)).isFile();
-    });
-  }
-
-  const files = getFilesInDir(dir);
-  console.log(files);
+  console.log(
+    await shopSelect({
+      message: "test",
+      choices: ["awefvcesrbhgsfdbhfad", "bagrefsfdszvbad", "cavfrvvdsvadsvzcx", "aafndiaslvnbinjcvoljzcx", "bpq3gk[idsafasd", "cagcdfgsagq3gtfqt4gh"],
+    })
+  );
 
   /////////////////////////
 }

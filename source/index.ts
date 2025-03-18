@@ -121,7 +121,7 @@ async function exitProgram() {
     password: getPassword(),
   });
   await skippableSlowWrite(primaryColor(getTerm("goodbye")));
-  process.exit(1);
+  process.exit(0);
 }
 
 ///////////////////////////////////////////// MAIN PROGRAM /////////////////////////////////////////////////
@@ -130,7 +130,7 @@ main().catch(async (error) => {
   totalClear();
   log("Index: Error in main function, " + error, "Error");
   console.log(getErrorMessage(error));
-  process.exit(1);
+  process.exit(0);
 });
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////

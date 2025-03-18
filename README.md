@@ -9,7 +9,7 @@
 ### Description
 A fantasy text adventure game, with following cool features
 
-  Character creation and management
+- Character creation and management
 - Combat system with turn-based mechanics
 - Inventory and equipment management
 - Dungeon exploration

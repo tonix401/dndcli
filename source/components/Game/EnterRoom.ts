@@ -15,10 +15,7 @@ import getEnemyAscii from "@resources/rooms/enemyAscii.js";
 import getBossAscii from "@resources/rooms/bossAscii.js";
 import { themedSelect } from "@utilities/MenuService.js";
 import { runCombat } from "src/combat.js";
-import {
-  getDataFromFile,
-  saveDataToFile,
-} from "@utilities/StorageService.js";
+import { getDataFromFile, saveDataToFile } from "@utilities/StorageService.js";
 import { getDungeon } from "@utilities/CacheService.js";
 import Config from "@utilities/Config.js";
 import getClosedTreasureAscii from "@resources/rooms/closedTreasureAscii.js";
@@ -116,7 +113,7 @@ async function enemyRoom(room: Room) {
   console.log(getEnemyAscii());
   console.log(primaryColor(getTerm("enemyRoomDiscovered")));
 
-  await themedInput({ message: getTerm("enterToFight") });
+  await pressEnter({ message: getTerm("enterToFight") });
 
   const character = getDataFromFile("character");
   const enemy =
@@ -150,7 +147,7 @@ async function bossRoom(room: Room) {
   console.log(getBossAscii());
   console.log(primaryColor(getTerm("enemyRoomDiscovered")));
 
-  await themedInput({ message: getTerm("enterToFight") });
+  await pressEnter({ message: getTerm("enterToFight") });
 
   const character = getDataFromFile("character");
   const enemy =

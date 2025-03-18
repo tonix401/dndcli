@@ -1,12 +1,9 @@
 import { getDungeon, setDungeon } from "@utilities/CacheService.js";
 import {
-  boxItUp,
-  getTextOnBackground,
   totalClear,
 } from "@utilities/ConsoleService.js";
 import {
   Dungeon,
-  getDungeonMapVisual,
   initiateDungeonMapWithHallways,
   Room,
 } from "@utilities/DungeonService.js";
