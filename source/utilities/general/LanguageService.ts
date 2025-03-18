@@ -739,6 +739,16 @@ const terms: Record<string, ITerm> = {
     en: "Flip",
     ch: "Flip",
   },
+  animations: {
+    de: "Animationen",
+    en: "Animations",
+    ch: "Animatione",
+  },
+  playAll: {
+    de: "Alle abspielen",
+    en: "Play all",
+    ch: "Alli abspiele",
+  },
   // lets hope we don't ever get to see this one :)
   undefined: {
     de: "undefined",
@@ -847,9 +857,9 @@ const terms: Record<string, ITerm> = {
     ch: "Du hesch en Ruum mit eme Gegner entdeckt",
   },
   enterToFight: {
-    de: "Drücke [Enter], um den Kampf zu beginnen",
-    en: "Press [Enter] to start the fight",
-    ch: "Drück [Enter] zum de Kampf starte",
+    de: `Drücke [${arrowRight}] oder [Enter], um den Kampf zu beginnen`,
+    en: `Press [${arrowRight}] or [Enter] to start the fight`,
+    ch: `Drück [${arrowRight}] oder [Enter] zum de Kampf starte`,
   },
   chestRoomDiscovered: {
     de: "Du hast eine Schatzkiste entdeckt",

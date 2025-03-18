@@ -54,28 +54,40 @@ export const dungeonMovementSelect = createPrompt(
       } else {
         switch (key.name) {
           case "up":
-            if (north) {
+            if (north && direction === "north") {
+              done("north");
+              setStatus("done");
+            } else if (north) {
               setDirection("north");
             } else {
               setDirection("neutral");
             }
             break;
           case "down":
-            if (south) {
+            if (south && direction === "south") {
+              done("south");
+              setStatus("done");
+            } else if (south) {
               setDirection("south");
             } else {
               setDirection("neutral");
             }
             break;
           case "left":
-            if (west) {
+            if (west && direction === "west") {
+              done("west");
+              setStatus("done");
+            } else if (west) {
               setDirection("west");
             } else {
               setDirection("neutral");
             }
             break;
           case "right":
-            if (east) {
+            if (east && direction === "east") {
+              done("east");
+              setStatus("done");
+            } else if (east) {
               setDirection("east");
             } else {
               setDirection("neutral");

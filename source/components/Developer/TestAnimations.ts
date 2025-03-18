@@ -25,12 +25,12 @@ export async function testAnimations() {
   while (true) {
     totalClear();
     const aniChoice = await themedSelectInRoom({
-      message: getTerm("Animations"),
+      message: getTerm("animations"),
       choices: [
         ...files.map((file: string) => {
           return { name: file.replace(".json", ""), value: file };
         }),
-        { name: getTerm("all"), value: "all" },
+        { name: getTerm("playAll"), value: "all" },
         { name: getTerm("goBack"), value: "goBack" },
       ],
     });

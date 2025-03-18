@@ -9,7 +9,10 @@ import {
   pressEnter,
   primaryColor,
   secondaryColor,
+  totalClear,
 } from "@utilities/ConsoleService.js";
+import { shopSelect } from "@components/ShopSelect.js";
+import { getTerm } from "@utilities/LanguageService.js";
 
 /**
  * Generate items for a shop based on player level and location
@@ -73,32 +76,29 @@ function getSellValue(item: IItem): number {
 export async function handleShopInteraction(
   character: ICharacter
 ): Promise<void> {
-  if (!character.currency) {
-    character.currency = 0;
-  }
+  character.currency ??= 0;
 
   // Generate shop inventory
   const shopInventory = generateShopInventory(character.level);
-
-  let exitShop = false;
-  while (!exitShop) {
+  while (true) {
+    totalClear();
     console.log(accentColor("\n=== MERCHANT SHOP ==="));
     console.log(primaryColor(`Gold: ${character.currency}`));
 
     const options = [
       { name: "Buy Items", value: "buy" },
       { name: "Sell Items", value: "sell" },
-      { name: "Leave Shop", value: "exit" },
+      { name: "Leave Shop", value: "goBack" },
     ];
 
-    const action = await themedSelectInRoom({
+    const action = await shopSelect({
       message: "What would you like to do?",
       choices: options,
+      canGoBack: true,
     });
 
-    if (action === "exit") {
-      exitShop = true;
-      continue;
+    if (action === "goBack") {
+      break;
     }
 
     if (action === "buy") {
@@ -120,25 +120,29 @@ async function handleBuyItems(
   character: ICharacter,
   shopInventory: IItem[]
 ): Promise<void> {
-  const buyChoices = shopInventory.map((item, index) => {
-    return {
-      name: `${item.name} (${item.rarity}) - ${item.description} - ${item.value} gold`,
-      value: index,
-    };
-  });
+  totalClear();
+  const buyChoices = shopInventory.map(
+    (item, index): { name: string; value: number | "goBack" } => {
+      return {
+        name: `${item.name} (${item.rarity}) - ${item.description} - ${item.value} gold`,
+        value: index,
+      };
+    }
+  );
 
-  buyChoices.push({ name: "Go Back", value: -1 });
+  buyChoices.push({ name: getTerm("goBack"), value: "goBack" });
 
   const selectedIndex = await themedSelectInRoom({
     message: `Your gold: ${character.currency}. What would you like to buy?`,
     choices: buyChoices,
+    canGoBack: true,
   });
 
-  if (selectedIndex === -1) {
+  if (selectedIndex === "goBack") {
     return;
   }
 
-  const selectedItem = shopInventory[selectedIndex];
+  const selectedItem = shopInventory[selectedIndex as number];
 
   // Check if player can afford it
   if (character.currency < (selectedItem.value || 0)) {
@@ -171,6 +175,7 @@ async function handleBuyItems(
  * Handle selling items
  */
 async function handleSellItems(character: ICharacter): Promise<void> {
+  totalClear();
   if (!character.inventory || character.inventory.length === 0) {
     console.log(
       secondaryColor("Your inventory is empty. You have nothing to sell.")
@@ -179,22 +184,25 @@ async function handleSellItems(character: ICharacter): Promise<void> {
     return;
   }
 
-  const sellChoices = character.inventory.map((item, index) => {
-    const sellValue = getSellValue(item);
-    return {
-      name: `${item.name} (x${item.quantity}) - Sell for ${sellValue} gold each`,
-      value: index,
-    };
-  });
+  const sellChoices = character.inventory.map(
+    (item, index): { name: string; value: number | "goBack" } => {
+      const sellValue = getSellValue(item);
+      return {
+        name: `${item.name} (x${item.quantity}) - Sell for ${sellValue} gold each`,
+        value: index,
+      };
+    }
+  );
 
-  sellChoices.push({ name: "Go Back", value: -1 });
+  sellChoices.push({ name: getTerm("goBack"), value: "goBack" });
 
   const selectedIndex = await themedSelectInRoom({
     message: "What would you like to sell?",
     choices: sellChoices,
+    canGoBack: true,
   });
 
-  if (selectedIndex === -1) {
+  if (selectedIndex === "goBack") {
     return;
   }
 
