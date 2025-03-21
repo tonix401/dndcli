@@ -153,6 +153,7 @@ export async function runCombat(
     console.log(accentColor("\nYour turn!"));
     await pause(800);
 
+    totalClear();
     const combatAction = await combatStatusSelect({
       message: "Choose your combat action:",
       choices: [
