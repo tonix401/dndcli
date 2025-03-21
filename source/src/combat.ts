@@ -152,7 +152,6 @@ export async function runCombat(
 
     console.log(accentColor("\nYour turn!"));
     await pause(800);
-
     totalClear();
     const combatAction = await combatStatusSelect({
       message: "Choose your combat action:",
@@ -164,9 +163,12 @@ export async function runCombat(
         { name: "Run Away", value: "Run" },
       ],
       enemy: enemy,
+      canGoBack: true
     });
 
     switch (combatAction) {
+      case "goBack":
+        return { success: false, fled: true };
       case "Attack":
         await doAttack(character, enemy);
         break;

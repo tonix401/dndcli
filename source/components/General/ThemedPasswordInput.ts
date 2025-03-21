@@ -1,9 +1,4 @@
-import {
-  createPrompt,
-  useState,
-  useKeypress,
-  isEnterKey,
-} from "@inquirer/core";
+import { createPrompt, useState, useKeypress } from "@inquirer/core";
 import ansiEscapes from "ansi-escapes";
 import {
   boxItUp,
@@ -16,6 +11,7 @@ import { getTheme } from "@utilities/CacheService.js";
 import { getRandomItemFromArray } from "@utilities/ThemingService.js";
 import getPasswordBackground from "@resources/generalScreens/passwordBackground.js";
 import chalk from "chalk";
+import { isBackKey, isConfirmKey, isRightKey } from "@utilities/MenuService.js";
 
 type PasswordConfig = {
   message: string;
@@ -31,11 +27,11 @@ export const themedPasswordInput = createPrompt<string, PasswordConfig>(
     const message = primaryColor(config.message);
 
     useKeypress(async (key, rl) => {
-      if (isEnterKey(key) || key.name === "right") {
+      if (isConfirmKey(key) || isRightKey(key)) {
         const answer = value;
         setValue(answer);
         done(answer);
-      } else if (key.name === "left" && canGoBack) {
+      } else if (isBackKey(key) && canGoBack) {
         done("goBack");
       } else {
         const newValue = rl.line;

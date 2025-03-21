@@ -1,7 +1,5 @@
 import { getDungeon, setDungeon } from "@utilities/CacheService.js";
-import {
-  totalClear,
-} from "@utilities/ConsoleService.js";
+import { totalClear } from "@utilities/ConsoleService.js";
 import {
   Dungeon,
   initiateDungeonMapWithHallways,
@@ -14,18 +12,27 @@ import { dungeonMovementSelect } from "./DungeonMovementSelect.js";
  * Dungeon minigame.
  */
 export async function dungeonMinigame() {
-  setDungeon(initiateDungeonMapWithHallways());
+  if (!getDungeon()) {
+    setDungeon(initiateDungeonMapWithHallways());
+  }
+
   while (true) {
     const dungeon = getDungeon();
     let currentRoom = dungeon.rooms[dungeon.player.y][dungeon.player.x];
 
     totalClear();
-    await movePlayerMenu(currentRoom, dungeon);
+    const wantsToLeave =
+      (await movePlayerMenu(currentRoom, dungeon)) === "goBack";
 
     currentRoom = dungeon.rooms[dungeon.player.y][dungeon.player.x];
     await enterRoom(currentRoom);
 
     setDungeon(dungeon);
+
+    if (wantsToLeave) {
+      totalClear();
+      break;
+    }
   }
 }
 
@@ -33,15 +40,21 @@ export async function dungeonMinigame() {
  * Shows the movement menu for the player.
  * @returns Whether the user wants to go back.
  */
-async function movePlayerMenu(currentRoom: Room, dungeon: Dungeon) {
+async function movePlayerMenu(
+  currentRoom: Room,
+  dungeon: Dungeon
+): Promise<void | "goBack"> {
   const chosenDirection = await dungeonMovementSelect({
     north: currentRoom.hallways.north,
     south: currentRoom.hallways.south,
     west: currentRoom.hallways.west,
     east: currentRoom.hallways.east,
+    canGoBack: true,
   });
 
   switch (chosenDirection) {
+    case "goBack":
+      return "goBack";
     case "north":
       dungeon.player.y -= 1;
       break;

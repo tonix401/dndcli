@@ -6,9 +6,6 @@ import {
   useRef,
   useMemo,
   useEffect,
-  isEnterKey,
-  isUpKey,
-  isDownKey,
   Separator,
   ValidationError,
   type Status,
@@ -23,9 +20,14 @@ import {
 } from "@utilities/ConsoleService.js";
 import {
   Choice,
+  isDownKey,
+  isConfirmKey,
   isSelectable,
+  isUpKey,
   normalizeChoices,
   NormalizedChoice,
+  isBackKey,
+  isRightKey,
 } from "@utilities/MenuService.js";
 import ansiEscapes from "ansi-escapes";
 import chalk from "chalk";
@@ -101,10 +103,10 @@ export const shopSelect = createPrompt(
     useKeypress((key, rl) => {
       clearTimeout(searchTimeoutRef.current);
 
-      if (isEnterKey(key) || key.name === "right") {
+      if (isConfirmKey(key)|| isRightKey(key)) {
         setStatus("done");
         done(selectedChoice.value);
-      } else if (canGoBack && key.name === "left") {
+      } else if (canGoBack && isBackKey(key)) {
         setStatus("done");
         done("goBack" as Value);
       } else if (isUpKey(key) || isDownKey(key)) {

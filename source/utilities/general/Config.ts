@@ -40,6 +40,9 @@ const CONTEXT_FILE = path.join(STORAGE_DIR, "context.json");
 // Game state file path
 const GAME_STATE_FILE = path.join(STORAGE_DIR, "gamestate.json");
 
+// Dungeon data file path
+const DUNGEON_FILE = path.join(STORAGE_DIR, "dungeon.json");
+
 // Animation frames file path (e.g., for attack animations)
 const ATTACK_FRAMES_FILE = path.join(
   RESOURCES_DIR,
@@ -901,6 +904,7 @@ export default {
   ATTACK_FRAMES_FILE,
   SOURCE_DIR,
   RESOURCES_DIR,
+  DUNGEON_FILE,
 
   // Strings
   SELECT_SEPARATOR,

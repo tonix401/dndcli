@@ -4,9 +4,7 @@ import {
   useKeypress,
   useRef,
   useEffect,
-  isEnterKey,
   type Status,
-  isSpaceKey,
 } from "@inquirer/core";
 import {
   alignText,
@@ -22,8 +20,22 @@ import { getDataFromFile } from "@utilities/StorageService.js";
 import { getTerm } from "@utilities/LanguageService.js";
 import Config from "@utilities/Config.js";
 import { getDungeonMapVisual } from "@utilities/DungeonService.js";
+import {
+  isBackKey,
+  isConfirmKey,
+  isDownKey,
+  isLeftKey,
+  isRightKey,
+  isUpKey,
+} from "@utilities/MenuService.js";
 
-type Direction = "north" | "south" | "east" | "west" | "neutral";
+type DungeonMovementSelectResult =
+  | "north"
+  | "south"
+  | "east"
+  | "west"
+  | "neutral"
+  | "goBack";
 
 /**
  * A modified version of the @inquirer/prompts select that uses arrow keys to navigate and select options.
@@ -36,26 +48,33 @@ export const dungeonMovementSelect = createPrompt(
       east?: boolean;
       south?: boolean;
       west?: boolean;
+      canGoBack?: boolean;
     },
-    done: (value: Direction) => void
+    done: (value: DungeonMovementSelectResult) => void
   ) => {
-    const { north = true, east = true, south = true, west = true } = config;
+    const {
+      north = true,
+      east = true,
+      south = true,
+      west = true,
+      canGoBack = false,
+    } = config;
     const [status, setStatus] = useState<Status>("idle");
-    const [direction, setDirection] = useState<Direction>("neutral");
+    const [direction, setDirection] =
+      useState<DungeonMovementSelectResult>("neutral");
     const searchTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
-
     useKeypress((key, rl) => {
       clearTimeout(searchTimeoutRef.current);
 
-      if ((isEnterKey(key) || isSpaceKey(key)) && direction !== "neutral") {
+      if ((isConfirmKey(key)) && direction !== "neutral") {
         rl.clearLine(0);
         setStatus("done");
         done(direction);
       } else {
-        switch (key.name) {
-          case "up":
+        switch (true) {
+          case isUpKey(key):
             if (north && direction === "north") {
-              done("north");
+              done(direction);
               setStatus("done");
             } else if (north) {
               setDirection("north");
@@ -63,9 +82,9 @@ export const dungeonMovementSelect = createPrompt(
               setDirection("neutral");
             }
             break;
-          case "down":
+          case isDownKey(key):
             if (south && direction === "south") {
-              done("south");
+              done(direction);
               setStatus("done");
             } else if (south) {
               setDirection("south");
@@ -73,9 +92,9 @@ export const dungeonMovementSelect = createPrompt(
               setDirection("neutral");
             }
             break;
-          case "left":
+          case isLeftKey(key):
             if (west && direction === "west") {
-              done("west");
+              done(direction);
               setStatus("done");
             } else if (west) {
               setDirection("west");
@@ -83,15 +102,20 @@ export const dungeonMovementSelect = createPrompt(
               setDirection("neutral");
             }
             break;
-          case "right":
+          case isRightKey(key):
             if (east && direction === "east") {
-              done("east");
+              done(direction);
               setStatus("done");
             } else if (east) {
               setDirection("east");
             } else {
               setDirection("neutral");
             }
+            break;
+          // isBackKey(key) also checks for key.name === "left", but because we already check for the case isLeftKey(key) above, we dont need to worry about it
+          case isBackKey(key) && canGoBack:
+            setStatus("done");
+            done("goBack");
             break;
         }
       }
@@ -158,7 +182,7 @@ export const dungeonMovementSelect = createPrompt(
  * @example
  */
 export function getCardinals(
-  direction: Direction,
+  direction: DungeonMovementSelectResult,
   north: boolean,
   east: boolean,
   south: boolean,
