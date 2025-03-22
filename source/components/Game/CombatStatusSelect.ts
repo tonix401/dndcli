@@ -6,9 +6,6 @@ import {
   useRef,
   useMemo,
   useEffect,
-  isEnterKey,
-  isUpKey,
-  isDownKey,
   Separator,
   ValidationError,
   type Status,
@@ -29,7 +26,12 @@ import { IEnemy } from "@utilities/IEnemy.js";
 import { getTerm } from "@utilities/LanguageService.js";
 import {
   Choice,
+  isBackKey,
+  isConfirmKey,
+  isDownKey,
+  isRightKey,
   isSelectable,
+  isUpKey,
   normalizeChoices,
   NormalizedChoice,
   SelectTheme,
@@ -124,10 +126,10 @@ export const combatStatusSelect = createPrompt(
     useKeypress((key, rl) => {
       clearTimeout(searchTimeoutRef.current);
 
-      if (isEnterKey(key) || key.name === "right") {
+      if (isConfirmKey(key) || isRightKey(key)) {
         setStatus("done");
         done(selectedChoice.value);
-      } else if (canGoBack && key.name === "left") {
+      } else if (canGoBack && isBackKey(key)) {
         setStatus("done");
         done("goBack" as Value);
       } else if (isUpKey(key) || isDownKey(key)) {

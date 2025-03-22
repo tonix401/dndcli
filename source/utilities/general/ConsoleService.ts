@@ -10,7 +10,11 @@ import getEmptyAscii from "@resources/rooms/emptyAscii.js";
 import fs from "fs-extra";
 import Config from "./Config.js";
 import path from "path";
-import { themedSingleKeyPrompt } from "@utilities/MenuService.js";
+import {
+  isConfirmKey,
+  isRightKey,
+  themedSingleKeyPrompt,
+} from "@utilities/MenuService.js";
 import ansiEscapes from "ansi-escapes";
 import { IAnimation } from "@utilities/IAnimation.js";
 
@@ -75,7 +79,7 @@ export async function skippableSlowWrite(
   readline.emitKeypressEvents(process.stdin);
   process.stdin.setRawMode(true);
   process.stdin.on("keypress", (_str, key) => {
-    if (key.name === "return") {
+    if (isConfirmKey(key) || isRightKey(key)) {
       log("Console Service: Skipping text...");
       isSkipping = true;
     }
@@ -158,23 +162,30 @@ export async function pressEnter(config?: {
   message?: string;
   allowLeft?: boolean;
 }): Promise<void> {
-  let keybindings;
   const message = config?.message ?? getTerm("pressEnter");
   const allowLeft = config?.allowLeft ?? false;
 
-  // Left is only allowed for info screen where you can go back
+  // Normal confirmation keys
+  let keybindings: Record<string, string | boolean> = {
+    return: true,
+    right: true,
+    space: true,
+    l: true,
+    d: true,
+  };
+
+  // Add left keybindings if allowed
   if (allowLeft) {
     keybindings = {
-      return: true,
-      right: true,
+      ...keybindings,
       left: true,
-    };
-  } else {
-    keybindings = {
-      return: true,
-      right: true,
+      q: true,
+      escape: true,
+      a: true,
+      j: true,
     };
   }
+
   process.stdout.write(ansiEscapes.cursorHide);
   return await themedSingleKeyPrompt({
     message: message,

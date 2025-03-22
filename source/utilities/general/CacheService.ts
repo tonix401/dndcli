@@ -15,25 +15,33 @@ import {
   Character,
   CharacterTrait,
 } from "@utilities/IGameState.js";
+import { ISettings } from "@utilities/ISettings.js";
 
 // #region Initiate
-let settings = null;
+let settings: ISettings | null = null;
 try {
   settings = getDataFromFile("settings");
 } catch (error) {
   log("Cache Service: " + error);
 }
 
-let gameState = null;
+let gameState: IGameState | null = null;
 try {
   gameState = getDataFromFile("gameState");
 } catch (error) {
   log("Cache Service: " + error);
 }
 
+let dungeon: Dungeon | null = null;
+try {
+  dungeon = getDataFromFile("dungeon");
+} catch (error) {
+  log("Cache Service: " + error);
+}
+
 let cachedLanguage: Language = settings?.language || Config.STANDARD_LANGUAGE;
 let cachedTheme: ITheme = settings?.theme || Config.STANDARD_THEME;
-let cachedDungeon = initiateDungeonMapWithHallways();
+let cachedDungeon: Dungeon = dungeon || initiateDungeonMapWithHallways();
 let cachedPassword: string = settings?.password || Config.STANDARD_PASSWORD;
 
 // Create a new game state with proper Map and Set objects
@@ -422,6 +430,7 @@ function save() {
   };
 
   saveDataToFile("gameState", serializableGameState);
+  saveDataToFile("dungeon", cachedDungeon);
 }
 // #endregion
 

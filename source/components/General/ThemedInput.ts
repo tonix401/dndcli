@@ -2,8 +2,6 @@ import {
   createPrompt,
   useState,
   useKeypress,
-  isEnterKey,
-  isBackspaceKey,
   type Status,
 } from "@inquirer/core";
 import { getTheme } from "@utilities/CacheService.js";
@@ -17,6 +15,7 @@ import {
 } from "@utilities/ConsoleService.js";
 import chalk from "chalk";
 import ansiEscapes from "ansi-escapes";
+import { isBackKey, isBackspaceKey, isConfirmKey, isRightKey } from "@utilities/MenuService.js";
 
 type InputTheme = {
   validationFailureMode: "keep" | "clear";
@@ -50,10 +49,10 @@ export const themedInput = createPrompt<string, InputConfig>((config, done) => {
       return;
     }
 
-    if (key.name === "left" && config.canGoBack) {
+    if (isBackKey(key) && config.canGoBack) {
       done("goBack");
       return;
-    } else if (isEnterKey(key)) {
+    } else if (isConfirmKey(key) || isRightKey(key)) {
       const answer = value || defaultValue;
       setStatus("loading");
 

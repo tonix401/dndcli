@@ -6,9 +6,6 @@ import {
   useRef,
   useMemo,
   useEffect,
-  isEnterKey,
-  isUpKey,
-  isDownKey,
   Separator,
   ValidationError,
   type Status,
@@ -23,7 +20,12 @@ import {
   secondaryColor,
 } from "@utilities/ConsoleService.js";
 import {
+  isBackKey,
+  isConfirmKey,
+  isDownKey,
+  isRightKey,
   isSelectable,
+  isUpKey,
   normalizeChoices,
   NormalizedChoice,
   SelectConfig,
@@ -85,10 +87,10 @@ export const themedSelectInRoom = createPrompt(
     useKeypress((key, rl) => {
       clearTimeout(searchTimeoutRef.current);
 
-      if (isEnterKey(key) || key.name === "right") {
+      if (isConfirmKey(key)|| isRightKey(key)) {
         setStatus("done");
         done(selectedChoice.value);
-      } else if (canGoBack && key.name === "left") {
+      } else if (canGoBack && isBackKey(key)) {
         setStatus("done");
         done("goBack" as Value);
       } else if (isUpKey(key) || isDownKey(key)) {

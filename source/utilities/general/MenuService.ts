@@ -1,4 +1,3 @@
-import { input, password } from "@inquirer/prompts";
 import { getTheme } from "./CacheService.js";
 import { errorColor, primaryColor, secondaryColor } from "./ConsoleService.js";
 import chalk from "chalk";
@@ -11,10 +10,6 @@ import {
   useRef,
   useMemo,
   useEffect,
-  isBackspaceKey,
-  isEnterKey,
-  isUpKey,
-  isDownKey,
   isNumberKey,
   Separator,
   ValidationError,
@@ -87,7 +82,6 @@ export const inputValidators = {
     return true;
   },
 };
-
 
 /**
  * A version of the select from inquirer that used the custom theme and current colors
@@ -258,7 +252,7 @@ const arrowKeysSelect = createPrompt(
     useKeypress((key, rl) => {
       clearTimeout(searchTimeoutRef.current);
 
-      if (isEnterKey(key) || key.name === "right") {
+      if (isConfirmKey(key) || key.name === "right") {
         setStatus("done");
         done(selectedChoice.value);
       } else if (isUpKey(key) || isDownKey(key)) {
@@ -293,7 +287,7 @@ const arrowKeysSelect = createPrompt(
           return item.name.toLowerCase().startsWith(searchTerm);
         });
 
-        if (key.name === "left" && canGoBack) {
+        if (isBackKey(key) && canGoBack) {
           setStatus("done");
           done("goBack" as any);
         } else if (matchIndex !== -1) {
@@ -396,3 +390,47 @@ export const themedSingleKeyPrompt = createPrompt(
     return theme.prefix + " " + chalk.hex(theme.secondaryColor)(config.message);
   }
 );
+
+// Functions that test for certain types of control keys inside selects and other prompts or menus
+/**
+ * up, w, i
+ */
+export function isUpKey(key: any): boolean {
+  return key.name === "up" || key.name === "w" || key.name === "i";
+}
+/**
+ * down, s, k
+ */
+export function isDownKey(key: any): boolean {
+  return key.name === "down" || key.name === "s" || key.name === "k";
+}
+/**
+ * left, a, j
+ */
+export function isLeftKey(key: any): boolean {
+  return key.name === "left" || key.name === "a" || key.name === "j";
+}
+/**
+ * right, d, l
+ */
+export function isRightKey(key: any): boolean {
+  return key.name === "right" || key.name === "d" || key.name === "l";
+}
+/**
+ * return, space, right
+ */
+export function isConfirmKey(key: any): boolean {
+  return key.name === "return" || key.name === "space";
+}
+/**
+ * escape, left
+ */
+export function isBackKey(key: any): boolean {
+  return key.name === "escape" || key.name === "left";
+}
+/**
+ * backspace
+ */
+export function isBackspaceKey(key: any): boolean {
+  return key.name === "backspace";
+}

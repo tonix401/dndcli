@@ -1,14 +1,13 @@
-import { shopSelect } from "@components/ShopSelect.js";
+import {totalClear } from "@utilities/ConsoleService.js";
+import crypto from "crypto";
 
 async function test() {
   ///////////////////////
-
-  console.log(
-    await shopSelect({
-      message: "test",
-      choices: ["awefvcesrbhgsfdbhfad", "bagrefsfdszvbad", "cavfrvvdsvadsvzcx", "aafndiaslvnbinjcvoljzcx", "bpq3gk[idsafasd", "cagcdfgsagq3gtfqt4gh"],
-    })
-  );
+  totalClear();
+  console.log(crypto
+    .createHash("sha256")
+    .update("123")
+    .digest("hex"))
 
   /////////////////////////
 }
