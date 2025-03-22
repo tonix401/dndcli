@@ -41,6 +41,7 @@ import ansiEscapes from "ansi-escapes";
 import chalk from "chalk";
 import { holdMyText } from "@components/DungeonMovementSelect.js";
 import { PartialDeep } from "@inquirer/type";
+import { log } from "@utilities/LogService.js";
 
 const enemyAscii = [
   "  |\\ .====. /|  ",
@@ -350,6 +351,7 @@ export function getCombatScreenEnvironment(page: string, enemy: IEnemy) {
     " | "
   );
   const heldText = holdMyText(boxItUp(allStats));
+  log(heldText, "Warn ");
 
   // Lets assume that the widest part is always the player stats in the hands
   const maxTotalWidth = removeFormatting(heldText).text.split("\n")[0].length;
