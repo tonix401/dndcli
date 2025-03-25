@@ -1,19 +1,19 @@
 import { checkbox } from "@inquirer/prompts";
-import { getTerm } from "@utilities/LanguageService.js";
+import { getTerm } from "@core/LanguageService.js";
 import {
   resetCachedGameState,
   getTheme,
   setLanguage,
   setTheme,
-} from "@utilities/CacheService.js";
+} from "@core/CacheService.js";
 import Config from "@utilities/Config.js";
-import { clearLogs } from "@utilities/LogService.js";
+import { clearLogs } from "@core/LogService.js";
 import {
   pressEnter,
   primaryColor,
   secondaryColor,
-} from "@utilities/ConsoleService.js";
-import { saveDataToFile } from "@utilities/StorageService.js";
+} from "@core/ConsoleService.js";
+import { saveDataToFile } from "@core/StorageService.js";
 
 /**
  * Menu component that handles resetting different types of data

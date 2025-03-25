@@ -10,14 +10,14 @@ import {
   ValidationError,
   type Status,
 } from "@inquirer/core";
-import { getTheme } from "@utilities/CacheService.js";
+import { getTheme } from "@core/CacheService.js";
 import {
   alignText,
   boxItUp,
   primaryColor,
   removeFormatting,
   secondaryColor,
-} from "@utilities/ConsoleService.js";
+} from "@core/ConsoleService.js";
 import {
   Choice,
   isDownKey,
@@ -28,7 +28,7 @@ import {
   NormalizedChoice,
   isBackKey,
   isRightKey,
-} from "@utilities/MenuService.js";
+} from "@ui/MenuService.js";
 import ansiEscapes from "ansi-escapes";
 import chalk from "chalk";
 import { getShopVisual } from "@resources/generalScreens/shopBackground.js";
@@ -103,7 +103,7 @@ export const shopSelect = createPrompt(
     useKeypress((key, rl) => {
       clearTimeout(searchTimeoutRef.current);
 
-      if (isConfirmKey(key)|| isRightKey(key)) {
+      if (isConfirmKey(key) || isRightKey(key)) {
         setStatus("done");
         done(selectedChoice.value);
       } else if (canGoBack && isBackKey(key)) {

@@ -1,14 +1,10 @@
-import {
-  accentColor,
-  pressEnter,
-  primaryColor,
-} from "@utilities/ConsoleService.js";
-import { getRandomEnemy } from "@utilities/GameService.js";
+import { accentColor, pressEnter, primaryColor } from "@core/ConsoleService.js";
+import { getRandomEnemy } from "@game/combat/EnemyService.js";
 import ICharacter from "@utilities/ICharacter.js";
 import { IEnemy } from "@utilities/IEnemy.js";
-import { getStartingItems } from "@utilities/InventoryService.js";
-import { getTerm } from "@utilities/LanguageService.js";
-import { getDataFromFile, saveDataToFile } from "@utilities/StorageService.js";
+import { getStartingItems } from "@game/character/InventoryService.js";
+import { getTerm } from "@core/LanguageService.js";
+import { getDataFromFile, saveDataToFile } from "@core/StorageService.js";
 import { runCombat } from "src/combat.js";
 
 const testEnemy: IEnemy = getRandomEnemy(

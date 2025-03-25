@@ -1,15 +1,11 @@
-import { log } from "@utilities/LogService.js";
-import {
-  pressEnter,
-  primaryColor,
-  totalClear,
-} from "@utilities/ConsoleService.js";
-import { getTerm } from "@utilities/LanguageService.js";
+import { log } from "@core/LogService.js";
+import { pressEnter, primaryColor, totalClear } from "@core/ConsoleService.js";
+import { getTerm } from "@core/LanguageService.js";
 import {
   checkPasswordScreen,
   setPasswordScreen,
-} from "@utilities/PasswordService.js";
-import { handleShopInteraction } from "@utilities/ShopService.js";
+} from "@core/PasswordService.js";
+import { handleShopInteraction } from "@game/world/ShopService.js";
 import Config from "@utilities/Config.js";
 import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
 import { showSettingsData } from "./ShowSettingsData.js";
@@ -18,7 +14,7 @@ import { showLogsMenu } from "./ShowLogsMenu.js";
 import { resetDataMenu } from "./ResetDataMenu.js";
 import { flipATable } from "./OminousFlip.js";
 import { testCombat } from "./TestCombat.js";
-import { getDataFromFile } from "@utilities/StorageService.js";
+import { getDataFromFile } from "@core/StorageService.js";
 import { dungeonMinigame } from "@components/DungeonMinigame.js";
 import { testImageGeneration } from "./TestImageGeneration.js";
 import { testAnimations } from "./TestAnimations.js";

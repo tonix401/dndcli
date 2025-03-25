@@ -5,7 +5,7 @@ import {
   getTextOnBackground,
   pause,
   totalClear,
-} from "@utilities/ConsoleService.js";
+} from "@core/ConsoleService.js";
 
 const frames = [
   "\n(°□°)       ┬─┬      \n",

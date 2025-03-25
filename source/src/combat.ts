@@ -1,7 +1,7 @@
-import { rollDice } from "@utilities/DiceService.js";
-import { inventoryMenu } from "@utilities/InventoryService.js";
-import { generateRandomItem } from "@utilities/ItemGenerator.js";
-import { addItemToInventory } from "@utilities/InventoryService.js";
+import { rollDice } from "@game/combat/DiceService.js";
+import { inventoryMenu } from "@game/character/InventoryService.js";
+import { generateRandomItem } from "@game/character/ItemGenerator.js";
+import { addItemToInventory } from "@game/character/InventoryService.js";
 import ICharacter from "@utilities/ICharacter.js";
 import { IEnemy } from "@utilities/IEnemy.js";
 import { IAbility } from "@utilities/IAbility.js";
@@ -11,12 +11,12 @@ import {
   pressEnter,
   primaryColor,
   totalClear,
-} from "@utilities/ConsoleService.js";
-import { saveDataToFile } from "@utilities/StorageService.js";
-import { pause } from "@utilities/ConsoleService.js";
-import { themedSelect } from "@utilities/MenuService.js";
+} from "@core/ConsoleService.js";
+import { saveDataToFile } from "@core/StorageService.js";
+import { pause } from "@core/ConsoleService.js";
+import { themedSelect } from "@ui/MenuService.js";
 import { combatStatusSelect } from "@components/CombatStatusSelect.js";
-import { getEquippedStatBonuses } from "@utilities/EquipmentService.js";
+import { getEquippedStatBonuses } from "@game/character/EquipmentService.js";
 
 interface CombatResult {
   success: boolean;
@@ -163,7 +163,7 @@ export async function runCombat(
         { name: "Run Away", value: "Run" },
       ],
       enemy: enemy,
-      canGoBack: true
+      canGoBack: true,
     });
 
     switch (combatAction) {

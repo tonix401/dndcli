@@ -1,13 +1,10 @@
-import {totalClear } from "@utilities/ConsoleService.js";
+import { totalClear } from "@core/ConsoleService.js";
 import crypto from "crypto";
 
 async function test() {
   ///////////////////////
   totalClear();
-  console.log(crypto
-    .createHash("sha256")
-    .update("123")
-    .digest("hex"))
+  console.log(crypto.createHash("sha256").update("123").digest("hex"));
 
   /////////////////////////
 }

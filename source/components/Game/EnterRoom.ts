@@ -4,23 +4,23 @@ import {
   primaryColor,
   secondaryColor,
   totalClear,
-} from "@utilities/ConsoleService.js";
-import { Room, RoomTypes } from "@utilities/DungeonService.js";
-import { getTerm } from "@utilities/LanguageService.js";
-import { log } from "@utilities/LogService.js";
+} from "@core/ConsoleService.js";
+import { Room, RoomTypes } from "@game/world/DungeonService.js";
+import { getTerm } from "@core/LanguageService.js";
+import { log } from "@core/LogService.js";
 import getTreasureAscii from "@resources/rooms/treasureAscii.js";
 import getEmptyAscii from "@resources/rooms/emptyAscii.js";
 import getTrapAscii from "@resources/rooms/trapAscii.js";
 import getEnemyAscii from "@resources/rooms/enemyAscii.js";
 import getBossAscii from "@resources/rooms/bossAscii.js";
-import { themedSelect } from "@utilities/MenuService.js";
+import { themedSelect } from "@ui/MenuService.js";
 import { runCombat } from "src/combat.js";
-import { getDataFromFile, saveDataToFile } from "@utilities/StorageService.js";
-import { getDungeon } from "@utilities/CacheService.js";
+import { getDataFromFile, saveDataToFile } from "@core/StorageService.js";
+import { getDungeon } from "@core/CacheService.js";
 import Config from "@utilities/Config.js";
 import getClosedTreasureAscii from "@resources/rooms/closedTreasureAscii.js";
 import { themedInput } from "@components/ThemedInput.js";
-import { generateRandomItem } from "@utilities/ItemGenerator.js";
+import { generateRandomItem } from "@game/character/ItemGenerator.js";
 
 const getYesNo = () => [
   { name: getTerm("yes"), value: true },

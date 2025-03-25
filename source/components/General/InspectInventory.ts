@@ -1,5 +1,5 @@
 import ICharacter from "@utilities/ICharacter.js";
-import { getTerm } from "@utilities/LanguageService.js";
+import { getTerm } from "@core/LanguageService.js";
 import {
   alignTextAsMultiTable,
   boxItUp,
@@ -7,20 +7,34 @@ import {
   pressEnter,
   primaryColor,
   secondaryColor,
+  accentColor,
+  errorColor,
   totalClear,
-} from "@utilities/ConsoleService.js";
-import { getDataFromFile } from "@utilities/StorageService.js";
+  navigationPrompt,
+} from "@core/ConsoleService.js";
+import { getDataFromFile } from "@core/StorageService.js";
 import Config from "@utilities/Config.js";
 import { getErrorMessage } from "@resources/generalScreens/errorMessage.js";
 import chalk from "chalk";
 
+/**
+ * Display a detailed view of the character's inventory with pagination
+ *
+ * Features:
+ * - Shows one item per page to prevent overflow in the room background
+ * - Displays item properties with appropriate formatting and colors
+ * - Indicates equipped items with ★ next to their name
+ * - Indicates consumable items explicitly in their type field
+ * - Supports navigation with arrow keys or number keys
+ */
 export async function inspectInventory() {
   totalClear();
   const charData: ICharacter =
     getDataFromFile("character") ?? Config.START_CHARACTER;
 
+  // Handle cases where character data doesn't exist or inventory is empty
   if (!charData) {
-    console.log(getTerm("noCharacter"));
+    console.log(getErrorMessage(getTerm("noCharacter")));
     await pressEnter({ allowLeft: true });
     return;
   }
@@ -31,53 +45,49 @@ export async function inspectInventory() {
     return;
   }
 
+  // Helper function to truncate text
+  function truncateText(text: string, maxLength: number): string {
+    return text.length > maxLength
+      ? text.substring(0, maxLength) + "..."
+      : text;
+  }
+
   // Check if an item is currently equipped
   const isItemEquipped = (itemName: string) => {
     if (!charData.equippedItems) return false;
     return charData.equippedItems.some((equip) => equip.name === itemName);
   };
 
-  // Format inventory items using the alignTextAsMultiTable function
-  const inventoryItems = charData.inventory.map((item) => {
+  // Format all inventory items with their properties
+  const formattedItems = charData.inventory.map((item) => {
     // Start with basic properties every item has
     const rows: [string, string][] = [
       [
         getTerm("name"),
-        `${item.name} (x${item.quantity})${
-          isItemEquipped(item.name) ? " " + chalk.green("★ Equipped") : ""
+        `${truncateText(item.name, 20)} (x${item.quantity})${
+          isItemEquipped(item.name) ? " " + accentColor("★") : ""
         }`,
       ],
-      [getTerm("description"), item.description],
+      [getTerm("description"), truncateText(item.description, 40)],
       [
         getTerm("type"),
         `${item.type || getTerm("unknown")}${
-          item.consumable === false ? " (" + getTerm("equipment") + ")" : ""
+          item.consumable ? ` (${getTerm("consumable")})` : ""
         }`,
       ],
-      [getTerm("rarity"), item.rarity],
     ];
 
-    // Add effect info if it exists
-    if (item.effect) {
-      rows.push([getTerm("effect"), item.effect]);
-    }
-
-    // Add damage for weapons
+    // Add weapon-specific stats
     if (item.type === "weapon" && item.damage) {
-      rows.push([getTerm("damage"), chalk.red(item.damage.toString())]);
+      rows.push([getTerm("damage"), errorColor(item.damage.toString())]);
     }
 
-    // Add defense for armor
+    // Add armor-specific stats
     if (item.type === "armor" && item.defense) {
-      rows.push([getTerm("defense"), chalk.blue(item.defense.toString())]);
+      rows.push([getTerm("defense"), primaryColor(item.defense.toString())]);
     }
 
-    // Add value if present
-    if (item.value) {
-      rows.push([getTerm("value"), `${item.value} ${getTerm("gold")}`]);
-    }
-
-    // Add stat bonuses if present - match format used in displayInventory
+    // Add stat bonuses if present
     if (item.stats) {
       const statBonuses = Object.entries(item.stats)
         .filter(([_, value]) => value && value > 0)
@@ -85,24 +95,120 @@ export async function inspectInventory() {
         .join(", ");
 
       if (statBonuses) {
-        rows.push([getTerm("statBonuses"), chalk.cyan(statBonuses)]);
+        rows.push([
+          getTerm("statBonuses"),
+          accentColor(truncateText(statBonuses, 20)),
+        ]);
       }
     }
+
+    // Add value if present
+    if (item.value) {
+      rows.push([
+        getTerm("value"),
+        secondaryColor(`${item.value} ${getTerm("gold")}`),
+      ]);
+    }
+
+    // Add effect info if it exists
+    if (item.effect) {
+      rows.push([getTerm("effect"), truncateText(item.effect, 30)]);
+    }
+
     return rows;
   });
 
-  // Create multi-table layout
-  const multiTable = alignTextAsMultiTable(inventoryItems, " | ");
+  // Pagination setup - one item per page to prevent UI overflow
+  const ITEMS_PER_PAGE = 1;
+  let currentPage = 0;
+  const totalPages = Math.ceil(formattedItems.length / ITEMS_PER_PAGE);
 
-  // Add a title above the table
-  const title = chalk.bold(`=== ${getTerm("inventory")} ===\n\n`);
+  // Main display loop
+  while (true) {
+    totalClear();
 
-  // Create the boxed display with the title and inventory table
-  const finalDisplay = boxItUp(primaryColor(title + multiTable.text));
+    // Get items for the current page
+    const startIdx = currentPage * ITEMS_PER_PAGE;
+    const endIdx = Math.min(startIdx + ITEMS_PER_PAGE, formattedItems.length);
+    const currentPageItems = formattedItems.slice(startIdx, endIdx);
 
-  // Overlay the display on the room background
-  const overlayedOnRoom = getTextOnBackground(finalDisplay);
+    // Create multi-table layout for current page items
+    const multiTable = alignTextAsMultiTable(currentPageItems, " | ");
 
-  console.log(overlayedOnRoom);
-  await pressEnter({ allowLeft: true });
+    // Create the page indicator
+    const pageIndicator = secondaryColor(
+      `\n${getTerm("page")} ${currentPage + 1}/${totalPages}`
+    );
+
+    // Add a title above the table
+    const title = chalk.bold(`=== ${getTerm("inventory")} ===\n\n`);
+
+    // Create simple legend for the star symbol
+    const legendText = `${accentColor("★")} = ${getTerm("equipped")}`;
+
+    // Create navigation menu options
+    let navigationOptions = "";
+    if (totalPages > 1) {
+      const prevPageText =
+        currentPage > 0
+          ? accentColor(`[1] ${getTerm("previousPage")}`)
+          : chalk.gray(`[1] ${getTerm("previousPage")}`);
+
+      const nextPageText =
+        currentPage < totalPages - 1
+          ? accentColor(`[2] ${getTerm("nextPage")}`)
+          : chalk.gray(`[2] ${getTerm("nextPage")}`);
+
+      const exitText = accentColor(`[0] ${getTerm("exit")}`);
+      navigationOptions = `\n\n${prevPageText}  |  ${nextPageText}  |  ${exitText}`;
+    }
+
+    // Create the boxed display with all components
+    const finalDisplay = boxItUp(
+      primaryColor(
+        title +
+          multiTable.text +
+          pageIndicator +
+          "\n\n" +
+          legendText +
+          navigationOptions
+      )
+    );
+
+    // Overlay the display on the room background
+    const overlayedOnRoom = getTextOnBackground(finalDisplay);
+
+    console.log(overlayedOnRoom);
+
+    // If only one page, exit on any key press
+    if (totalPages <= 1) {
+      await pressEnter();
+      break;
+    }
+
+    // Input handling - supports both number keys and arrow keys
+    const userInput = await navigationPrompt({ message: "" });
+
+    // Navigation logic remains the same
+    if (
+      (userInput === "1" || userInput === "left" || userInput === "up") &&
+      currentPage > 0
+    ) {
+      // Previous page
+      currentPage--;
+    } else if (
+      (userInput === "2" || userInput === "right" || userInput === "down") &&
+      currentPage < totalPages - 1
+    ) {
+      // Next page
+      currentPage++;
+    } else if (
+      userInput === "0" ||
+      userInput === "enter" ||
+      userInput === "escape"
+    ) {
+      // Exit inventory view
+      break;
+    }
+  }
 }

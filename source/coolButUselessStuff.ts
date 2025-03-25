@@ -1,8 +1,8 @@
-import { boxItUp, getTextOnBackground } from "@utilities/ConsoleService.js";
+import { boxItUp, getTextOnBackground } from "@core/ConsoleService.js";
 import dotenv from "dotenv";
 import ora from "ora";
 import fetch from "node-fetch";
-import { log } from "@utilities/LogService.js";
+import { log } from "@core/LogService.js";
 import fs from "fs-extra";
 import { themedInput } from "@components/ThemedInput.js";
 
