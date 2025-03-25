@@ -3,11 +3,11 @@ import path from "path";
 import crypto from "crypto";
 import { ITheme } from "@utilities/ITheme.js";
 import ICharacter from "@utilities/ICharacter.js";
-import { Language } from "@utilities/LanguageService.js";
+import { Language } from "@core/LanguageService.js";
 import { IAbility } from "@utilities/IAbility.js";
-import { LogTypes } from "./LogService.js";
+import { LogTypes } from "@core/LogService.js";
 import { EnemyMove } from "@utilities/IEnemy.js";
-import { IGameState } from "@utilities/IGameState.js";
+import { IGameStateData } from "@utilities/IGameState.js";
 
 // #region Paths
 // Base directory (assumes process.cwd() is the project root)
@@ -89,7 +89,7 @@ const START_CHARACTER: ICharacter = {
   class: "swordsman",
   level: 1,
   xp: 0,
-  hp: 3,
+  hp: 10,
   origin: "unknown",
   currency: 0,
   abilities: {
@@ -100,7 +100,32 @@ const START_CHARACTER: ICharacter = {
     charisma: 10,
     luck: 7,
   },
-  inventory: [],
+  inventory: [
+    {
+      id: "default-sword",
+      name: "Basic Sword",
+      description: "A rusty sword that still cuts.",
+      effect: "",
+      rarity: "Common",
+      quantity: 1,
+      consumable: false,
+      type: "weapon",
+      damage: 5,
+      stats: {
+        strength: 1,
+      },
+    },
+    {
+      id: "default-potion",
+      name: "Healing Potion",
+      description: "Restores 10 HP.",
+      effect: "restoreHP",
+      rarity: "Common",
+      quantity: 2,
+      consumable: true,
+    },
+  ],
+  equippedItems: [], // Adding empty equipped items array
   lastPlayed: new Date().toLocaleDateString("de-DE"),
 };
 /**
@@ -640,7 +665,7 @@ const ENEMY_MOVES_ARRAY: EnemyMove[] = [
 /**
  * Default structure for game state
  */
-const DEFAULT_GAME_STATE: IGameState = {
+const DEFAULT_GAME_STATE: IGameStateData = {
   theme: null,
   narrativeHistory: [],
   conversationHistory: [],
@@ -658,13 +683,12 @@ const DEFAULT_GAME_STATE: IGameState = {
     metadata: {},
   },
   chapters: [],
-  characters: new Map(),
+  characters: {},
   characterTraits: [],
-  themes: new Set(),
+  themes: [],
   maxHistoryItems: 50,
   storyPace: "FAST",
 };
-
 /**
  * Story pace settings
  */

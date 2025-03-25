@@ -1,10 +1,10 @@
-import { getDungeon, setDungeon } from "@utilities/CacheService.js";
-import { totalClear } from "@utilities/ConsoleService.js";
+import { getDungeon, setDungeon } from "@core/CacheService.js";
+import { totalClear } from "@core/ConsoleService.js";
 import {
   Dungeon,
   initiateDungeonMapWithHallways,
   Room,
-} from "@utilities/DungeonService.js";
+} from "@game/world/DungeonService.js";
 import { enterRoom } from "./EnterRoom.js";
 import { dungeonMovementSelect } from "./DungeonMovementSelect.js";
 

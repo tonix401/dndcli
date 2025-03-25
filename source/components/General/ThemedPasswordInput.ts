@@ -6,12 +6,12 @@ import {
   primaryColor,
   removeFormatting,
   secondaryColor,
-} from "@utilities/ConsoleService.js";
-import { getTheme } from "@utilities/CacheService.js";
-import { getRandomItemFromArray } from "@utilities/ThemingService.js";
+} from "@core/ConsoleService.js";
+import { getTheme } from "@core/CacheService.js";
+import { getRandomItemFromArray } from "@core/ThemingService.js";
 import getPasswordBackground from "@resources/generalScreens/passwordBackground.js";
 import chalk from "chalk";
-import { isBackKey, isConfirmKey, isRightKey } from "@utilities/MenuService.js";
+import { isBackKey, isConfirmKey, isRightKey } from "@ui/MenuService.js";
 
 type PasswordConfig = {
   message: string;

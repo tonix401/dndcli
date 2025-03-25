@@ -1,4 +1,4 @@
-import { primaryColor, secondaryColor } from "@utilities/ConsoleService.js";
+import { primaryColor, secondaryColor } from "@core/ConsoleService.js";
 
 export default function getEmptyAscii() {
   const p = (text: string) => primaryColor(text);

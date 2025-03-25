@@ -4,7 +4,7 @@ import {
   useKeypress,
   type Status,
 } from "@inquirer/core";
-import { getTheme } from "@utilities/CacheService.js";
+import { getTheme } from "@core/CacheService.js";
 import {
   accentColor,
   boxItUp,
@@ -12,10 +12,15 @@ import {
   primaryColor,
   removeFormatting,
   secondaryColor,
-} from "@utilities/ConsoleService.js";
+} from "@core/ConsoleService.js";
 import chalk from "chalk";
 import ansiEscapes from "ansi-escapes";
-import { isBackKey, isBackspaceKey, isConfirmKey, isRightKey } from "@utilities/MenuService.js";
+import {
+  isBackKey,
+  isBackspaceKey,
+  isConfirmKey,
+  isRightKey,
+} from "@ui/MenuService.js";
 
 type InputTheme = {
   validationFailureMode: "keep" | "clear";

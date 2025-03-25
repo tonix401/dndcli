@@ -3,11 +3,11 @@ import {
   getTheme,
   setLanguage,
   setTheme,
-} from "@utilities/CacheService.js";
-import { getTerm, Language } from "@utilities/LanguageService.js";
-import { log } from "@utilities/LogService.js";
-import { pressEnter, totalClear } from "@utilities/ConsoleService.js";
-import { getAllThemeOverrides } from "@utilities/ThemingService.js";
+} from "@core/CacheService.js";
+import { getTerm, Language } from "@core/LanguageService.js";
+import { log } from "@core/LogService.js";
+import { pressEnter, totalClear } from "@core/ConsoleService.js";
+import { getAllThemeOverrides } from "@core/ThemingService.js";
 import chalk from "chalk";
 import Config from "@utilities/Config.js";
 import { themedSelectInRoom } from "./ThemedSelectInRoom.js";

@@ -1,12 +1,12 @@
-import { getTheme } from "@utilities/CacheService.js";
+import { getTheme } from "@core/CacheService.js";
 import {
   boxItUp,
   getTextOnBackground,
   primaryColor,
   totalClear,
-} from "@utilities/ConsoleService.js";
-import { getTerm } from "@utilities/LanguageService.js";
-import { themedSingleKeyPrompt } from "@utilities/MenuService.js";
+} from "@core/ConsoleService.js";
+import { getTerm } from "@core/LanguageService.js";
+import { themedSingleKeyPrompt } from "@ui/MenuService.js";
 
 export async function tutorial(isNew: boolean) {
   let explanationsTerms = [

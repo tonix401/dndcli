@@ -1,7 +1,7 @@
 import chalk from "chalk";
-import { getTerm } from "@utilities/LanguageService.js";
+import { getTerm } from "@core/LanguageService.js";
 import packageJson from "@root/package.json" with {type: "json"};
-import { primaryColor, secondaryColor } from "@utilities/ConsoleService.js";
+import { primaryColor, secondaryColor } from "@core/ConsoleService.js";
 
 const p = (text: string) => chalk.bold(primaryColor(text));
 const s = (text: string) => secondaryColor(text);

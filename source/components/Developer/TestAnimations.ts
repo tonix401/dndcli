@@ -2,14 +2,10 @@ import Config from "@utilities/Config.js";
 import path from "path";
 import fs from "fs";
 import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
-import { getTerm } from "@utilities/LanguageService.js";
-import {
-  playAnimation,
-  pressEnter,
-  totalClear,
-} from "@utilities/ConsoleService.js";
+import { getTerm } from "@core/LanguageService.js";
+import { playAnimation, pressEnter, totalClear } from "@core/ConsoleService.js";
 import { getErrorMessage } from "@resources/generalScreens/errorMessage.js";
-import { log } from "@utilities/LogService.js";
+import { log } from "@core/LogService.js";
 
 export async function testAnimations() {
   const dir = path.join(Config.RESOURCES_DIR, "animations");
