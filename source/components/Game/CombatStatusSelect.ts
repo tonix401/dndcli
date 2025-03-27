@@ -41,7 +41,7 @@ import ansiEscapes from "ansi-escapes";
 import chalk from "chalk";
 import { holdMyText } from "@components/DungeonMovementSelect.js";
 import { PartialDeep } from "@inquirer/type";
-import { log } from "@utilities/LogService.js";
+import { log } from "@core/LogService.js";
 
 const enemyAscii = [
   "  |\\ .====. /|  ",
