@@ -1,13 +1,6 @@
-import { getTerm, Language } from "@utilities/LanguageService.js";
 import { ITheme } from "@utilities/ITheme.js";
 import { IThemeOverride } from "@utilities/IThemeOveride.js";
 import Config, { StoryPaceKey } from "@utilities/Config.js";
-import {
-  Dungeon,
-  initiateDungeonMapWithHallways,
-} from "@utilities/DungeonService.js";
-import { log } from "@utilities/LogService.js";
-import { getDataFromFile, saveDataToFile } from "@utilities/StorageService.js";
 import {
   IGameState,
   ConversationMessage,
@@ -16,6 +9,10 @@ import {
   CharacterTrait,
 } from "@utilities/IGameState.js";
 import { ISettings } from "@utilities/ISettings.js";
+import { getDataFromFile, saveDataToFile } from "@core/StorageService.js";
+import { log } from "@core/LogService.js";
+import { Dungeon, initiateDungeonMapWithHallways } from "@game/world/DungeonService.js";
+import { getTerm, Language } from "@core/LanguageService.js";
 
 // #region Initiate
 let settings: ISettings | null = null;

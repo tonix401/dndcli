@@ -11,11 +11,12 @@ const files = {
   context: Config.CONTEXT_FILE,
   settings: Config.SETTINGS_FILE,
   gameState: Config.GAME_STATE_FILE,
+  dungeon: Config.DUNGEON_FILE,
 };
 
-export function getDataFromFile(
-  file: "character" | "context" | "settings" | "gameState"
-): any {
+type File = keyof typeof files;
+
+export function getDataFromFile(file: File): any {
   const sourceFile = files[file];
   try {
     const data = fs.readFileSync(sourceFile, "utf-8");
@@ -31,10 +32,7 @@ export function getDataFromFile(
   }
 }
 
-export function saveDataToFile(
-  file: "character" | "context" | "settings" | "gameState",
-  data: string | object
-): void {
+export function saveDataToFile(file: File, data: string | object): void {
   const destinationFile = files[file];
   try {
     fs.writeFileSync(destinationFile, JSON.stringify(data, null, 2));
