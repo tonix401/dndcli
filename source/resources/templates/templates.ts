@@ -1,5 +1,5 @@
-import { errorColor, primaryColor, secondaryColor } from "@utilities/ConsoleService.js";
-import { getTerm } from "@utilities/LanguageService.js";
+import { errorColor, primaryColor, secondaryColor } from "@core/ConsoleService.js";
+import { getTerm } from "@core/LanguageService.js";
 import packageJson from "@root/package.json" with {type: "json"};
 
 function getTemplateRoomAscii() {

@@ -1,19 +1,57 @@
-import { GameState } from "src/gameState.js";
-import { generateChatNarrative, ChatCompletionResponse } from "@utilities/AIService.js";
-import { sanitizeJsonString } from "@utilities/ConsoleService.js";
-import { log } from "@utilities/LogService.js";
+/**
+ * CharacterAnalysisService
+ *
+ * This service analyzes player choices to extract important narrative elements
+ * including characters, locations, player intent, and emotional tone. It serves as
+ * the narrative intelligence layer that builds up the world state over time.
+ *
+ * Key responsibilities:
+ * - Detects characters mentioned in player choices
+ * - Identifies locations referenced in narrative
+ * - Determines player intent (explore, fight, talk, etc.)
+ * - Analyzes emotional tone of player decisions
+ * - Updates game state with discovered entities
+ */
+
+import { IGameState } from "@utilities/IGameState.js";
+import {
+  generateChatNarrative,
+  ChatCompletionResponse,
+} from "@ai/AIService.js";
+import { sanitizeJsonString } from "@core/ConsoleService.js";
+import { log } from "@core/LogService.js";
 
 /**
- * Analyzes player choices to extract key information for game state
+ * Structure representing the analyzed components of a player choice
+ * Used for AI response parsing and game state updates
+ */
+interface ChoiceAnalysis {
+  characters?: string[]; // Character names detected in the choice
+  locations?: string[]; // Location names mentioned or implied
+  intent?: string; // Primary action intent (explore, fight, talk, etc.)
+  tone?: string; // Emotional tone (cautious, brave, friendly, etc.)
+}
+
+/**
+ * Analyzes player choices to extract key narrative information and update game state
+ *
+ * When a player makes a choice, this function:
+ * 1. Sends the choice text to the AI for analysis
+ * 2. Extracts characters, locations, intent and tone
+ * 3. Updates the current chapter with discovered entities
+ * 4. Adds new characters to the main character registry with appropriate metadata
+ *
+ * @param choice - The player's chosen action text
+ * @param gameState - Current game state to be updated with analysis results
  */
 export async function analyzePlayerChoice(
   choice: string,
-  gameState: GameState
+  gameState: IGameState
 ): Promise<void> {
-  // Only analyze substantive choices
+  // Skip trivial choices to avoid unnecessary AI calls
   if (choice.toLowerCase() === "continue" || choice.length < 5) return;
 
-  // Define the character analysis function schema
+  // AI function schema definition for structured choice analysis
   const choiceAnalysisFunctionConfig = {
     functions: [
       {
@@ -56,6 +94,7 @@ export async function analyzePlayerChoice(
   };
 
   try {
+    // Request AI analysis of the player choice
     const response: ChatCompletionResponse = await generateChatNarrative(
       [
         {
@@ -74,18 +113,16 @@ export async function analyzePlayerChoice(
       }
     );
 
-    let analysis;
+    let analysis: ChoiceAnalysis = {};
 
-    // Try to get analysis from function call first
+    // Extract analysis data with fallback options for different response formats
     if (response.function_call && response.function_call.arguments) {
       try {
         analysis = JSON.parse(response.function_call.arguments);
       } catch (jsonError) {
         log(`Failed to parse function arguments: ${jsonError}`, "Error");
       }
-    }
-    // Fall back to content parsing if function call isn't available
-    else if (response.content) {
+    } else if (response.content) {
       try {
         const sanitized = sanitizeJsonString(response.content);
         analysis = JSON.parse(sanitized);
@@ -98,19 +135,29 @@ export async function analyzePlayerChoice(
       return;
     }
 
-    // Add discovered characters to the current chapter
+    // Update game state with discovered characters
+    // Characters are added both to chapter records and the main character registry
     if (analysis.characters && Array.isArray(analysis.characters)) {
       analysis.characters.forEach((character: string) => {
         if (
           character &&
           !gameState.getCurrentChapter().characters.includes(character)
         ) {
+          // Add to chapter's characters list
           gameState.getCurrentChapter().characters.push(character);
+
+          // Add to the main characters Map with details
+          gameState.addOrUpdateCharacter(character, {
+            description: "A character encountered during your adventure",
+            relationship: analysis.tone === "friendly" ? "friendly" : "neutral",
+            lastSeen: analysis.locations?.[0] || "Recently",
+            importance: 7, // High enough to be considered important
+          });
         }
       });
     }
 
-    // Add discovered locations to the current chapter
+    // Update locations in the current chapter
     if (analysis.locations && Array.isArray(analysis.locations)) {
       analysis.locations.forEach((location: string) => {
         if (
@@ -122,7 +169,7 @@ export async function analyzePlayerChoice(
       });
     }
 
-    // Store the intent and tone for potential future use
+    // Store player intent and tone in chapter metadata for narrative context
     if (analysis.intent) {
       gameState.getCurrentChapter().metadata.lastIntent = analysis.intent;
     }
@@ -131,7 +178,6 @@ export async function analyzePlayerChoice(
       gameState.getCurrentChapter().metadata.lastTone = analysis.tone;
     }
   } catch (error) {
-    // Silently log errors but don't interrupt gameplay
     log(`Error analyzing player choice: ${error}`, "Error");
   }
 }

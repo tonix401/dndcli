@@ -8,11 +8,11 @@ import {
   primaryColor,
   secondaryColor,
   totalClear,
-} from "@utilities/ConsoleService.js";
+} from "@core/ConsoleService.js";
 import chalk from "chalk";
-import { getTerm } from "@utilities/LanguageService.js";
-import { getDataFromFile } from "@utilities/StorageService.js";
-import { getEquippedStatBonuses } from "@utilities/EquipmentService.js";
+import { getTerm } from "@core/LanguageService.js";
+import { getDataFromFile } from "@core/StorageService.js";
+import { getEquippedStatBonuses } from "@game/character/EquipmentService.js";
 
 export async function inspectCharacter() {
   totalClear();

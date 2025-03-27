@@ -1,5 +1,5 @@
-import { primaryColor } from "@utilities/ConsoleService.js";
-import { getTerm } from "@utilities/LanguageService.js";
+import { primaryColor } from "@core/ConsoleService.js";
+import { getTerm } from "@core/LanguageService.js";
 
 export const getEnlargeWindowAscii = () => {
   return `
@@ -39,5 +39,9 @@ export const getEnlargeWindowAscii = () => {
 ║                                                                                                   ║
 ║         10        20        30        40        50        60        70        80        90        ║
 ╚═════════╧═════════╧═════════╧═════════╧═════════╧═════════╧═════════╧═════════╧═════════╧═════════╝
-${primaryColor(`${getTerm("enlargeWindowPrompt")} ${process.stdout.columns}x${process.stdout.rows}`)}`;
+${primaryColor(
+  `${getTerm("enlargeWindowPrompt")} ${process.stdout.columns}x${
+    process.stdout.rows
+  }`
+)}`;
 };

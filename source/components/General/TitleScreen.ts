@@ -5,13 +5,13 @@ import {
   secondaryColor,
   skippableSlowWrite,
   totalClear,
-} from "@utilities/ConsoleService.js";
-import { log } from "@utilities/LogService.js";
+} from "@core/ConsoleService.js";
+import { log } from "@core/LogService.js";
 import { tutorial } from "@components/Tutorial.js";
 import {
   ensureSetupAndCheckIsNew,
   saveDataToFile,
-} from "@utilities/StorageService.js";
+} from "@core/StorageService.js";
 import Config from "@utilities/Config.js";
 
 export async function titleScreen() {

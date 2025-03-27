@@ -1,22 +1,22 @@
-import { getStartingItems } from "@utilities/InventoryService.js";
-import { getTerm } from "@utilities/LanguageService.js";
-import { log } from "@utilities/LogService.js";
+import { getStartingItems } from "@game/character/InventoryService.js";
+import { getTerm } from "@core/LanguageService.js";
+import { log } from "@core/LogService.js";
 import {
   pressEnter,
   primaryColor,
   secondaryColor,
   totalClear,
-} from "@utilities/ConsoleService.js";
-import { rollDiceTotal } from "@utilities/DiceService.js";
+} from "@core/ConsoleService.js";
+import { rollDiceTotal } from "@game/combat/DiceService.js";
 import Config from "@utilities/Config.js";
 import {
   ChatCompletionRequestMessage,
   generateChatNarrative,
-} from "@utilities/AIService.js";
+} from "@ai/AIService.js";
 import ICharacter from "@utilities/ICharacter.js";
-import { saveDataToFile } from "@utilities/StorageService.js";
-import { getLanguage } from "@utilities/CacheService.js";
-import { inputValidators } from "@utilities/MenuService.js";
+import { saveDataToFile } from "@core/StorageService.js";
+import { getLanguage } from "@core/CacheService.js";
+import { inputValidators } from "@ui/MenuService.js";
 import { themedSelectInRoom } from "./ThemedSelectInRoom.js";
 import { themedInput } from "./ThemedInput.js";
 

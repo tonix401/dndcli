@@ -16,9 +16,9 @@ import chalk from "chalk";
 import inquirer from "inquirer";
 import { IItem } from "@utilities/IITem.js";
 import ICharacter from "@utilities/ICharacter.js";
-import { saveDataToFile, getDataFromFile } from "@utilities/StorageService.js";
-import { generateRandomItem } from "@utilities/ItemGenerator.js";
-import { getTerm } from "@utilities/LanguageService.js";
+import { saveDataToFile, getDataFromFile } from "@core/StorageService.js";
+import { generateRandomItem } from "@game/character/ItemGenerator.js";
+import { getTerm } from "@core/LanguageService.js";
 
 /**
  * Constants for inventory management
@@ -495,6 +495,23 @@ export async function useItem(
 }
 
 /**
+ * Checks if an item is currently equipped by the character
+ *<
+ * @param character - The character to check
+ * @param item - The item to check if equipped
+ * @returns Boolean indicating if the item is equipped
+ */
+export function isItemEquipped(character: ICharacter, item: IItem): boolean {
+  if (!character.equippedItems || character.equippedItems.length === 0) {
+    return false;
+  }
+
+  return character.equippedItems.some(
+    (equippedItem) => equippedItem.id === item.id
+  );
+}
+
+/**
  * Displays a dedicated inventory menu and processes the selected item.
  * Consumable items (with a defined effect) are processed; equipment items are offered to equip.
  *
@@ -516,7 +533,7 @@ export async function inventoryMenu(
     return;
   }
 
-  const { themedSelect } = await import("@utilities/MenuService.js");
+  const { themedSelect } = await import("@ui/MenuService.js");
 
   // Build the list of inventory choices with color coding and stat information
   const inventoryChoices = character.inventory.map(
@@ -540,11 +557,14 @@ export async function inventoryMenu(
         statsInfo = chalk.blue(` [DEF: ${item.defense}]`);
       }
 
-      // Show whether item is equipment or consumable
-      const usability =
-        item.consumable === false || item.effect === ""
-          ? chalk.gray("(Equipment)") + statsInfo
-          : "";
+      // Check if the item is equipment and show equipped status
+      let usability = "";
+      if (item.consumable === false || item.effect === "") {
+        const equipped = isItemEquipped(character, item);
+        usability = equipped
+          ? chalk.green("(Equipped)") + statsInfo
+          : chalk.gray("(Unequipped)") + statsInfo;
+      }
 
       return {
         name: `${chalk.bold(item.name)} (x${item.quantity}) - ${
@@ -624,8 +644,17 @@ export function displayInventory(character: ICharacter): void {
         statsInfo = chalk.blue(` [DEF: ${item.defense}]`);
       }
 
+      // Add equipped status indicator
+      const equippedStatus = isItemEquipped(character, item)
+        ? chalk.green(" [E]")
+        : "";
+
       console.log(
-        chalk.white(`${idx + 1}. ${item.name} (x${item.quantity})${statsInfo}`)
+        chalk.white(
+          `${idx + 1}. ${item.name} (x${
+            item.quantity
+          })${statsInfo}${equippedStatus}`
+        )
       );
     });
   }

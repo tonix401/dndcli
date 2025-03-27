@@ -1,4 +1,4 @@
-import { EnemyMove, IEnemy } from "@utilities/IEnemy.js";
+import { EnemyMove, EnemyMoveType, IEnemy } from "@utilities/IEnemy.js";
 import Config from "@utilities/Config.js";
 
 /**

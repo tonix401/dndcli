@@ -9,8 +9,8 @@
  * @version 1.0.0-ONHOLD
  */
 
-import { getOpenAI } from "@utilities/AIService.js";
-import { log } from "@utilities/LogService.js";
+import { getOpenAI } from "../ai/AIService.js";
+import { log } from "./LogService.js";
 import fs from "fs";
 import path from "path";
 import { createCanvas, loadImage } from "canvas";
@@ -33,10 +33,11 @@ let imagesGenerated = 0;
  * Maximum number of images that can be generated in a time window
  * Adjust based on API quotas and cost considerations
  */
-const IMAGE_GENERATION_LIMIT = 50;
+const IMAGE_GENERATION_LIMIT = 100;
 
 /**
- * Time window for image generation rate limiting (3 hours in milliseconds)
+ * Time window for image generation rate limiting (3 hours in milliseconds), this is a bit excessive but whatever
+ * I heard that the limit resets every 3 hours so I just set it to that
  */
 const LIMIT_WINDOW_MS = 3 * 60 * 60 * 1000;
 
@@ -83,8 +84,10 @@ export async function canGenerateImage(): Promise<boolean> {
  * @param {number} [options.width=120] - Width of ASCII art in characters
  * @param {number} [options.height=60] - Height of ASCII art in characters
  * @param {boolean} [options.highContrast=true] - Whether to enhance contrast
- * @param {boolean} [options.saveImage=true] - Whether to save the raw image to disk
+ * @param {boolean} [options.saveImage=true] - Whether to save the raw image to diskd
  * @param {string} [options.savePath] - Custom path to save the image
+ * @param {boolean} [options.forceNewGeneration=false] - Whether to bypass cache and force a new image
+ * @param {boolean} [options.preserveSquareShape=false] - New option to maintain exact square shape
  * @returns {Promise<string>} ASCII art representation of the generated image
  */
 export async function generateSceneImage(
@@ -95,12 +98,26 @@ export async function generateSceneImage(
     highContrast?: boolean;
     saveImage?: boolean;
     savePath?: string;
+    useEdgeDetection?: boolean; // New option
+    inverted?: boolean; // New option
+    asciiStyle?: "detailed" | "simple" | "inverted";
+    forceNewGeneration?: boolean;
+    preserveSquareShape?: boolean; // New option to maintain exact square shape
   }
 ): Promise<string> {
   try {
-    // Check cache first to avoid redundant API calls
-    if (imageCache[sceneDescription]) {
+    // Check cache first to avoid redundant API calls, unless forceNewGeneration is true
+    if (!options?.forceNewGeneration && imageCache[sceneDescription]) {
+      log(
+        "Using cached image for prompt: " +
+          sceneDescription.substring(0, 30) +
+          "..."
+      );
       return imageCache[sceneDescription];
+    }
+
+    if (options?.forceNewGeneration) {
+      log("Force new generation enabled, bypassing cache...");
     }
 
     // Verify we haven't exceeded rate limits
@@ -111,17 +128,25 @@ export async function generateSceneImage(
     }
 
     log("Generating scene image...");
+
+    // Create a new OpenAI instance to avoid potential state issues
     const openai = getOpenAI();
 
     // Optimize prompt for ASCII conversion by emphasizing contrast and clarity
-    const optimizedPrompt = `${sceneDescription}, monochrome, high contrast, simplified shapes, clear outlines, minimal detail, optimized for ASCII art conversion`;
+    const optimizedPrompt = `
+    A high-contrast black and white image designed for ASCII conversion. 
+    The scene depicts: ${sceneDescription}. 
+    Use bold, well-defined edges with strong lighting contrasts. 
+    Keep it simple and avoid excessive noise or clutter.
+    Avoid excessive fine details or textures. 
+    Ensure distinct silhouettes with minimal shading and a balanced composition.`;
 
     // Call OpenAI's image generation API with b64_json format instead of URL
     const response = await openai.images.generate({
       prompt: optimizedPrompt,
       n: 1,
-      size: "512x512",
-      response_format: "b64_json", // Request base64 data instead of URL
+      model: "dall-e-3",
+      response_format: "b64_json",
     });
 
     // Cast the response to the expected type with base64 data
@@ -163,25 +188,47 @@ export async function generateSceneImage(
 
     // Convert the base64 image to ASCII art
     // Larger default dimensions for more detail
-    const targetWidth = options?.width || 120;
-    const targetHeight = options?.height || 60;
+    const targetWidth = options?.width || 160;
+    const targetHeight = options?.height || 160;
     const highContrast = options?.highContrast ?? true;
+    const useInverted = options?.inverted ?? false;
+    const useEdgeDetection = options?.useEdgeDetection ?? false;
+    const preserveSquareShape = options?.preserveSquareShape ?? false; // New parameter
     const asciiResult = await convertImageToAscii(
       imageBase64,
       targetWidth,
       targetHeight,
-      highContrast
+      highContrast,
+      useInverted,
+      useEdgeDetection,
+      preserveSquareShape // Pass the new parameter
     );
 
-    // Cache the result to avoid regeneration
-    imageCache[sceneDescription] = asciiResult;
+    // Cache the result to avoid regeneration, using a unique key if forceNewGeneration is true
+    const cacheKey = options?.forceNewGeneration
+      ? `${sceneDescription}_${Date.now()}`
+      : sceneDescription;
+
+    imageCache[cacheKey] = asciiResult;
     imagesGenerated++;
     log("Scene image generated successfully.");
     return asciiResult;
   } catch (error: any) {
     log("Failed to generate scene image:", error);
     console.error("Failed to generate scene image:", error);
-    return `Error generating image: ${error.message}`;
+    throw new Error(`Error generating image: ${error.message}`);
+  } finally {
+    // Clean up resources to prevent memory leaks and ensure next generation works
+    try {
+      // Force garbage collection hints (Node.js can't directly force GC, but this helps)
+      if (global.gc) {
+        global.gc();
+      }
+    } catch (cleanupError) {
+      log(
+        "Note: Cleanup optimization unavailable, but operation should still succeed"
+      );
+    }
   }
 }
 
@@ -247,6 +294,58 @@ async function saveImageToDisk(
   }
 }
 
+function applyEdgeDetection(
+  data: Uint8ClampedArray,
+  width: number,
+  height: number
+): void {
+  // Create a copy of the data to work with
+  const original = new Uint8ClampedArray(data.length);
+  for (let i = 0; i < data.length; i++) {
+    original[i] = data[i];
+  }
+
+  // Sobel operator for edge detection
+  for (let y = 1; y < height - 1; y++) {
+    for (let x = 1; x < width - 1; x++) {
+      // Pixel positions
+      const idx = (y * width + x) * 4;
+      const idxTop = ((y - 1) * width + x) * 4; // This was missing
+      const idxBottom = ((y + 1) * width + x) * 4;
+      const idxLeft = (y * width + (x - 1)) * 4;
+      const idxRight = (y * width + (x + 1)) * 4;
+      const idxTopLeft = ((y - 1) * width + (x - 1)) * 4;
+      const idxTopRight = ((y - 1) * width + (x + 1)) * 4;
+      const idxBottomLeft = ((y + 1) * width + (x - 1)) * 4;
+      const idxBottomRight = ((y + 1) * width + (x + 1)) * 4;
+
+      // Sobel X component (using red channel as we're in grayscale)
+      const edgeX =
+        original[idxTopLeft] +
+        2 * original[idxLeft] +
+        original[idxBottomLeft] -
+        original[idxTopRight] -
+        2 * original[idxRight] -
+        original[idxBottomRight];
+
+      // Sobel Y component
+      const edgeY =
+        original[idxTopLeft] +
+        2 * original[idxTop] +
+        original[idxTopRight] -
+        original[idxBottomLeft] -
+        2 * original[idxBottom] -
+        original[idxBottomRight];
+
+      // Magnitude of gradient
+      const magnitude = Math.sqrt(edgeX * edgeX + edgeY * edgeY);
+
+      // Apply back to image (all channels as we're in grayscale)
+      data[idx] = data[idx + 1] = data[idx + 2] = Math.min(255, magnitude);
+    }
+  }
+}
+
 /**
  * Converts a base64 encoded image to ASCII art
  *
@@ -260,6 +359,9 @@ async function saveImageToDisk(
  * @param {number} targetWidth - Desired width of ASCII art in characters
  * @param {number} targetHeight - Desired height of ASCII art in characters
  * @param {boolean} [highContrast=true] - Whether to apply contrast enhancement
+ * @param {boolean} [inverted=false] - Whether to use inverted character set
+ * @param {boolean} [useEdgeDetection=false] - Whether to apply edge detection
+ * @param {boolean} [preserveSquareShape=false] - Whether to bypass terminal ratio correction
  * @returns {Promise<string>} A string of ASCII art representing the image
  * @private
  */
@@ -267,7 +369,10 @@ async function convertImageToAscii(
   imageBase64: string,
   targetWidth: number,
   targetHeight: number,
-  highContrast: boolean = true
+  highContrast: boolean = true,
+  inverted: boolean = false,
+  useEdgeDetection: boolean = false,
+  preserveSquareShape: boolean = false
 ): Promise<string> {
   try {
     // Create a buffer from base64 data
@@ -281,14 +386,27 @@ async function convertImageToAscii(
     const originalHeight = image.height;
     const aspectRatio = originalWidth / originalHeight;
 
-    // Adjust dimensions to maintain aspect ratio
-    let width = targetWidth;
-    let height = Math.round(width / aspectRatio / 2); // Divide by 2 because console characters are taller than wide
+    // Handle aspect ratio correction based on preserveSquareShape option
+    let width, height;
 
-    // If height exceeds target, adjust width
-    if (height > targetHeight) {
+    if (preserveSquareShape) {
+      // If we want exact dimensions, skip the terminal character ratio correction
+      width = targetWidth;
       height = targetHeight;
-      width = Math.round(height * aspectRatio * 2);
+    } else {
+      // Apply terminal character ratio correction for visually correct output
+      const terminalCharRatio = 0.5; // Terminal characters are about 1:2 (width:height)
+      const correctedAspectRatio = aspectRatio * terminalCharRatio;
+
+      // Calculate dimensions to maintain proper visual aspect ratio
+      width = Math.min(
+        targetWidth,
+        Math.floor(targetHeight * correctedAspectRatio * 2)
+      );
+      height = Math.min(
+        targetHeight,
+        Math.floor(width / correctedAspectRatio / 2)
+      );
     }
 
     // Create canvas and draw the image
@@ -296,44 +414,65 @@ async function convertImageToAscii(
     const ctx = canvas.getContext("2d");
     ctx.drawImage(image, 0, 0);
 
-    // Apply contrast enhancement if requested
-    if (highContrast) {
-      const imageData = ctx.getImageData(0, 0, originalWidth, originalHeight);
-      const data = imageData.data;
+    // Convert to grayscale first for better control
+    const imageData = ctx.getImageData(0, 0, originalWidth, originalHeight);
+    const data = imageData.data;
 
+    // Convert to grayscale
+    for (let i = 0; i < data.length; i += 4) {
+      const brightness =
+        0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+      data[i] = data[i + 1] = data[i + 2] = brightness;
+    }
+
+    // Apply edge detection if requested
+    if (useEdgeDetection) {
+      applyEdgeDetection(data, originalWidth, originalHeight);
+    }
+
+    // Apply contrast enhancement if requested with improved algorithm
+    if (highContrast) {
       // Find the min and max brightness values
       let min = 255;
       let max = 0;
       for (let i = 0; i < data.length; i += 4) {
-        const r = data[i];
-        const g = data[i + 1];
-        const b = data[i + 2];
-        const brightness = 0.299 * r + 0.587 * g + 0.114 * b;
+        const brightness = data[i]; // Already grayscale
         min = Math.min(min, brightness);
         max = Math.max(max, brightness);
       }
 
-      // Apply contrast stretching
+      // Apply enhanced contrast stretching with gamma
       const range = max - min;
       if (range > 0) {
         for (let i = 0; i < data.length; i += 4) {
-          for (let j = 0; j < 3; j++) {
-            // Calculate brightness using luminance formula
-            const brightness =
-              0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-            // Normalize brightness to 0-255 range
-            const adjustedValue = ((brightness - min) / range) * 255;
-            // Apply gamma correction for better mid-tone details
-            data[i + j] = Math.pow(adjustedValue / 255, 0.8) * 255;
-          }
+          // Apply contrast stretching
+          let normalized = (data[i] - min) / range;
+
+          // Apply S-curve for more balanced contrast
+          normalized =
+            Math.pow(normalized, 0.7) * (1 - Math.pow(1 - normalized, 0.7));
+
+          // Scale back to 0-255
+          const adjustedValue = Math.min(255, Math.max(0, normalized * 255));
+
+          // Apply to all RGB channels (already grayscale)
+          data[i] = data[i + 1] = data[i + 2] = adjustedValue;
         }
-        ctx.putImageData(imageData, 0, 0);
       }
     }
 
-    // Get image data after potential contrast enhancement
-    const imageData = ctx.getImageData(0, 0, originalWidth, originalHeight);
-    const pixels = imageData.data;
+    // Put processed image data back
+    ctx.putImageData(imageData, 0, 0);
+
+    // Define ASCII character sets
+    const ASCII_DENSITY_DETAILED = `$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,"^\`'. `;
+    const ASCII_DENSITY_SIMPLE = `@%#*+=-:. `; // Fewer characters for cleaner look
+    const ASCII_DENSITY_INVERTED = ` .'^\`",:;Il!i><~+_-?][}{1)(|/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$`;
+
+    // Choose character set based on inverted parameter
+    const asciiDensity = inverted
+      ? ASCII_DENSITY_INVERTED
+      : ASCII_DENSITY_DETAILED;
 
     // Create ASCII representation
     let asciiArt = "";
@@ -348,20 +487,16 @@ async function convertImageToAscii(
         // Calculate pixel index in the image data array (RGBA format)
         const pixelIndex = (sampleY * originalWidth + sampleX) * 4;
 
-        // Calculate grayscale value (standard luminance formula)
-        const r = pixels[pixelIndex];
-        const g = pixels[pixelIndex + 1];
-        const b = pixels[pixelIndex + 2];
-        const brightness = 0.299 * r + 0.587 * g + 0.114 * b;
+        // Get brightness (already grayscale)
+        const brightness = data[pixelIndex];
 
         // Map brightness to ASCII character
         const charIndex = Math.floor(
-          (brightness / 255) * (ASCII_DENSITY.length - 1)
+          (brightness / 255) * (asciiDensity.length - 1)
         );
-        // Use a double character for each pixel to improve horizontal resolution
-        // This compensates for terminal characters being taller than wide
-        asciiArt += ASCII_DENSITY[charIndex];
-        asciiArt += ASCII_DENSITY[charIndex];
+
+        // FIXED: Use single character for better proportions
+        asciiArt += asciiDensity[charIndex];
       }
       // Add newline after each row
       asciiArt += "\n";
@@ -460,6 +595,52 @@ export async function generateAndSaveImage(
     log("Failed to generate and save image:", error);
     console.error("Failed to generate and save image:", error);
     throw error;
+  }
+}
+
+/**
+ * Clears the image cache to free memory and force new generations
+ * Call this if you encounter issues with image generation
+ */
+export function clearImageCache(): void {
+  log("Clearing image cache...");
+  for (const key in imageCache) {
+    delete imageCache[key];
+  }
+  log("Image cache cleared successfully");
+}
+/**
+ * Resets the image service state to allow for new image generations
+ * Call this function when you encounter issues with multiple image generations
+ */
+export function resetImageServiceState(): void {
+  try {
+    // Clear any cached OpenAI clients that might be in a bad state
+    log("Resetting image service state...");
+
+    // Clear the image cache
+    clearImageCache();
+
+    // Reset rate limiting counters if needed
+    imagesGenerated = 0;
+    windowStart = Date.now();
+
+    // Force garbage collection if available
+    try {
+      if (global.gc) {
+        global.gc();
+      }
+    } catch (cleanupError) {
+      log(
+        "Note: Cleanup optimization unavailable, but operation should still succeed"
+      );
+    }
+    log("Image service state reset successfully.");
+  } catch (error) {
+    log(
+      "Failed to reset image service state: " +
+        (error instanceof Error ? error.message : String(error))
+    );
   }
 }
 

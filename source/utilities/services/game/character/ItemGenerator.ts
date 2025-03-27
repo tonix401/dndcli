@@ -96,16 +96,6 @@ function generateConsumableItem(level: number): IItem {
       name: "Agility Potion",
       description: "Temporarily increases dexterity",
     },
-    {
-      effect: "removeCurse",
-      name: "Holy Water",
-      description: "Removes negative effects",
-    },
-    {
-      effect: "revive",
-      name: "Revival Herb",
-      description: "Can bring someone back from unconsciousness",
-    },
   ];
 
   // Select a random effect from available templates
@@ -146,12 +136,6 @@ function generateConsumableItem(level: number): IItem {
       break;
     case "boostDexterity":
       description = `Increases dexterity by ${effectStrength} for the duration of combat.`;
-      break;
-    case "removeCurse":
-      description = `Removes negative status effects.`;
-      break;
-    case "revive":
-      description = `Brings an ally back with ${effectStrength * 10}% health.`;
       break;
     default:
       description = selectedEffect.description;

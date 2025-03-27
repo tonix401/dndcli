@@ -11,7 +11,7 @@ import {
   type Status,
   Theme,
 } from "@inquirer/core";
-import { getTheme } from "@utilities/CacheService.js";
+import { getTheme } from "@core/CacheService.js";
 import {
   alignText,
   alignTextAsTable,
@@ -20,10 +20,10 @@ import {
   primaryColor,
   removeFormatting,
   secondaryColor,
-} from "@utilities/ConsoleService.js";
+} from "@core/ConsoleService.js";
 import ICharacter from "@utilities/ICharacter.js";
 import { IEnemy } from "@utilities/IEnemy.js";
-import { getTerm } from "@utilities/LanguageService.js";
+import { getTerm } from "@core/LanguageService.js";
 import {
   Choice,
   isBackKey,
@@ -35,8 +35,8 @@ import {
   normalizeChoices,
   NormalizedChoice,
   SelectTheme,
-} from "@utilities/MenuService.js";
-import { getDataFromFile } from "@utilities/StorageService.js";
+} from "@ui/MenuService.js";
+import { getDataFromFile } from "@core/StorageService.js";
 import ansiEscapes from "ansi-escapes";
 import chalk from "chalk";
 import { holdMyText } from "@components/DungeonMovementSelect.js";

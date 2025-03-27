@@ -1,8 +1,9 @@
 import { IItem } from "@utilities/IITem.js";
 import ICharacter from "@utilities/ICharacter.js";
-import { saveDataToFile } from "@utilities/StorageService.js";
+import { saveDataToFile } from "@core/StorageService.js";
+import { primaryColor, secondaryColor } from "@core/ConsoleService.js";
 import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
-import { pressEnter, primaryColor, secondaryColor } from "@utilities/ConsoleService.js";
+import { pressEnter } from "@core/ConsoleService.js";
 
 /**
  * Check if an item can be equipped

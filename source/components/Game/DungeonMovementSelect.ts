@@ -13,13 +13,13 @@ import {
   primaryColor,
   removeFormatting,
   secondaryColor,
-} from "@utilities/ConsoleService.js";
+} from "@core/ConsoleService.js";
 import chalk from "chalk";
 import ansiEscapes from "ansi-escapes";
-import { getDataFromFile } from "@utilities/StorageService.js";
-import { getTerm } from "@utilities/LanguageService.js";
+import { getDataFromFile } from "@core/StorageService.js";
+import { getTerm } from "@core/LanguageService.js";
 import Config from "@utilities/Config.js";
-import { getDungeonMapVisual } from "@utilities/DungeonService.js";
+import { getDungeonMapVisual } from "@game/world/DungeonService.js";
 import {
   isBackKey,
   isConfirmKey,
@@ -27,7 +27,7 @@ import {
   isLeftKey,
   isRightKey,
   isUpKey,
-} from "@utilities/MenuService.js";
+} from "@ui/MenuService.js";
 
 type DungeonMovementSelectResult =
   | "north"
@@ -66,7 +66,7 @@ export const dungeonMovementSelect = createPrompt(
     useKeypress((key, rl) => {
       clearTimeout(searchTimeoutRef.current);
 
-      if ((isConfirmKey(key)) && direction !== "neutral") {
+      if (isConfirmKey(key) && direction !== "neutral") {
         rl.clearLine(0);
         setStatus("done");
         done(direction);
