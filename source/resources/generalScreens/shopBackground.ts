@@ -1,4 +1,4 @@
-import { primaryColor, secondaryColor } from "@core/ConsoleService.js";
+import { primaryColor, secondaryColor } from "@utilities/ConsoleService.js";
 
 export function getShopVisual(books: boolean = false, swords: boolean = false, bottles: boolean = false) {
   // books

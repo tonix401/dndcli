@@ -4,23 +4,22 @@ import {
   primaryColor,
   secondaryColor,
   totalClear,
-} from "@core/ConsoleService.js";
-import { Room, RoomTypes } from "@game/world/DungeonService.js";
-import { getTerm } from "@core/LanguageService.js";
-import { log } from "@core/LogService.js";
+} from "@utilities/ConsoleService.js";
+import { Room, RoomTypes } from "@utilities/world/DungeonService.js";
+import { getTerm } from "@utilities/LanguageService.js";
+import { log } from "@utilities/LogService.js";
 import getTreasureAscii from "@resources/rooms/treasureAscii.js";
 import getEmptyAscii from "@resources/rooms/emptyAscii.js";
 import getTrapAscii from "@resources/rooms/trapAscii.js";
 import getEnemyAscii from "@resources/rooms/enemyAscii.js";
 import getBossAscii from "@resources/rooms/bossAscii.js";
-import { themedSelect } from "@ui/MenuService.js";
+import { themedSelect } from "@utilities/MenuService.js";
 import { runCombat } from "src/combat.js";
-import { getDataFromFile, saveDataToFile } from "@core/StorageService.js";
-import { getDungeon } from "@core/CacheService.js";
+import { getDataFromFile, saveDataToFile } from "@utilities/StorageService.js";
+import { getDungeon, renewDungeon } from "@utilities/CacheService.js";
 import Config from "@utilities/Config.js";
 import getClosedTreasureAscii from "@resources/rooms/closedTreasureAscii.js";
-import { themedInput } from "@components/ThemedInput.js";
-import { generateRandomItem } from "@game/character/ItemGenerator.js";
+import { generateRandomItem } from "@utilities/character/ItemGenerator.js";
 
 const getYesNo = () => [
   { name: getTerm("yes"), value: true },
@@ -97,8 +96,9 @@ async function trapRoom(room: Room) {
     if (Math.random() < 0.25) {
       console.log(secondaryColor(getTerm("nothingHere")));
     } else {
-      // TODO: implement falling for trap logic
-      console.log("TODO: implement falling for trap logic");
+      await pressEnter({ message: getTerm("fellIntoTrap") });
+      renewDungeon();
+      return;
     }
   }
   await pressEnter();

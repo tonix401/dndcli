@@ -1,22 +1,22 @@
-import { getStartingItems } from "@game/character/InventoryService.js";
-import { getTerm } from "@core/LanguageService.js";
-import { log } from "@core/LogService.js";
+import { getStartingItems } from "@utilities/character/InventoryService.js";
+import { getTerm } from "@utilities/LanguageService.js";
+import { log } from "@utilities/LogService.js";
 import {
   pressEnter,
   primaryColor,
   secondaryColor,
   totalClear,
-} from "@core/ConsoleService.js";
-import { rollDiceTotal } from "@game/combat/DiceService.js";
+} from "@utilities/ConsoleService.js";
+import { rollDiceTotal } from "@utilities/combat/DiceService.js";
 import Config from "@utilities/Config.js";
 import {
   ChatCompletionRequestMessage,
   generateChatNarrative,
-} from "@ai/AIService.js";
+} from "@utilities/AIService.js";
 import ICharacter from "@utilities/ICharacter.js";
-import { saveDataToFile } from "@core/StorageService.js";
-import { getLanguage } from "@core/CacheService.js";
-import { inputValidators } from "@ui/MenuService.js";
+import { saveDataToFile } from "@utilities/StorageService.js";
+import { getLanguage } from "@utilities/CacheService.js";
+import { inputValidators } from "@utilities/MenuService.js";
 import { themedSelectInRoom } from "./ThemedSelectInRoom.js";
 import { themedInput } from "./ThemedInput.js";
 
@@ -25,6 +25,7 @@ export async function createCharacterMenu(): Promise<void> {
     const charData: ICharacter = Config.START_CHARACTER;
 
     // Get character name using themed prompt
+    totalClear();
     const namePrompt = primaryColor(getTerm("namePrompt"));
     charData.name = await themedInput({
       message: namePrompt,
@@ -101,6 +102,7 @@ export async function createCharacterMenu(): Promise<void> {
     }
 
     // Get character origin
+    totalClear();
     const originPrompt = primaryColor(getTerm("originPrompt"));
     let originInput = await themedInput({ message: originPrompt });
     if (originInput.toLowerCase() === "exit") return;

@@ -1,9 +1,10 @@
 import { IItem } from "@utilities/IITem.js";
 import { IAbility } from "@utilities/IAbility.js";
+import { ICharacterClass } from "./ICharacterClass.js";
 
 export default interface ICharacter {
   name: string;
-  class: string;
+  class: ICharacterClass;
   origin?: string;
   level: number;
   xp: number;

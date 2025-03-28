@@ -30,27 +30,27 @@
  * of individual service files within the codebase.
  */
 
-import * as Console from "@core/ConsoleService.js";
-import * as NarrativeDisplay from "@ui/NarrativeDisplayService.js";
-import * as Choice from "@ui/ChoiceService.js";
-import * as Narrative from "@game/narrative/NarrativeService.js";
-import * as NarrativeGenerationService from "@game/narrative/NarrativeService.js";
-import * as Objective from "@game/narrative/ObjectiveService.js";
-import * as CharacterAnalysis from "@game/character/CharacterAnalysisService.js";
-import * as AI from "@ai/AIService.js";
-import * as Dice from "@game/combat/DiceService.js";
-import * as Inventory from "@game/character/InventoryService.js";
-import * as Equipment from "@game/character/EquipmentService.js";
-import * as ItemGen from "@game/character/ItemGenerator.js";
-import * as SaveLoad from "@core/SaveLoadService.js";
-import * as Storage from "@core/StorageService.js";
-import * as Cache from "@core/CacheService.js";
-import * as Log from "@core/LogService.js";
-import * as Language from "@core/LanguageService.js";
-import * as Enemy from "@game/combat/EnemyService.js";
-import * as ArtService from "@game/narrative/ArtService.js";
-import * as EventHandlerService from "@state/EventHandlerService.js";
-import * as GameStateService from "@state/GameStateService.js";
+import * as Console from "@utilities/ConsoleService.js";
+import * as NarrativeDisplay from "@utilities/NarrativeDisplayService.js";
+import * as Choice from "@utilities/ChoiceService.js";
+import * as Narrative from "@utilities/narrative/NarrativeService.js";
+import * as NarrativeGenerationService from "@utilities/narrative/NarrativeService.js";
+import * as Objective from "@utilities/narrative/ObjectiveService.js";
+import * as CharacterAnalysis from "@utilities/character/CharacterAnalysisService.js";
+import * as AI from "@utilities/AIService.js";
+import * as Dice from "@utilities/combat/DiceService.js";
+import * as Inventory from "@utilities/character/InventoryService.js";
+import * as Equipment from "@utilities/character/EquipmentService.js";
+import * as ItemGen from "@utilities/character/ItemGenerator.js";
+import * as SaveLoad from "@utilities/SaveLoadService.js";
+import * as Storage from "@utilities/StorageService.js";
+import * as Cache from "@utilities/CacheService.js";
+import * as Log from "@utilities/LogService.js";
+import * as Language from "@utilities/LanguageService.js";
+import * as Enemy from "@utilities/combat/EnemyService.js";
+import * as ArtService from "@utilities/narrative/ArtService.js";
+import * as EventHandlerService from "@utilities/EventHandlerService.js";
+import * as GameStateService from "@utilities/GameStateService.js";
 
 export {
   Console,

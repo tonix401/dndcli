@@ -1,4 +1,4 @@
-import { log } from "@core/LogService.js";
+import { log } from "@utilities/LogService.js";
 import {
   totalClear,
   pressEnter,
@@ -6,14 +6,13 @@ import {
   removeFormatting,
   overlayTextOnLineAndFormat,
   wordWrap,
-} from "../core/ConsoleService.js";
-import { primaryColor, secondaryColor } from "../core/ConsoleService.js";
+} from "@utilities/ConsoleService.js";
+import { primaryColor, secondaryColor } from "@utilities/ConsoleService.js";
 import chalk from "chalk";
-import { getTheme } from "@core/CacheService.js";
 import Config from "@utilities/Config.js";
 import path from "path";
-import { IGameState } from "../../types/IGameState.js";
-import { deduplicateGameState } from "../core/SaveLoadService.js";
+import { IGameState } from "@utilities/IGameState.js";
+import { deduplicateGameState } from "@utilities/SaveLoadService.js";
 
 /**
  * Displays ASCII art from a string or loads it from a file
@@ -77,7 +76,7 @@ export async function displayAsciiArt(
     console.log(colorFn(artText));
   } catch (error) {
     log(
-      `Error displaying ASCII art: ${
+      `Narrative Display Service: Error displaying ASCII art: ${
         error instanceof Error ? error.message : String(error)
       }`,
       "Warn "
@@ -403,7 +402,10 @@ export async function getAsciiArtContent(filename: string): Promise<string> {
 
     return "";
   } catch (error) {
-    log(`Failed to load ASCII art from ${filename}: ${error}`, "Info ");
+    log(
+      `Narrative Display Service: Failed to load ASCII art from ${filename}: ${error}`,
+      "Info "
+    );
     return ""; // Return empty on error
   }
 }

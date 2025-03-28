@@ -3,11 +3,11 @@ import {
   getTheme,
   setLanguage,
   setTheme,
-} from "@core/CacheService.js";
-import { getTerm, Language } from "@core/LanguageService.js";
-import { log } from "@core/LogService.js";
-import { pressEnter, totalClear } from "@core/ConsoleService.js";
-import { getAllThemeOverrides } from "@core/ThemingService.js";
+} from "@utilities/CacheService.js";
+import { getTerm, Language, TermKey } from "@utilities/LanguageService.js";
+import { log } from "@utilities/LogService.js";
+import { pressEnter, totalClear } from "@utilities/ConsoleService.js";
+import { getAllThemeOverrides } from "@utilities/ThemingService.js";
 import chalk from "chalk";
 import Config from "@utilities/Config.js";
 import { themedSelectInRoom } from "./ThemedSelectInRoom.js";
@@ -86,7 +86,7 @@ async function changeLanguageMenu() {
     return;
   }
   setLanguage(chosenLang as Language);
-  log("Settings Menu: Switched language to: " + getTerm(chosenLang));
+  log("Settings Menu: Switched language to: " + getTerm(chosenLang as TermKey));
 }
 
 async function changeThemeMenu() {

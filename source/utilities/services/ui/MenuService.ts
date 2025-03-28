@@ -1,9 +1,9 @@
-import { getTheme } from "@core/CacheService.js";
+import { getTheme } from "@utilities/CacheService.js";
 import {
   errorColor,
   primaryColor,
   secondaryColor,
-} from "@core/ConsoleService.js";
+} from "@utilities/ConsoleService.js";
 import chalk from "chalk";
 import {
   createPrompt,
@@ -25,7 +25,7 @@ import type { PartialDeep } from "@inquirer/type";
 import colors from "yoctocolors-cjs";
 import figures from "@inquirer/figures";
 import ansiEscapes from "ansi-escapes";
-import { getTerm } from "@core/LanguageService.js";
+import { getTerm } from "@utilities/LanguageService.js";
 import ICharacter from "@utilities/ICharacter.js";
 
 /**
@@ -397,34 +397,34 @@ export const themedSingleKeyPrompt = createPrompt(
 
 // Functions that test for certain types of control keys inside selects and other prompts or menus
 /**
- * up, w, i
+ * up
  */
 export function isUpKey(key: any): boolean {
-  return key.name === "up" || key.name === "w" || key.name === "i";
+  return key.name === "up";
 }
 /**
- * down, s, k
+ * down
  */
 export function isDownKey(key: any): boolean {
-  return key.name === "down" || key.name === "s" || key.name === "k";
+  return key.name === "down";
 }
 /**
- * left, a, j
+ * left
  */
 export function isLeftKey(key: any): boolean {
-  return key.name === "left" || key.name === "a" || key.name === "j";
+  return key.name === "left";
 }
 /**
- * right, d, l
+ * right
  */
 export function isRightKey(key: any): boolean {
-  return key.name === "right" || key.name === "d" || key.name === "l";
+  return key.name === "right";
 }
 /**
- * return, space, right
+ * return
  */
 export function isConfirmKey(key: any): boolean {
-  return key.name === "return" || key.name === "space";
+  return key.name === "return";
 }
 /**
  * escape, left

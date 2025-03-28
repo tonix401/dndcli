@@ -1,8 +1,8 @@
 import readline from "readline";
-import { log } from "@core/LogService.js";
+import { log } from "@utilities/LogService.js";
 import chalk from "chalk";
-import { getTerm } from "@core/LanguageService.js";
-import { getTheme } from "@core/CacheService.js";
+import { getTerm } from "@utilities/LanguageService.js";
+import { getTheme } from "@utilities/CacheService.js";
 import ansiRegex from "ansi-regex";
 import util from "util";
 import boxen from "boxen";
@@ -14,7 +14,7 @@ import {
   isConfirmKey,
   isRightKey,
   themedSingleKeyPrompt,
-} from "@ui/MenuService.js";
+} from "@utilities/MenuService.js";
 import ansiEscapes from "ansi-escapes";
 import { IAnimation } from "@utilities/IAnimation.js";
 

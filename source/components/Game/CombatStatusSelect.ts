@@ -11,7 +11,7 @@ import {
   type Status,
   Theme,
 } from "@inquirer/core";
-import { getTheme } from "@core/CacheService.js";
+import { getTheme } from "@utilities/CacheService.js";
 import {
   alignText,
   alignTextAsTable,
@@ -20,10 +20,10 @@ import {
   primaryColor,
   removeFormatting,
   secondaryColor,
-} from "@core/ConsoleService.js";
+} from "@utilities/ConsoleService.js";
 import ICharacter from "@utilities/ICharacter.js";
 import { IEnemy } from "@utilities/IEnemy.js";
-import { getTerm } from "@core/LanguageService.js";
+import { getTerm } from "@utilities/LanguageService.js";
 import {
   Choice,
   isBackKey,
@@ -35,13 +35,13 @@ import {
   normalizeChoices,
   NormalizedChoice,
   SelectTheme,
-} from "@ui/MenuService.js";
-import { getDataFromFile } from "@core/StorageService.js";
+} from "@utilities/MenuService.js";
+import { getDataFromFile } from "@utilities/StorageService.js";
 import ansiEscapes from "ansi-escapes";
 import chalk from "chalk";
 import { holdMyText } from "@components/DungeonMovementSelect.js";
 import { PartialDeep } from "@inquirer/type";
-import { log } from "@core/LogService.js";
+import { log } from "@utilities/LogService.js";
 
 const enemyAscii = [
   "  |\\ .====. /|  ",

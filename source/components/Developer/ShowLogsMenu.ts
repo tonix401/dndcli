@@ -3,9 +3,9 @@ import {
   primaryColor,
   secondaryColor,
   totalClear,
-} from "@core/ConsoleService.js";
-import { getTerm } from "@core/LanguageService.js";
-import { clearLogs, getLogData, log } from "@core/LogService.js";
+} from "@utilities/ConsoleService.js";
+import { getTerm } from "@utilities/LanguageService.js";
+import { clearLogs, getLogData, log } from "@utilities/LogService.js";
 import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
 
 export async function showLogsMenu() {

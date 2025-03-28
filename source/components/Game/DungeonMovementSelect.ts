@@ -13,13 +13,13 @@ import {
   primaryColor,
   removeFormatting,
   secondaryColor,
-} from "@core/ConsoleService.js";
+} from "@utilities/ConsoleService.js";
 import chalk from "chalk";
 import ansiEscapes from "ansi-escapes";
-import { getDataFromFile } from "@core/StorageService.js";
-import { getTerm } from "@core/LanguageService.js";
+import { getDataFromFile } from "@utilities/StorageService.js";
+import { getTerm } from "@utilities/LanguageService.js";
 import Config from "@utilities/Config.js";
-import { getDungeonMapVisual } from "@game/world/DungeonService.js";
+import { getDungeonMapVisual } from "@utilities/world/DungeonService.js";
 import {
   isBackKey,
   isConfirmKey,
@@ -27,7 +27,7 @@ import {
   isLeftKey,
   isRightKey,
   isUpKey,
-} from "@ui/MenuService.js";
+} from "@utilities/MenuService.js";
 
 type DungeonMovementSelectResult =
   | "north"

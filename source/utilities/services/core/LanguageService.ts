@@ -1,11 +1,11 @@
-import { log } from "@core/LogService.js";
-import { getLanguage } from "@core/CacheService.js";
+import { log } from "@utilities/LogService.js";
+import { getLanguage } from "@utilities/CacheService.js";
 import chalk from "chalk";
 //TODO: Implement the missing terms :D
 
 export type Language = "de" | "en" | "ch";
 export type ITerm = Record<Language, string>;
-export type IColorTerm = Record<Language | "hex", string>;
+export type TermKey = keyof typeof terms;
 
 const arrowUp = chalk.bold("▲");
 const arrowDown = chalk.bold("▼");
@@ -23,7 +23,7 @@ const arrowLeft = chalk.bold("◄");
  * indented = true,
  * returns "  Drücke [Enter], um ins Menü zu kommen",
  */
-export function getTerm(key: string, indented: boolean = false): string {
+export function getTerm(key: TermKey, indented: boolean = false): string {
   const term = terms[key];
   if (!term) {
     log(`Language Service: Term not found: ${key}`, "Error");
@@ -35,7 +35,7 @@ export function getTerm(key: string, indented: boolean = false): string {
   return (indented ? "  " : "") + translation;
 }
 
-const terms: Record<string, ITerm> = {
+const terms = {
   // #region Main
   welcome: {
     de: "Von Julian Thäsler und Tom Weise",
@@ -420,10 +420,25 @@ const terms: Record<string, ITerm> = {
   },
 
   // Inventory messages
+  inventoryTitle: {
+    de: "=== Inventar ===",
+    en: "=== Inventory ===",
+    ch: "=== Inventar ===",
+  },
+  equippedTitle: {
+    de: "=== Ausgerüstet ===",
+    en: "=== Equipped ===",
+    ch: "=== Usgrüstet ===",
+  },
   inventoryFull: {
     de: "Dein Inventar ist voll",
     en: "Your inventory is full",
     ch: "Dis Inventar isch voll",
+  },
+  inventoryEmpty: {
+    de: "Dein Inventar ist leer",
+    en: "Your Inventory is empty",
+    ch: "Dis Inventar isch leer",
   },
   itemAdded: {
     de: "Gegenstand hinzugefügt",
@@ -630,6 +645,16 @@ const terms: Record<string, ITerm> = {
     en: "Character data",
     ch: "Charakterdate",
   },
+  saveStateData: {
+    de: "Spielstanddaten",
+    en: "Save state data",
+    ch: "Spilstanddate",
+  },
+  animations: {
+    de: "Animationen",
+    en: "Animations",
+    ch: "Animatione",
+  },
   setPassword: {
     de: "Passwort ändern",
     en: "Change password",
@@ -760,11 +785,16 @@ const terms: Record<string, ITerm> = {
     en: "Flip",
     ch: "Flip",
   },
+  playAll: {
+    de: "Alle abspielen",
+    en: "Play all",
+    ch: "All abspiele",
+  },
   // lets hope we don't ever get to see this one :)
   undefined: {
-    de: "undefined",
+    de: "undefiniert",
     en: "undefined",
-    ch: "undefined",
+    ch: "undefiniert",
   },
   //#endregion
 
@@ -824,6 +854,11 @@ const terms: Record<string, ITerm> = {
     en: "That must be higher than the current HP",
     ch: "Das mues höcher sii als d'aktuelli HP",
   },
+  notTheSame: {
+    de: "Das ist nicht dasselbe",
+    en: "That is not the same",
+    ch: "Das isch nöd s'gleiche",
+  },
   //#endregion
 
   //#region Dungeon
@@ -862,6 +897,11 @@ const terms: Record<string, ITerm> = {
     en: "Seems like there is really nothing here... sad",
     ch: "Es schiint als wär würkli nüt do... schad",
   },
+  fellIntoTrap: {
+    de: `Du bist in eine Falle gefallen und landest in einer tieferen Ebene. Drücke ${arrowRight} oder [Enter], um fortzufahren`,
+    en: `You fell into a trap and land in a deeper level. Press ${arrowRight} or [Enter] to continue`,
+    ch: `Du bisch i e Falle gfalle und landisch i ere tieferere Ebene. Drück ${arrowRight} oder [Enter], um witermache`,
+  },
   enemyRoomDiscovered: {
     de: "Du hast einen Raum mit einem Gegner entdeckt",
     en: "You discovered a room with an enemy",
@@ -892,5 +932,69 @@ const terms: Record<string, ITerm> = {
     en: "You found an item: ",
     ch: "Du hesch en Gegestand gfunde: ",
   },
+  // #endregion
+
+  // #region Campaign
+  exploreFurther: {
+    de: "Erkunde die Umgebung weiter",
+    en: "Explore the area further",
+    ch: "Erforscht d'Gegend witer",
+  },
+  askForMoreInfo: {
+    de: "Frage jemanden nach mehr Informationen",
+    en: "Ask someone for more information",
+    ch: "Frag öpper nach meh Informatione",
+  },
+  openInventory: {
+    de: "📦Öffne dein Inventar",
+    en: "📦Open your inventory",
+    ch: "📦Öpfne dis Inventar",
+  },
+  reviewScene: {
+    de: "📚Aktuelle Szene nochmal ansehen",
+    en: "📚Review current scene",
+    ch: "📚Aktuelli Szenerie nochma aaluege",
+  },
+  returnToMenu: {
+    de: "🏠Zurück zum Hauptmenü",
+    en: "🏠Back to main menu",
+    ch: "🏠Zrugg zum Hauptmenü",
+  },
+  whatNext: {
+    de: "✧ Was möchtest Du als nächstes tun? ✧",
+    en: "✧ What would you like to do next? ✧",
+    ch: "✧ Was wotsch du als nächscht mache? ✧",
+  },
+  chooseNextOption: {
+    de: "Wähle eine Option",
+    en: "Choose an option",
+    ch: "Wähl e Option",
+  },
+  savingBeforeExit: {
+    de: "💾 Spiel wird gespeichert...",
+    en: "💾 Saving game...",
+    ch: "💾 Spiel wird gspichere...",
+  },
+  savedSuccessfully: {
+    de: "💾 Spiel erfolgreich gespeichert",
+    en: "💾 Game saved successfully",
+    ch: "💾 Spiel erfolgrich gspichere",
+  },
+  saveFailed: {
+    de: "💾 Spiel konnte nicht gespeichert werden",
+    en: "💾 Game could not be saved",
+    ch: "💾 Spiel cha nöd gspichere werde",
+  },
+  cannotOpenInventory: {
+    de: "Kann das Inventar im Moment nicht öffnen",
+    en: "Unable to access inventory at this time",
+    ch: "Kann s'Inventar im Moment nöd öffne",
+  },
+  closedInventory: {
+    de: "Du schliesst dein Inventar und überlegst dir deinen nächsten Schritt...",
+    en: "You close your inventory and consider your next move...",
+    ch: "Du schliesst dis Inventar und überlegsch dir din nöchschti Schritt...",
+  },
+
   // #endregion
 };

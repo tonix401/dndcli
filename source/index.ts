@@ -1,12 +1,12 @@
-import { getTerm } from "@core/LanguageService.js";
+import { getTerm } from "@utilities/LanguageService.js";
 import { createCharacterMenu } from "@components/CreateCharacterMenu.js";
 import { inspectCharacter } from "@components/InspectCharacter.js";
 import {
   primaryColor,
   skippableSlowWrite,
   totalClear,
-} from "@core/ConsoleService.js";
-import { log } from "@core/LogService.js";
+} from "@utilities/ConsoleService.js";
+import { log } from "@utilities/LogService.js";
 import { settingsMenu } from "@components/SettingsMenu.js";
 import {
   getLanguage,
@@ -14,15 +14,15 @@ import {
   getTheme,
   setLanguage,
   setTheme,
-} from "@core/CacheService.js";
+} from "@utilities/CacheService.js";
 import { secretDevMenu } from "@components/DeveloperMenu.js";
 import { inspectInventory } from "@components/InspectInventory.js";
 import { titleScreen } from "@components/TitleScreen.js";
-import { startCampaign } from "@game/GameService.js";
+import { startCampaign } from "@utilities/GameService.js";
 import { tutorial } from "@components/Tutorial.js";
 import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
 import { getErrorMessage } from "@resources/generalScreens/errorMessage.js";
-import { getDataFromFile, saveDataToFile } from "@core/StorageService.js";
+import { getDataFromFile, saveDataToFile } from "@utilities/StorageService.js";
 import Config from "@utilities/Config.js";
 
 const getMenuOptions = () => [

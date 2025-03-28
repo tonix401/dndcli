@@ -1,5 +1,5 @@
 import ICharacter from "@utilities/ICharacter.js";
-import { getTerm } from "@core/LanguageService.js";
+import { getTerm } from "@utilities/LanguageService.js";
 import {
   alignTextAsMultiTable,
   boxItUp,
@@ -11,8 +11,8 @@ import {
   errorColor,
   totalClear,
   navigationPrompt,
-} from "@core/ConsoleService.js";
-import { getDataFromFile } from "@core/StorageService.js";
+} from "@utilities/ConsoleService.js";
+import { getDataFromFile } from "@utilities/StorageService.js";
 import Config from "@utilities/Config.js";
 import { getErrorMessage } from "@resources/generalScreens/errorMessage.js";
 import chalk from "chalk";

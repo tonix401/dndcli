@@ -1,9 +1,9 @@
 import { configDotenv } from "dotenv";
 import Config from "@utilities/Config.js";
-import { log } from "@core/LogService.js";
+import { log } from "@utilities/LogService.js";
 import fs from "fs-extra";
-import { inputValidators } from "@ui/MenuService.js";
-import { getTerm } from "@core/LanguageService.js";
+import { inputValidators } from "@utilities/MenuService.js";
+import { getTerm } from "@utilities/LanguageService.js";
 import { themedInput } from "@components/ThemedInput.js";
 
 const files = {

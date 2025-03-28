@@ -1,19 +1,25 @@
 import { IGameState } from "../../types/IGameState.js";
-import { log } from "@core/LogService.js";
-import { sanitizeJsonString, pause } from "@core/ConsoleService.js";
+import { log } from "@utilities/LogService.js";
+import {
+  sanitizeJsonString,
+  pause,
+  accentColor,
+  errorColor,
+} from "@utilities/ConsoleService.js";
 import { primaryColor, secondaryColor } from "../core/ConsoleService.js";
-import { themedSelect } from "@ui/MenuService.js";
+import { themedSelect } from "@utilities/MenuService.js";
 import {
   generateChatNarrative,
   ChatCompletionResponse,
 } from "../ai/AIService.js";
 import { inventoryMenu } from "../game/character/InventoryService.js";
 import chalk from "chalk";
-import { getTheme } from "@core/CacheService.js";
+import { getTheme } from "@utilities/CacheService.js";
 import {
   getAsciiArtContent,
   displayTextInBookFormat,
 } from "./NarrativeDisplayService.js";
+import { getTerm } from "@utilities/LanguageService.js";
 
 /**
  * Extracts choices from narrative text and prompts the user to select one.
@@ -41,7 +47,10 @@ export async function promptForChoice(
 
     // If no choices were found or extraction failed, generate new choices
     if (choices.length === 0) {
-      log("No choices found in narrative. Generating options...", "Warn ");
+      log(
+        "Choice Service: No choices found in narrative. Generating options...",
+        "Warn "
+      );
 
       // Generate choices based on current narrative context
       const generatedChoices = await generateChoices(narrative);
@@ -52,11 +61,11 @@ export async function promptForChoice(
         // Fallback if choice generation fails
         choices.push(
           {
-            name: "Explore the area further",
+            name: getTerm("exploreFurther"),
             value: "Explore the area further",
           },
           {
-            name: "Ask someone for more information",
+            name: getTerm("askForMoreInfo"),
             value: "Ask someone for more information",
           }
         );
@@ -66,19 +75,19 @@ export async function promptForChoice(
     // Always add inventory option if requested
     if (includeInventoryOption) {
       choices.push({
-        name: "📦 Open Inventory",
+        name: getTerm("openInventory"),
         value: "Open Inventory",
       });
     }
 
     choices.push({
-      name: "📚 Review Current Scene",
+      name: getTerm("reviewScene"),
       value: "Reread Story",
     });
 
     // Always add an exit option
     choices.push({
-      name: "Return to main menu",
+      name: getTerm("returnToMenu"),
       value: "Return to main menu",
     });
 
@@ -93,7 +102,7 @@ export async function promptForChoice(
   } catch (error) {
     // Handle any errors and provide a fallback
     log(
-      `Error parsing choices: ${
+      `Choice Service: Error parsing choices: ${
         error instanceof Error ? error.message : String(error)
       }`
     );
@@ -169,7 +178,10 @@ async function generateChoices(
           choices = args.choices;
         }
       } catch (jsonError) {
-        log(`Failed to parse function arguments: ${jsonError}`, "Error");
+        log(
+          `Choice Service: Failed to parse function arguments: ${jsonError}`,
+          "Error"
+        );
       }
     }
     // Fall back to content parsing if function call isn't available
@@ -181,7 +193,10 @@ async function generateChoices(
           choices = parsedChoices;
         }
       } catch (jsonError) {
-        log(`Failed to parse choices JSON: ${jsonError}`, "Error");
+        log(
+          `Choice Service: Failed to parse choices JSON: ${jsonError}`,
+          "Error"
+        );
       }
     }
 
@@ -196,7 +211,7 @@ async function generateChoices(
     // If we reach here, we need fallback options
     throw new Error("No valid choices generated");
   } catch (e) {
-    log("Failed to generate choices: " + e, "Error");
+    log("Choice Service: Failed to generate choices: " + e, "Error");
 
     // Provide fallback options if JSON parsing fails
     const fallbackChoices = [
@@ -224,7 +239,7 @@ function formatChoicesForDisplay(
 
   // Add each choice with formatting and numbers
   choices.forEach((choice, index) => {
-    const choiceNumber = chalk.hex(getTheme().accentColor)(`${index + 1}.`);
+    const choiceNumber = accentColor(`${index + 1}.`);
     result += `${choiceNumber} ${primaryColor(choice.name)}\n`;
   });
 
@@ -268,7 +283,7 @@ export async function presentChoicesAfterNarrative(
       }
     }
   } catch (error) {
-    log(`Could not load choices ASCII art: ${error}`, "Info ");
+    log(`Choice Service: Could not load choices ASCII art: ${error}`, "Info ");
   }
 
   // Format choices for display
@@ -282,13 +297,11 @@ export async function presentChoicesAfterNarrative(
   }
 
   // Now display choices in a book format
-  console.log(
-    chalk.hex(getTheme().accentColor)("\n✧ What will you do next? ✧\n")
-  );
+  console.log(accentColor(getTerm("whatNext")));
 
   // Use themed select for choice selection
   const selectedChoice = await themedSelect({
-    message: "Choose your next action:",
+    message: getTerm("chooseNextOption"),
     choices: choices,
   });
 
@@ -297,9 +310,7 @@ export async function presentChoicesAfterNarrative(
       const { saveGameState } = await import("../core/SaveLoadService.js");
 
       // Show saving indicator
-      console.log(
-        chalk.hex(getTheme().accentColor)("\n💾 Saving game before exiting...")
-      );
+      console.log(accentColor(getTerm("savingBeforeExit")));
 
       // Deduplicate game state before saving
       const { deduplicateGameState } = await import(
@@ -308,13 +319,11 @@ export async function presentChoicesAfterNarrative(
       deduplicateGameState(gameState);
 
       await saveGameState(gameState);
-      console.log(chalk.green("Game saved successfully!"));
+      console.log(accentColor(getTerm("savedSuccessfully")));
       await pause(1000); // Brief pause to show the message
     } catch (error) {
-      log(`Error saving game during exit: ${error}`, "Error");
-      console.log(
-        chalk.yellow("Could not save game state. Your progress may be lost.")
-      );
+      log(`Choice Service: Error saving game during exit: ${error}`, "Error");
+      console.log(errorColor(getTerm("saveFailed")));
       await pause(1500);
     }
   }
@@ -340,8 +349,11 @@ export async function presentChoicesAfterNarrative(
   // Handle inventory as a special case that doesn't advance the narrative
   if (selectedChoice === "Open Inventory") {
     if (!characterData) {
-      log("Character data required for inventory access", "Error");
-      console.log(chalk.yellow("Unable to access inventory at this time."));
+      log(
+        "Choice Service: Character data required for inventory access",
+        "Error"
+      );
+      console.log(errorColor(getTerm("cannotOpenInventory")));
       // Re-prompt for a choice
       return presentChoicesAfterNarrative(
         narrative,
@@ -353,11 +365,7 @@ export async function presentChoicesAfterNarrative(
 
     // Open the inventory without advancing narrative
     await inventoryMenu(characterData, false);
-    console.log(
-      secondaryColor(
-        "\nYou close your inventory and consider your next move..."
-      )
-    );
+    console.log(secondaryColor(getTerm("closedInventory")));
 
     // After inventory interaction is complete, re-prompt for a choice
     return presentChoicesAfterNarrative(

@@ -1,7 +1,7 @@
-import { rollDice } from "@game/combat/DiceService.js";
-import { inventoryMenu } from "@game/character/InventoryService.js";
-import { generateRandomItem } from "@game/character/ItemGenerator.js";
-import { addItemToInventory } from "@game/character/InventoryService.js";
+import { rollDice } from "@utilities/combat/DiceService.js";
+import { inventoryMenu } from "@utilities/character/InventoryService.js";
+import { generateRandomItem } from "@utilities/character/ItemGenerator.js";
+import { addItemToInventory } from "@utilities/character/InventoryService.js";
 import ICharacter from "@utilities/ICharacter.js";
 import { IEnemy } from "@utilities/IEnemy.js";
 import { IAbility } from "@utilities/IAbility.js";
@@ -11,12 +11,12 @@ import {
   pressEnter,
   primaryColor,
   totalClear,
-} from "@core/ConsoleService.js";
-import { saveDataToFile } from "@core/StorageService.js";
-import { pause } from "@core/ConsoleService.js";
-import { themedSelect } from "@ui/MenuService.js";
+} from "@utilities/ConsoleService.js";
+import { saveDataToFile } from "@utilities/StorageService.js";
+import { pause } from "@utilities/ConsoleService.js";
+import { themedSelect } from "@utilities/MenuService.js";
 import { combatStatusSelect } from "@components/CombatStatusSelect.js";
-import { getEquippedStatBonuses } from "@game/character/EquipmentService.js";
+import { getEquippedStatBonuses } from "@utilities/character/EquipmentService.js";
 
 interface CombatResult {
   success: boolean;
