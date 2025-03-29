@@ -438,3 +438,8 @@ export function isBackKey(key: any): boolean {
 export function isBackspaceKey(key: any): boolean {
   return key.name === "backspace";
 }
+
+export const getYesNo = () => [
+  { name: getTerm("yes"), value: true },
+  { name: getTerm("no"), value: false },
+];

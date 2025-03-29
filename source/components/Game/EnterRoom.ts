@@ -26,29 +26,30 @@ const getYesNo = () => [
   { name: getTerm("no"), value: false },
 ];
 
-export async function enterRoom(room: Room) {
+type RoomResult = "died" | "fled" | "cleared" | "bossCleared";
+
+export async function enterRoom(room: Room): Promise<RoomResult> {
   if (room.cleared) {
-    return;
+    return "cleared";
   }
   const { type } = room;
   totalClear();
   switch (type) {
+    case RoomTypes.ENEMY:
+      return await enemyRoom(room);
+    case RoomTypes.BOSS:
+      return await bossRoom(room);
     case RoomTypes.EMPTY:
       await emptyRoom(room);
       break;
     case RoomTypes.TRAP:
       await trapRoom(room);
       break;
-    case RoomTypes.ENEMY:
-      await enemyRoom(room);
-      break;
-    case RoomTypes.BOSS:
-      await bossRoom(room);
-      break;
     case RoomTypes.CHEST:
       await chestRoom(room);
       break;
   }
+  return "cleared";
 }
 
 /**
@@ -108,7 +109,7 @@ async function trapRoom(room: Room) {
 /**
  * Handles the enemy room.
  */
-async function enemyRoom(room: Room) {
+async function enemyRoom(room: Room): Promise<RoomResult> {
   log("Enter Room: enemy room");
   console.log(getEnemyAscii());
   console.log(primaryColor(getTerm("enemyRoomDiscovered")));
@@ -121,7 +122,11 @@ async function enemyRoom(room: Room) {
   const combatResult = await runCombat(character, enemy);
   if (combatResult.success) {
     clearRoom(room);
+    return "cleared";
+  } else if (combatResult.fled) {
+    return "fled";
   }
+  return "died";
 }
 
 /**
@@ -155,7 +160,11 @@ async function bossRoom(room: Room) {
   const combatResult = await runCombat(character, enemy);
   if (combatResult.success) {
     clearRoom(room);
+    return "bossCleared";
+  } else if (combatResult.fled) {
+    return "fled";
   }
+  return "died";
 }
 
 /**

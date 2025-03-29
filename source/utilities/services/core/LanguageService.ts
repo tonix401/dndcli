@@ -1,7 +1,6 @@
 import { log } from "@utilities/LogService.js";
 import { getLanguage } from "@utilities/CacheService.js";
 import chalk from "chalk";
-//TODO: Implement the missing terms :D
 
 export type Language = "de" | "en" | "ch";
 export type ITerm = Record<Language, string>;
@@ -931,6 +930,21 @@ const terms = {
     de: "Du hast einen Gegenstand gefunden: ",
     en: "You found an item: ",
     ch: "Du hesch en Gegestand gfunde: ",
+  },
+  confirmDungeonExit: {
+    de: "Bist Du sicher, dass du den Dungeon verlassen willst?\n Du kannst später nicht mehr zurück",
+    en: "Are you sure you want to exit the dungeon?\n You will not be able to go back in later",
+    ch: "Bisch sicher, dass Du de Dungeon verlah willsch?\n Du chasch nüm zrugg cho spöter.",
+  },
+  fleeDungeon: {
+    de: "Du nimmst Deine Beine in die Hand und fliehst so schnell du kannst aus dem Dungeon.\nDie Decke und Wände beginnen zu bröckeln und machen merkwürdige Geräusche.\nMit deinem letzten Atemzug schaffst du es nach draußen, während der Dungeon hinter dir in sich zusammenfällt.",
+    en: "You take to your heels and flee the dungeon as fast as you can.\nThe ceiling and walls start to crumble, making strange noises.\nWith your last breath, you make it outside just as the dungeon collapses behind you.",
+    ch: "Du nimmst Di Bei id Hand und flüesch so schnäll wie Du chasch us em Dungeon.\nD'Wänd und d'Decki fanged ah az brösmle und mache komischi Gäräusche.\nMit äm letschte Schnauf schaffsch es usse, grad wänn de Dungeon hinder Di zämäfallt.",
+  },
+  bossCleared: {
+    de: "Herzlichen Glückwunsch, Du hast den Boss besiegt und damit den Dungeon beendet.\n Viel Glück auf Deinen weiteren Abenteuern.",
+    en: "Congratulations, you have defeated the boss and completed the dungeon.\n Good luck on your future adventures!",
+    ch: "Grautulation, Du hesch de Boss bsiigt und de Dungeon gschlosse.\n Viel Glück uf Dini wiiteri Abentüür!",
   },
   // #endregion
 
