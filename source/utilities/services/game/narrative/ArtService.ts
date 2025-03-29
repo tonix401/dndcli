@@ -5,12 +5,12 @@
  * based on game context, character class, story arc, and narrative content.
  */
 
-import { log } from "@core/LogService.js";
-import { getAsciiArtContent } from "@ui/NarrativeDisplayService.js";
+import { log } from "@utilities/LogService.js";
+import { getAsciiArtContent } from "@utilities/NarrativeDisplayService.js";
 import { IGameState } from "@utilities/IGameState.js";
-import { getTerm } from "@core/LanguageService.js";
-import { getLanguage } from "@core/CacheService.js";
-import { translateText } from "@ai/AIService.js";
+import { getTerm } from "@utilities/LanguageService.js";
+import { getLanguage } from "@utilities/CacheService.js";
+import { translateText } from "@utilities/AIService.js";
 
 /**
  * Gets appropriate ASCII art for a character class intro
