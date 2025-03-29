@@ -70,7 +70,7 @@ export async function campaignLoop(
       console.log(
         chalk
           .hex(Cache.getTheme().accentColor)
-          .bold("✅ Loaded saved campaign state.")
+          .bold(getTerm("loadedSavedCampaignState"))
       );
 
       // Get both recap text and ASCII art for the recap book display
@@ -291,7 +291,7 @@ Starting Instructions:
         initialChoice.toLowerCase().includes("return to main menu") ||
         initialChoice.toLowerCase() === "exit"
       ) {
-        console.log(Console.secondaryColor("Returning to main menu..."));
+        console.log(Console.secondaryColor(getTerm("returningToMainMenu")));
         return;
       }
       gameState.addNarrative(introNarrative);
@@ -535,7 +535,9 @@ Starting Instructions:
         choice.toLowerCase() === "exit"
       ) {
         console.log(
-          chalk.hex(Cache.getTheme().accentColor)("Returning to main menu...")
+          chalk.hex(Cache.getTheme().accentColor)(
+            getTerm("returningToMainMenu")
+          )
         );
         await SaveLoad.saveGameState(gameState);
         return;
@@ -560,7 +562,7 @@ Starting Instructions:
       }
 
       await Console.pressEnter({
-        message: "Press Enter to return to the main menu...",
+        message: getTerm("pressEnterToReturnToMenu"),
       });
       return;
     }
@@ -629,16 +631,12 @@ export async function startCampaign(): Promise<void> {
     }
 
     if (isNewCampaign) {
-      console.log(
-        Console.secondaryColor(
-          "\nIMPORTANT: Story pace can only be selected once per campaign and cannot be changed later."
-        )
-      );
+      console.log(Console.secondaryColor("\n" + getTerm("storyPaceWarning")));
 
       // Allow the player to select their preferred story pace.
       const paceChoice = await themedSelectInRoom({
         message: chalk.hex(Cache.getTheme().accentColor)(
-          "Choose your story pace:"
+          getTerm("chooseStoryPace")
         ),
         choices: Object.entries(STORY_PACE).map(([key, value]) => ({
           name: `${value.name} - ${value.description}`,
@@ -648,13 +646,11 @@ export async function startCampaign(): Promise<void> {
 
       gameState.setStoryPace(paceChoice as StoryPaceKey);
       console.log(
-        chalk.hex(Cache.getTheme().accentColor)(
-          "Story pace set. Your adventure begins..."
-        )
+        chalk.hex(Cache.getTheme().accentColor)(getTerm("storyPaceSet"))
       );
     } else {
       console.log(
-        chalk.hex(Cache.getTheme().accentColor)("Continuing your adventure...")
+        chalk.hex(Cache.getTheme().accentColor)(getTerm("continuingCampaign"))
       );
     }
 
@@ -667,7 +663,7 @@ export async function startCampaign(): Promise<void> {
     }
 
     console.log(
-      chalk.hex(Cache.getTheme().accentColor)("Starting campaign...")
+      chalk.hex(Cache.getTheme().accentColor)(getTerm("startingCampaign"))
     );
 
     // Load the intro ASCII art, but don't display yet - it will be shown in the book
@@ -706,10 +702,6 @@ export async function startCampaign(): Promise<void> {
       }`,
       "Error"
     );
-    console.log(
-      Console.secondaryColor(
-        "Failed to start campaign. Returning to main menu..."
-      )
-    );
+    console.log(Console.secondaryColor(getTerm("failedToStartCampaign")));
   }
 }

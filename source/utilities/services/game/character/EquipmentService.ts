@@ -4,6 +4,7 @@ import { saveDataToFile } from "@utilities/StorageService.js";
 import { primaryColor, secondaryColor } from "@utilities/ConsoleService.js";
 import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
 import { pressEnter } from "@utilities/ConsoleService.js";
+import { getTerm } from "@utilities/LanguageService.js";
 
 /**
  * Check if an item can be equipped
@@ -54,7 +55,7 @@ export async function equipItem(
   itemIndex: number
 ): Promise<{ success: boolean; message: string }> {
   if (!character.inventory || itemIndex >= character.inventory.length) {
-    return { success: false, message: "Invalid item selection." };
+    return { success: false, message: getTerm("invalidItemSelection") };
   }
 
   const item = character.inventory[itemIndex];
@@ -63,7 +64,7 @@ export async function equipItem(
   if (!canEquipItem(item)) {
     return {
       success: false,
-      message: `${item.name} cannot be equipped.`,
+      message: getTerm("cannotEquipItem").replace("{name}", item.name),
     };
   }
 
@@ -71,7 +72,10 @@ export async function equipItem(
   if (item.requiredLevel && character.level < item.requiredLevel) {
     return {
       success: false,
-      message: `You need to be level ${item.requiredLevel} to equip this item.`,
+      message: getTerm("levelRequirementEquip").replace(
+        "{level}",
+        item.requiredLevel.toString()
+      ),
     };
   }
 
@@ -91,7 +95,7 @@ export async function equipItem(
 
   return {
     success: true,
-    message: `Equipped ${item.name}.`,
+    message: getTerm("itemEquipped").replace("{name}", item.name),
   };
 }
 
@@ -106,7 +110,7 @@ export async function unequipItem(
     !character.equippedItems ||
     equipIndex >= character.equippedItems.length
   ) {
-    return { success: false, message: "Invalid equipment selection." };
+    return { success: false, message: getTerm("invalidEquipmentSelection") };
   }
 
   const item = character.equippedItems[equipIndex];
@@ -127,7 +131,7 @@ export async function unequipItem(
 
   return {
     success: true,
-    message: `Unequipped ${item.name} and placed it in your inventory.`,
+    message: getTerm("itemUnequipped").replace("{name}", item.name),
   };
 }
 
@@ -137,10 +141,10 @@ export async function unequipItem(
 export async function showEquipmentMenu(character: ICharacter): Promise<void> {
   while (true) {
     // Display current equipped items
-    console.log(primaryColor("\n=== EQUIPPED ITEMS ==="));
+    console.log(primaryColor(`\n=== ${getTerm("equippedItems")} ===`));
 
     if (!character.equippedItems || character.equippedItems.length === 0) {
-      console.log(secondaryColor("No items equipped."));
+      console.log(secondaryColor(getTerm("noItemsEquipped")));
     } else {
       character.equippedItems.forEach((item, index) => {
         console.log(
@@ -149,16 +153,16 @@ export async function showEquipmentMenu(character: ICharacter): Promise<void> {
       });
     }
 
-    console.log(primaryColor("\n=== EQUIPMENT MENU ==="));
+    console.log(primaryColor(`\n=== ${getTerm("equipmentMenu")} ===`));
 
     const options = [
-      { name: "Equip an Item", value: "equip" },
-      { name: "Unequip an Item", value: "unequip" },
-      { name: "Return", value: "return" },
+      { name: getTerm("equipItem"), value: "equip" },
+      { name: getTerm("unequipItem"), value: "unequip" },
+      { name: getTerm("return"), value: "return" },
     ];
 
     const choice = await themedSelectInRoom({
-      message: "What would you like to do?",
+      message: getTerm("whatWouldYouLikeToDo"),
       choices: options,
     });
 
@@ -183,17 +187,15 @@ export async function showEquipmentMenu(character: ICharacter): Promise<void> {
         );
 
       if (equipChoices.length === 0) {
-        console.log(
-          secondaryColor("\nYou don't have any items that can be equipped.")
-        );
+        console.log(secondaryColor(`\n${getTerm("noEquippableItems")}`));
         await pressEnter();
         continue;
       }
 
-      equipChoices.push({ name: "Cancel", value: -1 });
+      equipChoices.push({ name: getTerm("cancel"), value: -1 });
 
       const selectedIndex = await themedSelectInRoom({
-        message: "Choose an item to equip:",
+        message: getTerm("chooseItemToEquip"),
         choices: equipChoices,
       });
 
@@ -210,9 +212,7 @@ export async function showEquipmentMenu(character: ICharacter): Promise<void> {
 
     if (choice === "unequip") {
       if (!character.equippedItems || character.equippedItems.length === 0) {
-        console.log(
-          secondaryColor("\nYou don't have any equipped items to unequip.")
-        );
+        console.log(secondaryColor(`\n${getTerm("noItemsToUnequip")}`));
         await pressEnter();
         continue;
       }
@@ -224,10 +224,10 @@ export async function showEquipmentMenu(character: ICharacter): Promise<void> {
         };
       });
 
-      unequipChoices.push({ name: "Cancel", value: -1 });
+      unequipChoices.push({ name: getTerm("cancel"), value: -1 });
 
       const selectedIndex = await themedSelectInRoom({
-        message: "Choose an item to unequip:",
+        message: getTerm("chooseItemToUnequip"),
         choices: unequipChoices,
       });
 

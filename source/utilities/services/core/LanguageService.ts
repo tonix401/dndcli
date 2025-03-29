@@ -601,11 +601,6 @@ const terms = {
     en: "Whoops, seems like something went wrong 🤔",
     ch: "Hoppla, da isch öppis schief gloffe 🤔",
   },
-  backToMainMenu: {
-    de: "Zurück zum Hauptmenü",
-    en: "Back to main menu",
-    ch: "Zrugg zum Hauptmenü",
-  },
   enterPassword: {
     de: "Bitte Passwort eingeben",
     en: "Please enter the password",
@@ -1240,6 +1235,37 @@ const terms = {
     en: "A New Chapter",
     ch: "Es neus Kapitel",
   },
+  storyPaceWarning: {
+    de: "WICHTIG: Die Erzähltempo kann nur einmal pro Kampagne ausgewählt werden und kann später nicht mehr geändert werden.",
+    en: "IMPORTANT: Story pace can only be selected once per campaign and cannot be changed later.",
+    ch: "WICHTIG: S'Erzähltempo cha nur einisch pro Kampagne usgwählt werde und cha spöter nümme gänderet werde.",
+  },
+  chooseStoryPace: {
+    de: "Wähle dein Erzähltempo:",
+    en: "Choose your story pace:",
+    ch: "Wähl dis Erzähltempo:",
+  },
+  storyPaceSet: {
+    de: "Erzähltempo festgelegt. Dein Abenteuer beginnt...",
+    en: "Story pace set. Your adventure begins...",
+    ch: "Erzähltempo festgleit. Dis Abentüür beginnt...",
+  },
+  pressEnterToReturnToMenu: {
+    de: "Drücke Enter, um zum Hauptmenü zurückzukehren...",
+    en: "Press Enter to return to the main menu...",
+    ch: "Drück Enter zum zum Hauptmenü zruggkehre...",
+  },
+  noCharacterDataFound: {
+    de: "Keine Charakterdaten gefunden. Bitte erstelle zuerst einen Charakter.",
+    en: "No character data found. Please create a character first.",
+    ch: "Kei Charakterdate gfunde. Bitte erstell zerscht en Charakter.",
+  },
+  failedToStartCampaign: {
+    de: "Kampagne konnte nicht gestartet werden. Kehre zum Hauptmenü zurück...",
+    en: "Failed to start campaign. Returning to main menu...",
+    ch: "Kampagne het nöd chönne gstartet werde. Kehr zum Hauptmenü zrugg...",
+  },
+
   // #endregion
 
   // #region Arc Guidelines
@@ -1280,6 +1306,373 @@ const terms = {
     de: "Baue auf etablierte Elemente, indem du Komplikationen einführst. Erhöhe die Einsätze für den Charakter und vertiefe NPC-Beziehungen. Schaffe Hindernisse auf dem Weg zu den Hauptzielen.",
     en: "Build upon established elements by introducing complications. Increase stakes for the character and deepen NPC relationships. Create roadblocks toward the main objectives.",
     ch: "Bau uf etablierti Element uf, indem du Komplikatione iiführsch. Erhöh d'Isätz für de Charakter und vertief d'NPC-Beziehige. Schaff Hinderniss uf em Wäg zu de Hauptziel.",
+  },
+  arcTransitionRisingToClimax: {
+    de: "Steigere die Spannung zu einem Höhepunkt. Führe eine entscheidende Konfrontation ein. Teste die Fähigkeiten und Entschlossenheit des Protagonisten.",
+    en: "Escalate tension toward a climactic point. Introduce a decisive confrontation. Test the protagonist's skills and resolve.",
+    ch: "Steiger d'Spannig zu eme Höhepunkt. Füehr e entscheidendi Konfrontation ii. Test d'Fähigkeite und Entschlosseheit vom Protagonist.",
+  },
+  arcTransitionClimaxToFalling: {
+    de: "Zeige die unmittelbaren Folgen der Klimax. Beginne mit der Auflösung der Hauptkonflikte. Lasse den Protagonisten die Konsequenzen seiner Entscheidungen reflektieren.",
+    en: "Show the immediate aftermath of the climax. Begin resolving major conflicts. Let the protagonist reflect on the consequences of their decisions.",
+    ch: "Zeig d'direkte Folge vo de Klimax. Fang mit de Uflösig vo de Hauptkonflikte aa. La de Protagonist d'Konsequenze vo sine Entscheidig reflektiere.",
+  },
+  arcTransitionFallingToResolution: {
+    de: "Löse verbleibende Handlungsstränge auf. Runde die Charakterentwicklung ab. Biete befriedigende Abschlüsse für die Hauptthemen.",
+    en: "Resolve remaining story threads. Round out character development. Provide satisfying conclusions to major themes.",
+    ch: "Lös verblibendi Handligsstrang uf. Rund d'Charakterentwicklig ab. Biet befriedigendi Abschlüss für d'Haupttheme.",
+  },
+  arcTransitionResolutionToIntro: {
+    de: "Deute auf neue Abenteuer hin. Führe subtil neue Elemente oder Charaktere ein. Bereite den Boden für einen frischen Anfang.",
+    en: "Hint at new adventures. Subtly introduce new elements or characters. Set the stage for a fresh beginning.",
+    ch: "Düt uf neui Abentüür hii. Füehr subtil neui Element oder Charakter ii. Bereit de Bode für en frische Afang.",
+  },
+  arcTransitionDefault: {
+    de: "Entwickle die Geschichte auf natürliche Weise weiter, indem Du auf bisherigen Ereignissen aufbaust.",
+    en: "Advance the story naturally, building upon previous events.",
+    ch: "Entwickel d'Gschicht uf natürlichi Art wiiter, indem du uf bisheriige Ereigniss ufbausch.",
+  },
+  // #endregion
+
+  // #region Campaign
+  returningToMainMenu: {
+    de: "Zurück zum Hauptmenü...",
+    en: "Returning to main menu...",
+    ch: "Zrugg zum Hauptmenü...",
+  },
+  loadedSavedCampaignState: {
+    de: "✅ Gespeicherter Kampagnen-Status geladen.",
+    en: "✅ Loaded saved campaign state.",
+    ch: "✅ Gspicherte Kampagne-Status glade.",
+  },
+  introduction: {
+    de: "Einführung",
+    en: "Introduction",
+    ch: "Iifüehrig",
+  },
+  // #endregion
+
+  // #region NarrativeService
+  generatingNextScene: {
+    de: "Nächste Szene wird generiert...",
+    en: "Generating next scene...",
+    ch: "Nöchsti Szene wird generiert...",
+  },
+  processingChoice: {
+    de: "Deine Entscheidung wird verarbeitet...",
+    en: "Processing your choice...",
+    ch: "Dini Entscheidig wird verarbeitet...",
+  },
+  generatingRecap: {
+    de: "Zusammenfassung wird erstellt...",
+    en: "Generating recap...",
+    ch: "Zämmefassig wird erstellt...",
+  },
+  enhancingNarrative: {
+    de: "Erzählung wird verbessert...",
+    en: "Enhancing narrative...",
+    ch: "Verzählig wird verbesseret...",
+  },
+  // #endregion
+
+  // #region EventHandlerService
+  pressEnterForCombat: {
+    de: "Drücke [Enter], um den Kampf zu beginnen",
+    en: "Press [Enter] to start combat",
+    ch: "Drück [Enter] zum de Kampf starte",
+  },
+  combatEncounterTriggered: {
+    de: "Kampfbegegnung ausgelöst!",
+    en: "Combat encounter triggered!",
+    ch: "Kampfbegegnig usglöst!",
+  },
+  enemyAppears: {
+    de: "{enemy} erscheint vor dir!",
+    en: "{enemy} appears before you!",
+    ch: "{enemy} erschiint vor dir!",
+  },
+  combatDefeat: {
+    de: "Du wurdest besiegt...",
+    en: "You have been defeated...",
+    ch: "Du bisch besiegt worde...",
+  },
+  combatVictory: {
+    de: "Sieg! Du erhältst {xp} Erfahrungspunkte.",
+    en: "Victory! You gain {xp} experience points.",
+    ch: "Sieg! Du überchunsch {xp} Erfahrigspünkt.",
+  },
+  foundNewItem: {
+    de: "Du hast einen neuen Gegenstand gefunden: {name} ({rarity})",
+    en: "You found a new item: {name} ({rarity})",
+    ch: "Du hesch en neue Gegestand gfunde: {name} ({rarity})",
+  },
+  pressContinueJourney: {
+    de: "Drücke [Enter], um deine Reise fortzusetzen",
+    en: "Press [Enter] to continue your journey",
+    ch: "Drück [Enter] zum dini Reis fortsetze",
+  },
+  foundItems: {
+    de: "Du hast folgende Gegenstände gefunden:",
+    en: "You found the following items:",
+    ch: "Du hesch die folgende Gegeständ gfunde:",
+  },
+  inventoryFullItemLeft: {
+    de: "Dein Inventar ist voll. Der Gegenstand wurde zurückgelassen.",
+    en: "Your inventory is full. The item was left behind.",
+    ch: "Dis Inventar isch voll. De Gegestand isch zrugglah worde.",
+  },
+  dungeonIssue: {
+    de: "Es gab ein Problem mit dem Dungeon. Kehre zur Hauptgeschichte zurück.",
+    en: "There was an issue with the dungeon. Return to the main story.",
+    ch: "Es het es Problem mit em Dungeon geh. Kehr zur Hauptgschicht zrugg.",
+  },
+  merchantEncounter: {
+    de: "Du triffst einen Händler auf deinem Weg.",
+    en: "You encounter a merchant on your path.",
+    ch: "Du triffsch en Händler uf dim Wäg.",
+  },
+  diceRollRequired: {
+    de: "Eine Würfelprobe ist erforderlich. Werfe einen W20...",
+    en: "A dice roll is required. Rolling a d20...",
+    ch: "En Würfelprobe isch erforderlich. Wirfe en W20...",
+  },
+  youRolled: {
+    de: "Du hast eine {roll} gewürfelt!",
+    en: "You rolled a {roll}!",
+    ch: "Du hesch e {roll} gwürflet!",
+  },
+  // #endregion
+
+  // #region EquipmentService
+  equipmentSlots: {
+    de: "Ausrüstungsslots",
+    en: "Equipment slots",
+    ch: "Usrüstigsslots",
+  },
+  head: {
+    de: "Kopf",
+    en: "Head",
+    ch: "Chopf",
+  },
+  body: {
+    de: "Körper",
+    en: "Body",
+    ch: "Körper",
+  },
+  mainHand: {
+    de: "Haupthand",
+    en: "Main hand",
+    ch: "Haupthand",
+  },
+  offHand: {
+    de: "Nebenhand",
+    en: "Off hand",
+    ch: "Nebehand",
+  },
+  accessory: {
+    de: "Zubehör",
+    en: "Accessory",
+    ch: "Zubehör",
+  },
+  statBonus: {
+    de: "Statusbonus",
+    en: "Stat bonus",
+    ch: "Statusbonus",
+  },
+  equipmentEffect: {
+    de: "Ausrüstungseffekt",
+    en: "Equipment effect",
+    ch: "Usrüstigseffekt",
+  },
+  currentlyEquipped: {
+    de: "Aktuell ausgerüstet",
+    en: "Currently equipped",
+    ch: "Aktuell usgrüstet",
+  },
+  cannotEquip: {
+    de: "Kann nicht ausgerüstet werden",
+    en: "Cannot equip",
+    ch: "Cha nöd usgrüstet werde",
+  },
+  invalidItemSelection: {
+    de: "Ungültige Gegenstandsauswahl",
+    en: "Invalid item selection",
+    ch: "Ungültigi Gegestandsuswahl",
+  },
+  cannotEquipItem: {
+    de: "{name} kann nicht ausgerüstet werden",
+    en: "{name} cannot be equipped",
+    ch: "{name} cha nöd usgrüstet werde",
+  },
+  levelRequirementEquip: {
+    de: "Du benötigst Level {level}, um diesen Gegenstand auszurüsten",
+    en: "You need to be level {level} to equip this item",
+    ch: "Du muesch Level {level} sii zum de Gegestand usrüste",
+  },
+  invalidEquipmentSelection: {
+    de: "Ungültige Ausrüstungsauswahl",
+    en: "Invalid equipment selection",
+    ch: "Ungültigi Usrüstigsuswahl",
+  },
+  equippedItems: {
+    de: "Ausgerüstete Gegenstände",
+    en: "Equipped Items",
+    ch: "Usgrüsteti Gegeständ",
+  },
+  noItemsEquipped: {
+    de: "Keine Gegenstände ausgerüstet",
+    en: "No items equipped",
+    ch: "Kei Gegeständ usgrüstet",
+  },
+  equipmentMenu: {
+    de: "Ausrüstungsmenü",
+    en: "Equipment Menu",
+    ch: "Usrüstigsmenü",
+  },
+  equipItem: {
+    de: "Gegenstand ausrüsten",
+    en: "Equip item",
+    ch: "Gegestand usrüste",
+  },
+  unequipItem: {
+    de: "Gegenstand ablegen",
+    en: "Unequip item",
+    ch: "Gegestand ablege",
+  },
+  return: {
+    de: "Zurück",
+    en: "Return",
+    ch: "Zrugg",
+  },
+  whatWouldYouLikeToDo: {
+    de: "Was möchtest du tun?",
+    en: "What would you like to do?",
+    ch: "Was wotsch mache?",
+  },
+  noEquippableItems: {
+    de: "Keine ausrüstbaren Gegenstände im Inventar",
+    en: "No equippable items in inventory",
+    ch: "Kei usrüstbari Gegeständ im Inventar",
+  },
+  chooseItemToEquip: {
+    de: "Wähle einen Gegenstand zum Ausrüsten",
+    en: "Choose an item to equip",
+    ch: "Wähl en Gegestand zum Usrüste",
+  },
+  noItemsToUnequip: {
+    de: "Keine Gegenstände zum Ablegen",
+    en: "No items to unequip",
+    ch: "Kei Gegeständ zum Ablege",
+  },
+  chooseItemToUnequip: {
+    de: "Wähle einen Gegenstand zum Ablegen",
+    en: "Choose an item to unequip",
+    ch: "Wähl en Gegestand zum Ablege",
+  },
+  // #endregion
+
+  // #region MenuService
+  loading: {
+    de: "Wird geladen...",
+    en: "Loading...",
+    ch: "Wird glade...",
+  },
+  mainMenuTitle: {
+    de: "⚔️ D&D Command Line Interface ⚔️",
+    en: "⚔️ D&D Command Line Interface ⚔️",
+    ch: "⚔️ D&D Command Line Interface ⚔️",
+  },
+  chooseOption: {
+    de: "Wähle eine Option",
+    en: "Choose an option",
+    ch: "Wähl e Option",
+  },
+  noSelectableChoices: {
+    de: "Keine auswählbaren Optionen",
+    en: "No selectable choices",
+    ch: "Kei uswählbari Optione",
+  },
+  disabled: {
+    de: "(deaktiviert)",
+    en: "(disabled)",
+    ch: "(deaktiviert)",
+  },
+
+  useArrowKeys: {
+    de: "Benutze ↑/↓ für Navigation, ↵ zum Auswählen",
+    en: "Use ↑/↓ to navigate, ↵ to select",
+    ch: "Bruuch ↑/↓ zum Navigiere, ↵ zum Uswähle",
+  },
+  // #endregion
+
+  // #region NarrativeDisplayService
+  pressRightForStory: {
+    de: "Drücke → für die Geschichte",
+    en: "Press → for the story",
+    ch: "Drück → für d'Gschicht",
+  },
+  storyBeginsHere: {
+    de: "Die Geschichte beginnt hier",
+    en: "The story begins here",
+    ch: "D'Gschicht fängt do a",
+  },
+  pressEnterForChoices: {
+    de: "Drücke [Enter] für Auswahlmöglichkeiten",
+    en: "Press [Enter] for choices",
+    ch: "Drück [Enter] für Uswahlmöglichkeite",
+  },
+  useArrowKeysNavigation: {
+    de: "Verwende ← und → zum Navigieren, [Enter] zum Fortfahren",
+    en: "Use ← and → to navigate, [Enter] to continue",
+    ch: "Benutz ← und → zum Navigiere, [Enter] zum Fortfahre",
+  },
+  pressEnterToContinue: {
+    de: "Drücke [Enter] zum Fortfahren",
+    en: "Press [Enter] to continue",
+    ch: "Drück [Enter] zum Fortfahre",
+  },
+  adventureRecap: {
+    de: "Zusammenfassung des Abenteuers",
+    en: "Adventure Recap",
+    ch: "Zämmefassig vom Abentüür",
+  },
+  // #endregion
+
+  // #region ImageService
+  usingCachedImage: {
+    de: "Verwende gecachtes Bild für: ",
+    en: "Using cached image for: ",
+    ch: "Verwände gspicherets Bild für: ",
+  },
+  forceNewGeneration: {
+    de: "Erzwinge neue Bildgenerierung",
+    en: "Forcing new image generation",
+    ch: "Erzwinge neui Bildgenerierig",
+  },
+  imageGenerationLimitReached: {
+    de: "Bildgenerierungslimit erreicht. Bitte versuche es später erneut.",
+    en: "Image generation limit reached. Please try again later.",
+    ch: "Bildgenerierigslimit erreicht. Bitte versuech's spöter nomal.",
+  },
+  generatingSceneImage: {
+    de: "Erzeuge Szenenbild...",
+    en: "Generating scene image...",
+    ch: "Generiere Szenebild...",
+  },
+  sceneImageGenerated: {
+    de: "Szenenbild erzeugt",
+    en: "Scene image generated",
+    ch: "Szenebild generiert",
+  },
+  failedToGenerateImage: {
+    de: "Fehler bei der Bilderzeugung",
+    en: "Failed to generate image",
+    ch: "Fehler bide Bildgenerierig",
+  },
+  errorGeneratingImage: {
+    de: "Fehler beim Erzeugen des Bildes",
+    en: "Error generating image",
+    ch: "Fehler bim Generiere vom Bild",
   },
   // #endregion
 };
