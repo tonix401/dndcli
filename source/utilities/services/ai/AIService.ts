@@ -8,14 +8,14 @@
  *
  */
 
-import {OpenAI} from "openai";
+import { OpenAI } from "openai";
 import dotenv from "dotenv";
 import ICharacter from "@utilities/ICharacter.js";
-import {IGameState} from "@utilities/IGameState.js";
-import {detectNarrativeLoop} from "@narrative/NarrativeService.js";
-import {enforceStoryRequirements} from "@narrative/ObjectiveService.js";
-import {sanitizeJsonString} from "@core/ConsoleService.js";
-import {log} from "@core/LogService.js";
+import { IGameState } from "@utilities/IGameState.js";
+import { detectNarrativeLoop } from "@narrative/NarrativeService.js";
+import { enforceStoryRequirements } from "@narrative/ObjectiveService.js";
+import { sanitizeJsonString } from "@core/ConsoleService.js";
+import { log } from "@core/LogService.js";
 
 /**
  * Structure for chat completion messages sent to the API
@@ -25,8 +25,8 @@ import {log} from "@core/LogService.js";
  * @property {string} content - The content of the message
  */
 export interface ChatCompletionRequestMessage {
-    role: "system" | "user" | "assistant";
-    content: string;
+  role: "system" | "user" | "assistant";
+  content: string;
 }
 
 /**
@@ -37,8 +37,8 @@ export interface ChatCompletionRequestMessage {
  * @property {string} arguments - JSON string of arguments for the function
  */
 export interface FunctionCallResult {
-    name: string;
-    arguments: string;
+  name: string;
+  arguments: string;
 }
 
 /**
@@ -49,8 +49,8 @@ export interface FunctionCallResult {
  * @property {FunctionCallResult} [function_call] - Function call details if available
  */
 export interface ChatCompletionResponse {
-    content: string | null;
-    function_call?: FunctionCallResult;
+  content: string | null;
+  function_call?: FunctionCallResult;
 }
 
 /**
@@ -58,10 +58,10 @@ export interface ChatCompletionResponse {
  * Provides better error identification and handling for AI-specific errors
  */
 class ChatGenerationError extends Error {
-    constructor(message: string) {
-        super(message);
-        this.name = "ChatGenerationError";
-    }
+  constructor(message: string) {
+    super(message);
+    this.name = "ChatGenerationError";
+  }
 }
 
 /**
@@ -81,14 +81,14 @@ let openai: OpenAI;
  * @throws {Error} If OPENAI_API_KEY is missing from environment variables
  */
 function ensureConfig() {
-    if (!isItConfigured) {
-        dotenv.config();
-        if (!process.env.OPENAI_API_KEY) {
-            throw new Error("Missing OPENAI_API_KEY in environment variables");
-        }
-        openai = new OpenAI();
-        isItConfigured = true;
+  if (!isItConfigured) {
+    dotenv.config();
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error("Missing OPENAI_API_KEY in environment variables");
     }
+    openai = new OpenAI();
+    isItConfigured = true;
+  }
 }
 
 /**
@@ -101,22 +101,26 @@ function ensureConfig() {
  * @property {number} [topP] - Nucleus sampling parameter (0-1)
  * @property {number} [maxRetries] - Maximum number of retry attempts
  * @property {number} [retryDelay] - Delay between retries in milliseconds
- * @property {Array<Object>} [functions] - Function definitions for structured outputs
- * @property {Object|string} [function_call] - Function call configuration
+ * @property {Array<{
+ *   name: string;
+ *   description?: string;
+ *   parameters: Record<string, unknown>;
+ * }>} [functions] - Function definitions for structured outputs
+ * @property {{ name: string } | "auto" | "none"} [function_call] - Function call configuration
  */
 export interface GenerateTextOptions {
-    model?: string;
-    maxTokens?: number;
-    temperature?: number;
-    topP?: number;
-    maxRetries?: number;
-    retryDelay?: number;
-    functions?: Array<{
-        name: string;
-        description?: string;
-        parameters: Record<string, unknown>;
-    }>;
-    function_call?: { name: string } | "auto" | "none";
+  model?: string;
+  maxTokens?: number;
+  temperature?: number;
+  topP?: number;
+  maxRetries?: number;
+  retryDelay?: number;
+  functions?: Array<{
+    name: string;
+    description?: string;
+    parameters: Record<string, unknown>;
+  }>;
+  function_call?: { name: string } | "auto" | "none";
 }
 
 /**
@@ -152,101 +156,101 @@ export interface GenerateTextOptions {
  * });
  */
 export async function generateChatNarrative(
-    messages: ChatCompletionRequestMessage[],
-    options?: GenerateTextOptions
+  messages: ChatCompletionRequestMessage[],
+  options?: GenerateTextOptions
 ): Promise<ChatCompletionResponse> {
-    ensureConfig();
+  ensureConfig();
 
-    if (!messages?.length) {
-        throw new ChatGenerationError("Messages array cannot be empty");
-    }
+  if (!messages?.length) {
+    throw new ChatGenerationError("Messages array cannot be empty");
+  }
 
-    // Setup retry configuration
-    const maxRetries = options?.maxRetries || 3;
-    const retryDelay = options?.retryDelay || 1000; // ms
-    let attempt = 0;
+  // Setup retry configuration
+  const maxRetries = options?.maxRetries || 3;
+  const retryDelay = options?.retryDelay || 1000; // ms
+  let attempt = 0;
 
-    while (attempt <= maxRetries) {
-        try {
-            // Prepare API request parameters
-            const requestParams: any = {
-                model: options?.model || "gpt-4o",
-                messages,
-                max_tokens: options?.maxTokens ?? 2048,
-                temperature: options?.temperature ?? 0.85,
-                top_p: options?.topP ?? 0.7,
-            };
+  while (attempt <= maxRetries) {
+    try {
+      // Prepare API request parameters
+      const requestParams: any = {
+        model: options?.model || "gpt-4o",
+        messages,
+        max_tokens: options?.maxTokens ?? 2048,
+        temperature: options?.temperature ?? 0.85,
+        top_p: options?.topP ?? 0.7,
+      };
 
-            // Add function calling parameters if provided
-            if (options?.functions) {
-                requestParams.functions = options.functions;
+      // Add function calling parameters if provided
+      if (options?.functions) {
+        requestParams.functions = options.functions;
+      }
+      if (options?.function_call) {
+        requestParams.function_call = options.function_call;
+      }
+
+      // Make API call
+      const response = await openai.chat.completions.create(requestParams);
+
+      const messageResponse = response.choices[0]?.message;
+
+      // Return structured response with content and function_call if available
+      return {
+        content: messageResponse?.content ?? null,
+        function_call: messageResponse?.function_call
+          ? {
+              name: messageResponse.function_call.name,
+              arguments: messageResponse.function_call.arguments,
             }
-            if (options?.function_call) {
-                requestParams.function_call = options.function_call;
-            }
+          : undefined,
+      };
+    } catch (error) {
+      attempt++;
 
-            // Make API call
-            const response = await openai.chat.completions.create(requestParams);
+      // Check if this is a retriable error (network issues typically)
+      const isRetriable =
+        error instanceof Error &&
+        (error.message.includes("network") ||
+          error.message.includes("timeout") ||
+          error.message.includes("rate limit") ||
+          error.message.includes("429") ||
+          error.message.includes("500") ||
+          error.message.includes("503"));
 
-            const messageResponse = response.choices[0]?.message;
-
-            // Return structured response with content and function_call if available
-            return {
-                content: messageResponse?.content ?? null,
-                function_call: messageResponse?.function_call
-                    ? {
-                        name: messageResponse.function_call.name,
-                        arguments: messageResponse.function_call.arguments,
-                    }
-                    : undefined,
-            };
-        } catch (error) {
-            attempt++;
-
-            // Check if this is a retriable error (network issues typically)
-            const isRetriable =
-                error instanceof Error &&
-                (error.message.includes("network") ||
-                    error.message.includes("timeout") ||
-                    error.message.includes("rate limit") ||
-                    error.message.includes("429") ||
-                    error.message.includes("500") ||
-                    error.message.includes("503"));
-
-            // If it's our last attempt or not retriable, throw the error
-            if (attempt > maxRetries || !isRetriable) {
-                if (error instanceof ChatGenerationError) {
-                    throw error;
-                }
-                if (error instanceof Error) {
-                    log(
-                        `Failed to generate chat narrative after ${attempt} attempts: ${error.message}`,
-                        "Error"
-                    );
-                    throw new ChatGenerationError(
-                        `Failed to generate chat narrative: ${error.message}`
-                    );
-                }
-                throw new ChatGenerationError(
-                    "An unknown error occurred while generating chat narrative"
-                );
-            }
-
-            // Log retry attempt
-            log(
-                `Attempt ${attempt}/${maxRetries} failed, retrying in ${retryDelay}ms: ${
-                    error instanceof Error ? error.message : "Unknown error"
-                }`,
-                "Warn "
-            );
-
-            // Wait before retrying
-            await new Promise((resolve) => setTimeout(resolve, retryDelay * attempt));
+      // If it's our last attempt or not retriable, throw the error
+      if (attempt > maxRetries || !isRetriable) {
+        if (error instanceof ChatGenerationError) {
+          throw error;
         }
-    }
+        if (error instanceof Error) {
+          log(
+            `Failed to generate chat narrative after ${attempt} attempts: ${error.message}`,
+            "Error"
+          );
+          throw new ChatGenerationError(
+            `Failed to generate chat narrative: ${error.message}`
+          );
+        }
+        throw new ChatGenerationError(
+          "An unknown error occurred while generating chat narrative"
+        );
+      }
 
-    // This should never be reached due to the throw in the catch block on the last attempt
-    throw new ChatGenerationError("Failed to generate narrative after retries");
+      // Log retry attempt
+      log(
+        `Attempt ${attempt}/${maxRetries} failed, retrying in ${retryDelay}ms: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
+        "Warn "
+      );
+
+      // Wait before retrying
+      await new Promise((resolve) => setTimeout(resolve, retryDelay * attempt));
+    }
+  }
+
+  // This should never be reached due to the throw in the catch block on the last attempt
+  throw new ChatGenerationError("Failed to generate narrative after retries");
 }
 
 /**
@@ -277,67 +281,67 @@ export async function generateChatNarrative(
  * console.log(`You encounter a ${enemy.name} with ${enemy.hp} HP!`);
  */
 export async function generateEnemyFromNarrative(
-    narrative: string,
-    characterData: ICharacter
+  narrative: string,
+  characterData: ICharacter
 ): Promise<{
-    name: string;
-    hp: number;
-    maxhp: number;
-    attack: number;
-    defense: number;
-    xpReward: number;
+  name: string;
+  hp: number;
+  maxhp: number;
+  attack: number;
+  defense: number;
+  xpReward: number;
 }> {
-    ensureConfig();
-    const combatSection =
-        narrative.split("COMBAT ENCOUNTER:")[1]?.split("\n")[0] || narrative;
+  ensureConfig();
+  const combatSection =
+    narrative.split("COMBAT ENCOUNTER:")[1]?.split("\n")[0] || narrative;
 
-    // Define function schema for enemy generation
-    const enemyGenerationFunction = {
-        name: "generateEnemy",
-        description:
-            "Generate a balanced enemy for combat based on player stats and narrative context",
-        parameters: {
-            type: "object",
-            properties: {
-                name: {
-                    type: "string",
-                    description: "Enemy name based on narrative context",
-                },
-                hp: {
-                    type: "integer",
-                    description: `Enemy HP between ${Math.floor(
-                        Number(characterData.abilities.maxhp) * 0.5
-                    )}-${Math.floor(Number(characterData.abilities.maxhp) * 1.5)}`,
-                },
-                attack: {
-                    type: "integer",
-                    description: `Attack value between ${Math.max(
-                        1,
-                        Number(characterData.abilities.strength) - 2
-                    )}-${Number(characterData.abilities.strength) + 3}`,
-                },
-                defense: {
-                    type: "integer",
-                    description: `Defense value between 1-${Math.max(
-                        2,
-                        Number(characterData.abilities.strength) - 1
-                    )}`,
-                },
-                xpReward: {
-                    type: "integer",
-                    description: `XP reward between ${
-                        10 + Number(characterData.level) * 3
-                    }-${20 + Number(characterData.level) * 5}`,
-                },
-            },
-            required: ["name", "hp", "attack", "defense", "xpReward"],
+  // Define function schema for enemy generation
+  const enemyGenerationFunction = {
+    name: "generateEnemy",
+    description:
+      "Generate a balanced enemy for combat based on player stats and narrative context",
+    parameters: {
+      type: "object",
+      properties: {
+        name: {
+          type: "string",
+          description: "Enemy name based on narrative context",
         },
-    };
+        hp: {
+          type: "integer",
+          description: `Enemy HP between ${Math.floor(
+            Number(characterData.abilities.maxhp) * 0.5
+          )}-${Math.floor(Number(characterData.abilities.maxhp) * 1.5)}`,
+        },
+        attack: {
+          type: "integer",
+          description: `Attack value between ${Math.max(
+            1,
+            Number(characterData.abilities.strength) - 2
+          )}-${Number(characterData.abilities.strength) + 3}`,
+        },
+        defense: {
+          type: "integer",
+          description: `Defense value between 1-${Math.max(
+            2,
+            Number(characterData.abilities.strength) - 1
+          )}`,
+        },
+        xpReward: {
+          type: "integer",
+          description: `XP reward between ${
+            10 + Number(characterData.level) * 3
+          }-${20 + Number(characterData.level) * 5}`,
+        },
+      },
+      required: ["name", "hp", "attack", "defense", "xpReward"],
+    },
+  };
 
-    const messages: ChatCompletionRequestMessage[] = [
-        {
-            role: "system",
-            content: `You are an enemy generator for a fantasy RPG. Create a balanced enemy based on player stats and narrative context.
+  const messages: ChatCompletionRequestMessage[] = [
+    {
+      role: "system",
+      content: `You are an enemy generator for a fantasy RPG. Create a balanced enemy based on player stats and narrative context.
       Player Stats:
       - Level: ${characterData.level}
       - HP: ${characterData.hp}/${characterData.abilities.maxhp}
@@ -349,82 +353,82 @@ export async function generateEnemyFromNarrative(
       - Attack should be balanced against player's strength
       - Defense should be lower than player's strength to ensure damage is possible
       - XP reward should scale with enemy difficulty and player level`,
-        },
-        {
-            role: "user",
-            content: `Combat Description: ${combatSection}\nGenerate an appropriate enemy that matches the narrative tone and provides a balanced challenge.`,
-        },
-    ];
+    },
+    {
+      role: "user",
+      content: `Combat Description: ${combatSection}\nGenerate an appropriate enemy that matches the narrative tone and provides a balanced challenge.`,
+    },
+  ];
 
-    try {
-        const response = await generateChatNarrative(messages, {
-            temperature: 0.7,
-            maxTokens: 150,
-            functions: [enemyGenerationFunction],
-            function_call: {name: "generateEnemy"},
-        });
+  try {
+    const response = await generateChatNarrative(messages, {
+      temperature: 0.7,
+      maxTokens: 150,
+      functions: [enemyGenerationFunction],
+      function_call: { name: "generateEnemy" },
+    });
 
-        let enemy;
+    let enemy;
 
-        // Try to get enemy data from function call result first
-        if (response.function_call && response.function_call.arguments) {
-            enemy = JSON.parse(response.function_call.arguments);
-        }
-        // Fall back to parsing content if function call is not available
-        else if (response.content) {
-            enemy = JSON.parse(sanitizeJsonString(response.content));
-        }
-        // Default enemy if parsing fails
-        else {
-            throw new Error("Failed to generate enemy data");
-        }
-
-        const hp = Math.min(
-            Math.max(
-                Math.floor(Number(characterData.abilities.maxhp) * 0.5),
-                enemy.hp
-            ),
-            Math.floor(Number(characterData.abilities.maxhp) * 1.5)
-        );
-
-        // Validate and adjust enemy stats if necessary
-        return {
-            name: enemy.name,
-            hp: hp,
-            maxhp: hp,
-            attack: Math.min(
-                Math.max(
-                    Math.max(1, Number(characterData.abilities.strength) - 2),
-                    enemy.attack
-                ),
-                Number(characterData.abilities.strength) + 3
-            ),
-            defense: Math.min(
-                Math.max(1, enemy.defense),
-                Math.max(2, Number(characterData.abilities.strength) - 1)
-            ),
-            xpReward: Math.min(
-                Math.max(10 + Number(characterData.level) * 3, enemy.xpReward),
-                20 + Number(characterData.level) * 5
-            ),
-        };
-    } catch (error) {
-        log(`Failed to generate enemy: ${error}`, "Error");
-        const hp = Math.floor(Number(characterData.abilities.maxhp) * 0.75);
-
-        // Fallback enemy with balanced stats based on player
-        return {
-            name: "Mysterious Creature",
-            hp: hp,
-            maxhp: hp,
-            attack: Math.max(1, Number(characterData.abilities.strength) - 1),
-            defense: Math.max(
-                1,
-                Math.floor(Number(characterData.abilities.strength) / 2)
-            ),
-            xpReward: 15 + Number(characterData.level) * 4,
-        };
+    // Try to get enemy data from function call result first
+    if (response.function_call && response.function_call.arguments) {
+      enemy = JSON.parse(response.function_call.arguments);
     }
+    // Fall back to parsing content if function call is not available
+    else if (response.content) {
+      enemy = JSON.parse(sanitizeJsonString(response.content));
+    }
+    // Default enemy if parsing fails
+    else {
+      throw new Error("Failed to generate enemy data");
+    }
+
+    const hp = Math.min(
+      Math.max(
+        Math.floor(Number(characterData.abilities.maxhp) * 0.5),
+        enemy.hp
+      ),
+      Math.floor(Number(characterData.abilities.maxhp) * 1.5)
+    );
+
+    // Validate and adjust enemy stats if necessary
+    return {
+      name: enemy.name,
+      hp: hp,
+      maxhp: hp,
+      attack: Math.min(
+        Math.max(
+          Math.max(1, Number(characterData.abilities.strength) - 2),
+          enemy.attack
+        ),
+        Number(characterData.abilities.strength) + 3
+      ),
+      defense: Math.min(
+        Math.max(1, enemy.defense),
+        Math.max(2, Number(characterData.abilities.strength) - 1)
+      ),
+      xpReward: Math.min(
+        Math.max(10 + Number(characterData.level) * 3, enemy.xpReward),
+        20 + Number(characterData.level) * 5
+      ),
+    };
+  } catch (error) {
+    log(`Failed to generate enemy: ${error}`, "Error");
+    const hp = Math.floor(Number(characterData.abilities.maxhp) * 0.75);
+
+    // Fallback enemy with balanced stats based on player
+    return {
+      name: "Mysterious Creature",
+      hp: hp,
+      maxhp: hp,
+      attack: Math.max(1, Number(characterData.abilities.strength) - 1),
+      defense: Math.max(
+        1,
+        Math.floor(Number(characterData.abilities.strength) / 2)
+      ),
+      xpReward: 15 + Number(characterData.level) * 4,
+    };
+  }
 }
 
 /**
@@ -513,26 +517,26 @@ Story Completion Guidelines:
  * ];
  */
 export function generateCharacterIntroPrompt(characterData: any): string {
-    return `
+  return `
 Character Sheet:
 Name: ${characterData.name}
 Origin: ${characterData.origin}
 Level & Class: ${characterData.level} ${characterData.class}
 Stats: HP ${characterData.hp}/${characterData.abilities.maxhp}, STR ${
-        characterData.abilities.strength
-    }, MANA ${characterData.abilities.mana}, DEX ${
-        characterData.abilities.dexterity
-    }, CHA ${characterData.abilities.charisma}, LUCK ${
-        characterData.abilities.luck
-    }
+    characterData.abilities.strength
+  }, MANA ${characterData.abilities.mana}, DEX ${
+    characterData.abilities.dexterity
+  }, CHA ${characterData.abilities.charisma}, LUCK ${
+    characterData.abilities.luck
+  }
 XP: ${characterData.xp} 
 Currency: ${characterData.currency}
 Inventory: ${characterData.inventory
-        .map(
-            (item: { name: string; quantity: number }) =>
-                `${item.name} (x${item.quantity})`
-        )
-        .join(", ")}
+    .map(
+      (item: { name: string; quantity: number }) =>
+        `${item.name} (x${item.quantity})`
+    )
+    .join(", ")}
   `;
 }
 
@@ -563,45 +567,45 @@ Inventory: ${characterData.inventory
  * // This might add "curious" trait and "exploration" theme to character
  */
 export async function analyzePlayerChoice(
-    choice: string,
-    gameState: IGameState
+  choice: string,
+  gameState: IGameState
 ): Promise<void> {
-    // Define function for choice analysis
-    const analysisFunction = {
-        name: "analyzePlayerChoice",
-        description:
-            "Analyze player choice to determine traits, relationships and themes",
-        parameters: {
-            type: "object",
-            properties: {
-                traits: {
-                    type: "object",
-                    description:
-                        "Character traits affected by this choice, with values from -2 to 2",
-                    additionalProperties: {type: "number"},
-                },
-                relationships: {
-                    type: "object",
-                    description:
-                        "Character relationships affected by this choice, with values from -2 to 2",
-                    additionalProperties: {type: "number"},
-                },
-                themes: {
-                    type: "array",
-                    description: "Thematic elements present in this choice",
-                    items: {type: "string"},
-                },
-            },
-            required: ["traits", "themes"],
+  // Define function for choice analysis
+  const analysisFunction = {
+    name: "analyzePlayerChoice",
+    description:
+      "Analyze player choice to determine traits, relationships and themes",
+    parameters: {
+      type: "object",
+      properties: {
+        traits: {
+          type: "object",
+          description:
+            "Character traits affected by this choice, with values from -2 to 2",
+          additionalProperties: { type: "number" },
         },
-    };
+        relationships: {
+          type: "object",
+          description:
+            "Character relationships affected by this choice, with values from -2 to 2",
+          additionalProperties: { type: "number" },
+        },
+        themes: {
+          type: "array",
+          description: "Thematic elements present in this choice",
+          items: { type: "string" },
+        },
+      },
+      required: ["traits", "themes"],
+    },
+  };
 
-    try {
-        const response = await generateChatNarrative(
-            [
-                {
-                    role: "system",
-                    content: `Analyze this player choice and determine what it reveals about 
+  try {
+    const response = await generateChatNarrative(
+      [
+        {
+          role: "system",
+          content: `Analyze this player choice and determine what it reveals about 
           the character's traits and relationships. Answer in JSON format with:
           {
             "traits": {"trait1": -2 to 2, "trait2": -2 to 2},
@@ -610,89 +614,89 @@ export async function analyzePlayerChoice(
           }
           Do NOT use + signs before positive numbers as this breaks JSON parsing.
           Keep the response concise with 1-3 traits, 0-2 relationships, and 1-2 themes.`,
-                },
-                {
-                    role: "user",
-                    content: choice,
-                },
-            ],
-            {
-                maxTokens: 150,
-                temperature: 0.4,
-                functions: [analysisFunction],
-                function_call: {name: "analyzePlayerChoice"},
-            }
-        );
+        },
+        {
+          role: "user",
+          content: choice,
+        },
+      ],
+      {
+        maxTokens: 150,
+        temperature: 0.4,
+        functions: [analysisFunction],
+        function_call: { name: "analyzePlayerChoice" },
+      }
+    );
 
-        let result;
+    let result;
 
-        // Try to get analysis from function call first
-        if (response.function_call && response.function_call.arguments) {
-            result = JSON.parse(response.function_call.arguments);
-        }
-        // Fall back to content parsing if function call isn't available
-        else if (response.content) {
-            const sanitizedAnalysis = sanitizeJsonString(response.content);
-            result = JSON.parse(sanitizedAnalysis);
-        } else {
-            // If neither is available, exit silently
-            return;
-        }
-
-        // Update character traits based on choice
-        if (result.traits) {
-            Object.entries(result.traits).forEach(([trait, value]) => {
-                gameState.updateCharacterTrait(trait, Number(value));
-            });
-        }
-
-        // Track thematic elements
-        if (result.themes) {
-            result.themes.forEach((theme: string) => {
-                gameState.addTheme(theme);
-            });
-        }
-
-        // Update relationships if present
-        if (result.relationships) {
-            Object.entries(result.relationships).forEach(([character, value]) => {
-                // Get current relationship status or default to neutral
-                const existing = gameState
-                    .getImportantCharacters()
-                    .find(
-                        (c: { name: string; relationship: string }) =>
-                            c.name.toLowerCase() === character.toLowerCase()
-                    );
-
-                const currentValue = existing
-                    ? existing.relationship === "friendly"
-                        ? 7
-                        : existing.relationship === "hostile"
-                            ? 3
-                            : 5
-                    : 5;
-
-                // Determine new relationship value and string
-                const newValue = Math.max(
-                    1,
-                    Math.min(10, currentValue + Number(value))
-                );
-                let relationshipStr = "neutral";
-                if (newValue > 6) relationshipStr = "friendly";
-                if (newValue < 4) relationshipStr = "hostile";
-
-                // Update character
-                gameState.addOrUpdateCharacter(character, {
-                    relationship: relationshipStr,
-                    importance: existing ? undefined : 6, // Default importance if new
-                    lastSeen: "current scene",
-                });
-            });
-        }
-    } catch (e) {
-        // Handle parsing error silently - don't break game flow
-        log(`Failed to analyze player choice: ${e}`, "Error");
+    // Try to get analysis from function call first
+    if (response.function_call && response.function_call.arguments) {
+      result = JSON.parse(response.function_call.arguments);
     }
+    // Fall back to content parsing if function call isn't available
+    else if (response.content) {
+      const sanitizedAnalysis = sanitizeJsonString(response.content);
+      result = JSON.parse(sanitizedAnalysis);
+    } else {
+      // If neither is available, exit silently
+      return;
+    }
+
+    // Update character traits based on choice
+    if (result.traits) {
+      Object.entries(result.traits).forEach(([trait, value]) => {
+        gameState.updateCharacterTrait(trait, Number(value));
+      });
+    }
+
+    // Track thematic elements
+    if (result.themes) {
+      result.themes.forEach((theme: string) => {
+        gameState.addTheme(theme);
+      });
+    }
+
+    // Update relationships if present
+    if (result.relationships) {
+      Object.entries(result.relationships).forEach(([character, value]) => {
+        // Get current relationship status or default to neutral
+        const existing = gameState
+          .getImportantCharacters()
+          .find(
+            (c: { name: string; relationship: string }) =>
+              c.name.toLowerCase() === character.toLowerCase()
+          );
+
+        const currentValue = existing
+          ? existing.relationship === "friendly"
+            ? 7
+            : existing.relationship === "hostile"
+            ? 3
+            : 5
+          : 5;
+
+        // Determine new relationship value and string
+        const newValue = Math.max(
+          1,
+          Math.min(10, currentValue + Number(value))
+        );
+        let relationshipStr = "neutral";
+        if (newValue > 6) relationshipStr = "friendly";
+        if (newValue < 4) relationshipStr = "hostile";
+
+        // Update character
+        gameState.addOrUpdateCharacter(character, {
+          relationship: relationshipStr,
+          importance: existing ? undefined : 6, // Default importance if new
+          lastSeen: "current scene",
+        });
+      });
+    }
+  } catch (e) {
+    // Handle parsing error silently - don't break game flow
+    log(`Failed to analyze player choice: ${e}`, "Error");
+  }
 }
 
 /**
@@ -715,35 +719,35 @@ export async function analyzePlayerChoice(
  * messages.push({ role: "system", content: memorySummary });
  */
 export function summarizeImportantEvents(gameState: IGameState): string {
-    // Get recent narratives (last 3)
-    const recentNarratives = gameState
-        .getNarrativeHistory()
-        .slice(-3)
-        .map((narrative) =>
-            narrative.length > 300 ? narrative.substring(0, 300) + "..." : narrative
-        )
-        .join("\n");
+  // Get recent narratives (last 3)
+  const recentNarratives = gameState
+    .getNarrativeHistory()
+    .slice(-3)
+    .map((narrative) =>
+      narrative.length > 300 ? narrative.substring(0, 300) + "..." : narrative
+    )
+    .join("\n");
 
-    // Get important characters
-    const importantCharacters = gameState
-        .getImportantCharacters()
-        .map(
-            (c: { name: string; relationship: string; lastSeen?: string }) =>
-                `${c.name} (${c.relationship}): Last seen ${c.lastSeen || "recently"}`
-        )
-        .join("\n");
+  // Get important characters
+  const importantCharacters = gameState
+    .getImportantCharacters()
+    .map(
+      (c: { name: string; relationship: string; lastSeen?: string }) =>
+        `${c.name} (${c.relationship}): Last seen ${c.lastSeen || "recently"}`
+    )
+    .join("\n");
 
-    // Get character traits
-    const characterTraits = gameState
-        .getCharacterTraits()
-        .filter((t: { level: number }) => t.level > 6)
-        .map((t: { name: string; level: number }) => `${t.name} (Level ${t.level})`)
-        .join(", ");
+  // Get character traits
+  const characterTraits = gameState
+    .getCharacterTraits()
+    .filter((t: { level: number }) => t.level > 6)
+    .map((t: { name: string; level: number }) => `${t.name} (Level ${t.level})`)
+    .join(", ");
 
-    // Get themes
-    const themes = gameState.getThemes().join(", ");
+  // Get themes
+  const themes = gameState.getThemes().join(", ");
 
-    return `
+  return `
 RECENT EVENTS:
 ${recentNarratives || "No significant recent events."}
 
@@ -758,9 +762,9 @@ ${themes || "No established themes yet."}
 
 CURRENT OBJECTIVES:
 ${
-        gameState.getCurrentChapter().pendingObjectives.join(", ") ||
-        "No active objectives."
-    }
+  gameState.getCurrentChapter().pendingObjectives.join(", ") ||
+  "No active objectives."
+}
 `;
 }
 
@@ -787,36 +791,36 @@ ${
  * messages.unshift({ role: "system", content: instructions });
  */
 export function getEnhancedAIInstructions(gameState: IGameState): string {
-    const currentArc = gameState.getCurrentChapter().arc;
-    const {canResolveQuest, requiredElementsMissing} =
-        enforceStoryRequirements(gameState);
+  const currentArc = gameState.getCurrentChapter().arc;
+  const { canResolveQuest, requiredElementsMissing } =
+    enforceStoryRequirements(gameState);
 
-    // Base instructions
-    let enhancedInstructions = existingInstructions;
+  // Base instructions
+  let enhancedInstructions = existingInstructions;
 
-    // Add pacing guidance
-    enhancedInstructions += `\nCurrent Narrative Phase: ${currentArc.toUpperCase()}\n`;
+  // Add pacing guidance
+  enhancedInstructions += `\nCurrent Narrative Phase: ${currentArc.toUpperCase()}\n`;
 
-    // Enforce minimum story requirements
-    if (!canResolveQuest) {
-        enhancedInstructions += `\nIMPORTANT: The story is not ready for resolution yet. Required elements missing: ${requiredElementsMissing.join(
-            ", "
-        )}.\n`;
-    }
+  // Enforce minimum story requirements
+  if (!canResolveQuest) {
+    enhancedInstructions += `\nIMPORTANT: The story is not ready for resolution yet. Required elements missing: ${requiredElementsMissing.join(
+      ", "
+    )}.\n`;
+  }
 
-    // Add specific instructions by arc
-    switch (currentArc) {
-        case "introduction":
-            enhancedInstructions += `
+  // Add specific instructions by arc
+  switch (currentArc) {
+    case "introduction":
+      enhancedInstructions += `
       For this INTRODUCTION phase:
       - Focus on world-building and establishing the setting
       - Introduce key NPCs that will be relevant later
       - Present initial small challenges to build character
       - DO NOT resolve any major plot elements yet
       `;
-            break;
-        case "rising-action":
-            enhancedInstructions += `
+      break;
+    case "rising-action":
+      enhancedInstructions += `
       For this RISING ACTION phase:
       - Escalate challenges and stakes
       - Introduce complications to the main quest
@@ -824,9 +828,9 @@ export function getEnhancedAIInstructions(gameState: IGameState): string {
       - Develop relationships with key NPCs
       - DO NOT resolve the main quest yet
       `;
-            break;
-        case "climax":
-            enhancedInstructions += `
+      break;
+    case "climax":
+      enhancedInstructions += `
       For this CLIMAX phase:
       - Present a major challenge or confrontation
       - Include a significant combat encounter if none has occurred yet
@@ -834,18 +838,18 @@ export function getEnhancedAIInstructions(gameState: IGameState): string {
       - Reveal important information or twists
       - Allow for meaningful character decisions
       `;
-            break;
-        case "falling-action":
-            enhancedInstructions += `
+      break;
+    case "falling-action":
+      enhancedInstructions += `
       For this FALLING ACTION phase:
       - Show immediate consequences of the climax
       - Begin resolving major plot threads
       - Allow character reflection
       - Set up the final resolution
       `;
-            break;
-        case "resolution":
-            enhancedInstructions += `
+      break;
+    case "resolution":
+      enhancedInstructions += `
       For this RESOLUTION phase:
       - Provide closure to story arcs
       - Resolve remaining character relationships
@@ -853,21 +857,74 @@ export function getEnhancedAIInstructions(gameState: IGameState): string {
       - Only now may you conclude the main quest fully
       - Hint at potential future adventures
       `;
-            break;
-    }
+      break;
+  }
 
-    // Add anti-loop protection
-    if (detectNarrativeLoop(gameState)) {
-        enhancedInstructions += `
+  // Add anti-loop protection
+  if (detectNarrativeLoop(gameState)) {
+    enhancedInstructions += `
     IMPORTANT: The narrative appears to be in a repetitive loop. Please:
     - Change the scene significantly in your next response
     - Introduce a new character, location, or event
     - Progress the main plot with new information
     - DO NOT repeat similar options or scenarios
     `;
-    }
+  }
 
-    return enhancedInstructions;
+  return enhancedInstructions;
+}
+
+// ...existing code...
+
+/**
+ * Translates text to the target language using AI
+ *
+ * @param text Text to translate
+ * @param targetLanguage In theory we can ask it to translate into any language
+ * @returns Translated text
+ */
+export async function translateText(
+  text: string,
+  targetLanguage: string
+): Promise<string> {
+  // Skip translation if text is empty or target language is English (assumed default)
+  if (!text || targetLanguage === "en") {
+    return text;
+  }
+
+  try {
+    const languageNames: Record<string, string> = {
+      en: "English",
+      de: "German",
+      ch: "Swiss German",
+    };
+
+    const fullLanguageName = languageNames[targetLanguage] || "English";
+
+    const response = await generateChatNarrative(
+      [
+        {
+          role: "system",
+          content: `You are a professional translator. Translate the following text into ${fullLanguageName}. 
+            Preserve all formatting including line breaks. Do not add any explanations or notes.
+            Just return the translated text.`,
+        },
+        {
+          role: "user",
+          content: text,
+        },
+      ],
+      {
+        temperature: 0.3,
+        maxTokens: 1500,
+      }
+    );
+
+    return response.content || text;
+  } catch (error) {
+    log(`Translation failed: ${error}`, "Error");
+    return text;
+  }
 }
 
 /**
@@ -885,6 +942,6 @@ export function getEnhancedAIInstructions(gameState: IGameState): string {
  * const models = await openaiClient.models.list();
  */
 export function getOpenAI(): OpenAI {
-    ensureConfig();
-    return openai;
+  ensureConfig();
+  return openai;
 }
