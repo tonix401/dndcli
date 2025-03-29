@@ -893,4 +893,290 @@ const terms: Record<string, ITerm> = {
     ch: "Du hesch en Gegestand gfunde: ",
   },
   // #endregion
+  // Objective related
+  objective: {
+    de: "Ziel",
+    en: "Objective",
+    ch: "Ziil",
+  },
+  pendingObjectives: {
+    de: "Ausstehende Ziele",
+    en: "Pending Objectives",
+    ch: "Usstehendi Ziil",
+  },
+  completedObjectives: {
+    de: "Abgeschlossene Ziele",
+    en: "Completed Objectives",
+    ch: "Abgschlosseni Ziil",
+  },
+  staleObjectives: {
+    de: "Veraltete Ziele",
+    en: "Stale Objectives",
+    ch: "Veralteti Ziil",
+  },
+  newObjectives: {
+    de: "Neue Ziele",
+    en: "New Objectives",
+    ch: "Neui Ziil",
+  },
+  objectiveCompleted: {
+    de: "Ziel abgeschlossen",
+    en: "Objective completed",
+    ch: "Ziil abgschlosse",
+  },
+  // Story pace
+  fast: {
+    de: "Schnell",
+    en: "Fast",
+    ch: "Schnäll",
+  },
+  medium: {
+    de: "Mittel",
+    en: "Medium",
+    ch: "Mittel",
+  },
+  slow: {
+    de: "Langsam",
+    en: "Slow",
+    ch: "Langsam",
+  },
+  // Campaign messages
+  startingCampaign: {
+    de: "Kampagne wird gestartet...",
+    en: "Starting campaign...",
+    ch: "Kampagne wird gstartet...",
+  },
+  newCampaign: {
+    de: "Neue Kampagne",
+    en: "New campaign",
+    ch: "Neui Kampagne",
+  },
+  continuingCampaign: {
+    de: "Bestehende Kampagne wird fortgesetzt",
+    en: "Continuing existing campaign",
+    ch: "Bestehendi Kampagne wird fortgsetzt",
+  },
+  generatingIntroduction: {
+    de: "Einführung wird generiert...",
+    en: "Generating introduction...",
+    ch: "Iifüehrig wird generiert...",
+  },
+  introductionReady: {
+    de: "Einführung bereit!",
+    en: "Introduction ready!",
+    ch: "Iifüehrig parat!",
+  },
+  failedToGenerateIntro: {
+    de: "Fehler beim Generieren der Einführung",
+    en: "Failed to generate introduction",
+    ch: "Fehler bim Generiere vo dr Iifüehrig",
+  },
+  weavingStory: {
+    de: "Der nächste Teil deiner Geschichte wird erstellt...",
+    en: "Weaving the next part of your story...",
+    ch: "Dr nöchscht Teil vo dinere Gschicht wird erstellt...",
+  },
+  storyReady: {
+    de: "Der nächste Teil deiner Geschichte ist bereit!",
+    en: "Next part of your story ready!",
+    ch: "Dr nöchscht Teil vo dinere Gschicht isch parat!",
+  },
+  storytellingIssue: {
+    de: "Problem beim Erzählen der Geschichte",
+    en: "Storytelling encountered an issue",
+    ch: "Problem bim Verzelle vo dr Gschicht",
+  },
+  ensuringNarrativeContinuity: {
+    de: "Narrative Kontinuität wird sichergestellt...",
+    en: "Ensuring narrative continuity...",
+    ch: "Narrativi Kontinuität wird sichergstellt...",
+  },
+  narrativeFlowSecured: {
+    de: "Narrativer Fluss gesichert",
+    en: "Narrative flow secured",
+    ch: "Narrative Fluss gsicheret",
+  },
+  narrativeContinuityIssue: {
+    de: "Problem mit der narrativen Kontinuität",
+    en: "Issue with narrative continuity",
+    ch: "Problem mit dr narrative Kontinuität",
+  },
+  // Scene types
+  battle: {
+    de: "Schlacht",
+    en: "Battle",
+    ch: "Schlacht",
+  },
+  tavern: {
+    de: "Taverne",
+    en: "Tavern",
+    ch: "Taverne",
+  },
+  castle: {
+    de: "Schloss",
+    en: "Castle",
+    ch: "Schloss",
+  },
+  forest: {
+    de: "Wald",
+    en: "Forest",
+    ch: "Wald",
+  },
+  mountain: {
+    de: "Berg",
+    en: "Mountain",
+    ch: "Bärg",
+  },
+  dungeon: {
+    de: "Verlies",
+    en: "Dungeon",
+    ch: "Verliess",
+  },
+  shop: {
+    de: "Laden",
+    en: "Shop",
+    ch: "Lade",
+  },
+  // Error messages
+  failedToExtractObjectives: {
+    de: "Fehler beim Extrahieren der Ziele",
+    en: "Failed to extract objectives",
+    ch: "Fehler bim Extrahiere vo de Ziil",
+  },
+  failedToSaveGameState: {
+    de: "Fehler beim Speichern des Spielstandes",
+    en: "Failed to save game state",
+    ch: "Fehler bim Spichere vom Spielstand",
+  },
+  campaignLoopError: {
+    de: "Fehler in der Kampagnen-Schleife",
+    en: "Campaign loop error",
+    ch: "Fehler i dr Kampagne-Schleife",
+  },
+  gameStateSaved: {
+    de: "Spielstand gespeichert. Du kannst später weiterspielen.",
+    en: "Game state saved. You can continue later.",
+    ch: "Spielstand gspicheret. Du chasch spöter wiiterspiele.",
+  },
+  // Other campaign terms
+  chapter: {
+    de: "Kapitel",
+    en: "Chapter",
+    ch: "Kapitel",
+  },
+  previously: {
+    de: "Zuvor",
+    en: "Previously",
+    ch: "Vorhär",
+  },
+  recentDecisions: {
+    de: "Letzte Entscheidungen",
+    en: "Recent decisions",
+    ch: "Letschti Entscheidigä",
+  },
+  adventureContinues: {
+    de: "Dein Abenteuer geht weiter...",
+    en: "Your adventure continues...",
+    ch: "Dis Abentüür gaht witer...",
+  },
+  narrative: {
+    de: "Erzählung",
+    en: "Narrative",
+    ch: "Verzählig",
+  },
+  story: {
+    de: "Geschichte",
+    en: "Story",
+    ch: "Gschicht",
+  },
+  arc: {
+    de: "Handlungsbogen",
+    en: "Arc",
+    ch: "Handligsboge",
+  },
+  scene: {
+    de: "Szene",
+    en: "Scene",
+    ch: "Szene",
+  },
+  yourAdventureSoFar: {
+    de: "Dein Abenteuer bisher",
+    en: "Your Adventure So Far",
+    ch: "Dis Abentüür bis jetzt",
+  },
+  // #endregion
+
+  // #region Chapter and Arc Titles
+  chapterTitleIntroduction: {
+    de: "Der Anfang",
+    en: "The Beginning",
+    ch: "De Afang",
+  },
+  chapterTitleRisingAction: {
+    de: "Die Herausforderung wächst",
+    en: "The Challenge Grows",
+    ch: "D'Useforderig wachst",
+  },
+  chapterTitleClimax: {
+    de: "Der Moment der Wahrheit",
+    en: "The Moment of Truth",
+    ch: "De Moment vo de Wahrheit",
+  },
+  chapterTitleFallingAction: {
+    de: "Die Nachwirkungen",
+    en: "The Aftermath",
+    ch: "D'Nachwürkige",
+  },
+  chapterTitleResolution: {
+    de: "Der Abschluss",
+    en: "The Conclusion",
+    ch: "De Abschluss",
+  },
+  chapterTitleDefault: {
+    de: "Ein neues Kapitel",
+    en: "A New Chapter",
+    ch: "Es neus Kapitel",
+  },
+  // #endregion
+
+  // #region Arc Guidelines
+  arcGuidelineIntroduction: {
+    de: "Etabliere den Schauplatz, stelle wichtige Charaktere vor und präsentiere den ersten Konflikt",
+    en: "Establish setting, introduce key characters, and present initial conflict",
+    ch: "Etablier de Schauplatz, stell wichtigi Charaktere vor und zeig de erst Konflikt",
+  },
+  arcGuidelineRisingAction: {
+    de: "Steigere die Herausforderungen, führe Komplikationen ein, vertiefe Charakterbeziehungen",
+    en: "Escalate challenges, introduce complications, deepen character relationships",
+    ch: "Steiger d'Useforderige, füehr Komplikatione i, vertief d'Beziehige zwüsche de Charaktere",
+  },
+  arcGuidelineClimax: {
+    de: "Arbeite auf eine große Konfrontation hin, maximiere Spannung, erschaffe hohe Einsätze",
+    en: "Build toward major confrontation, maximize tension, create high stakes",
+    ch: "Arbeit uf e grossi Konfrontation hee, maximier d'Spannig, schaff hohi Isätz",
+  },
+  arcGuidelineFallingAction: {
+    de: "Zeige die Konsequenzen des Höhepunkts, beginne Konflikte zu lösen",
+    en: "Show consequences of climax, begin resolving conflicts",
+    ch: "Zeig d'Konsequenze vom Höhepunkt, fang a Konflikt z'löse",
+  },
+  arcGuidelineResolution: {
+    de: "Biete Abschluss für Handlungsstränge, deute auf zukünftige Abenteuer hin",
+    en: "Provide closure to story arcs, hint at future adventures",
+    ch: "Biet Abschluss für d'Gschicht, düt uf zukünftigi Abentüür hee",
+  },
+  arcGuidelineDefault: {
+    de: "Entwickle die Geschichte mit bedeutungsvollen Entscheidungen weiter",
+    en: "Continue developing the story with meaningful choices",
+    ch: "Entwickel d'Gschicht mit bedütigsolle Entscheidig witer",
+  },
+  // #endregion
+
+  // #region Arc Transitions
+  arcTransitionIntroToRising: {
+    de: "Baue auf etablierte Elemente, indem du Komplikationen einführst. Erhöhe die Einsätze für den Charakter und vertiefe NPC-Beziehungen. Schaffe Hindernisse auf dem Weg zu den Hauptzielen.",
+    en: "Build upon established elements by introducing complications. Increase stakes for the character and deepen NPC relationships. Create roadblocks toward the main objectives.",
+    ch: "Bau uf etablierti Element uf, indem du Komplikatione iiführsch. Erhöh d'Isätz für de Charakter und vertief d'NPC-Beziehige. Schaff Hinderniss uf em Wäg zu de Hauptziel.",
+  },
+  // #endregion
 };
