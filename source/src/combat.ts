@@ -17,6 +17,7 @@ import { pause } from "@utilities/ConsoleService.js";
 import { themedSelect } from "@utilities/MenuService.js";
 import { combatStatusSelect } from "@components/CombatStatusSelect.js";
 import { getEquippedStatBonuses } from "@utilities/character/EquipmentService.js";
+import { getTerm } from "@utilities/LanguageService.js";
 
 interface CombatResult {
   success: boolean;
@@ -154,13 +155,13 @@ export async function runCombat(
     await pause(800);
     totalClear();
     const combatAction = await combatStatusSelect({
-      message: "Choose your combat action:",
+      message: getTerm("chooseCombatOption"),
       choices: [
-        { name: "Attack", value: "Attack" },
-        { name: "Defend", value: "Defend" },
-        { name: "Use Ability", value: "Ability" },
-        { name: "Use Item", value: "Item" },
-        { name: "Run Away", value: "Run" },
+        { name: getTerm("attack"), value: "Attack" },
+        { name: getTerm("defend"), value: "Defend" },
+        { name: getTerm("useAbility"), value: "Ability" },
+        { name: getTerm("useItem"), value: "Item" },
+        { name: getTerm("runAway"), value: "Run" },
       ],
       enemy: enemy,
       canGoBack: true,

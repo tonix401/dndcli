@@ -350,8 +350,8 @@ export function getCombatScreenEnvironment(page: string, enemy: IEnemy) {
     chalk.white(alignedPage),
     " | "
   );
-  const heldText = holdMyText(boxItUp(allStats));
-  log(heldText, "Warn ");
+  const box = boxItUp(allStats)
+  const heldText = holdMyText(box);
 
   // Lets assume that the widest part is always the player stats in the hands
   const maxTotalWidth = removeFormatting(heldText).text.split("\n")[0].length;
