@@ -232,7 +232,7 @@ const arrowKeysSelect = createPrompt(
 
       if (first === -1) {
         throw new ValidationError(
-          "[select prompt] No selectable choices. All choices are disabled."
+          `[select prompt] ${getTerm("noSelectableChoices")}`
         );
       }
 
@@ -323,10 +323,10 @@ const arrowKeysSelect = createPrompt(
 
       if (items.length > pageSize) {
         helpTipBottom = `\n${theme.style.help(
-          "(Use arrow keys to reveal more choices)"
+          getTerm("useArrowKeysNavigation")
         )}`;
       } else {
-        helpTipTop = theme.style.help("(Use arrow keys)");
+        helpTipTop = theme.style.help(getTerm("useArrowKeys"));
       }
     }
 
@@ -340,7 +340,9 @@ const arrowKeysSelect = createPrompt(
 
         if (item.disabled) {
           const disabledLabel =
-            typeof item.disabled === "string" ? item.disabled : "(disabled)";
+            typeof item.disabled === "string"
+              ? item.disabled
+              : getTerm("disabled");
           return theme.style.disabled(`${item.name} ${disabledLabel}`);
         }
 
