@@ -399,34 +399,34 @@ export const themedSingleKeyPrompt = createPrompt(
 
 // Functions that test for certain types of control keys inside selects and other prompts or menus
 /**
- * up, w, i
+ * up
  */
 export function isUpKey(key: any): boolean {
-  return key.name === "up" || key.name === "w" || key.name === "i";
+  return key.name === "up";
 }
 /**
- * down, s, k
+ * down
  */
 export function isDownKey(key: any): boolean {
-  return key.name === "down" || key.name === "s" || key.name === "k";
+  return key.name === "down";
 }
 /**
- * left, a, j
+ * left
  */
 export function isLeftKey(key: any): boolean {
-  return key.name === "left" || key.name === "a" || key.name === "j";
+  return key.name === "left";
 }
 /**
- * right, d, l
+ * right
  */
 export function isRightKey(key: any): boolean {
-  return key.name === "right" || key.name === "d" || key.name === "l";
+  return key.name === "right";
 }
 /**
- * return, space, right
+ * return
  */
 export function isConfirmKey(key: any): boolean {
-  return key.name === "return" || key.name === "space";
+  return key.name === "return";
 }
 /**
  * escape, left
@@ -440,3 +440,8 @@ export function isBackKey(key: any): boolean {
 export function isBackspaceKey(key: any): boolean {
   return key.name === "backspace";
 }
+
+export const getYesNo = () => [
+  { name: getTerm("yes"), value: true },
+  { name: getTerm("no"), value: false },
+];

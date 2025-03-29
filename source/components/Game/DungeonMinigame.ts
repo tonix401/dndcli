@@ -1,4 +1,8 @@
-import { getDungeon, setDungeon } from "@utilities/CacheService.js";
+import {
+  getDungeon,
+  renewDungeon,
+  setDungeon,
+} from "@utilities/CacheService.js";
 import {
   Dungeon,
   initiateDungeonMapWithHallways,
@@ -6,13 +10,22 @@ import {
 } from "@utilities/world/DungeonService.js";
 import { enterRoom } from "./EnterRoom.js";
 import { dungeonMovementSelect } from "./DungeonMovementSelect.js";
-import { totalClear } from "@utilities/ConsoleService.js";
+import {
+  accentColor,
+  pressEnter,
+  totalClear,
+} from "@utilities/ConsoleService.js";
 import { log } from "@utilities/LogService.js";
+import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
+import { getYesNo } from "@utilities/MenuService.js";
+import { getTerm } from "@utilities/LanguageService.js";
+
+type DungeonResult = "completed" | "fled" | "died";
 
 /**
  * Dungeon minigame.
  */
-export async function dungeonMinigame() {
+export async function dungeonMinigame(): Promise<DungeonResult> {
   if (!getDungeon()) {
     setDungeon(initiateDungeonMapWithHallways());
   }
@@ -26,11 +39,38 @@ export async function dungeonMinigame() {
       (await movePlayerMenu(currentRoom, dungeon)) === "goBack";
 
     currentRoom = dungeon.rooms[dungeon.player.y][dungeon.player.x];
-    await enterRoom(currentRoom);
+    const roomResult = await enterRoom(currentRoom);
 
+    // While in the map screen leaving with "escape" will lead to this confirmation menu
+    // If confirming the player will leave the dungeon and will not be able to enter again
     if (wantsToLeave) {
       totalClear();
-      break;
+      const confirmLeaving = await themedSelectInRoom({
+        message: getTerm("confirmDungeonExit"),
+        choices: getYesNo(),
+      });
+      if (confirmLeaving) {
+        totalClear();
+        console.log(accentColor(getTerm("fleeDungeon")));
+        await pressEnter();
+        renewDungeon();
+        return "fled";
+      }
+    }
+
+    // Completing the dungeon
+    if (roomResult === "bossCleared") {
+      totalClear();
+      console.log(accentColor(getTerm("bossCleared")));
+      renewDungeon();
+      await pressEnter();
+      return "completed";
+    }
+
+    // Dying...
+    if (roomResult === "died") {
+      totalClear();
+      return "died";
     }
   }
 }

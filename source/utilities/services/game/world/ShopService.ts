@@ -49,16 +49,6 @@ function generateShopInventory(playerLevel: number): IItem[] {
     inventory.push(item);
   }
 
-  // TODO: Add more complex items based on shop type
-  /**
-   * Add shop-specific specialty items
-   * if (shopType === "magic") {
-   *   // Add magic-focused items
-   * } else if (shopType === "blacksmith") {
-   *   // Add weapons and armor
-   * }
-   */
-
   return inventory;
 }
 
