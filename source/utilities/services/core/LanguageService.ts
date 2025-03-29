@@ -927,9 +927,9 @@ const terms = {
     ch: "Du hesch en Gegestand gfunde: ",
   },
   confirmDungeonExit: {
-    de: "Bist Du sicher, dass du den Dungeon verlassen willst?\n Du kannst später nicht mehr zurück",
-    en: "Are you sure you want to exit the dungeon?\n You will not be able to go back in later",
-    ch: "Bisch sicher, dass Du de Dungeon verlah willsch?\n Du chasch nüm zrugg cho spöter.",
+    de: "Bist Du sicher, dass du den Dungeon verlassen willst?",
+    en: "Are you sure you want to exit the dungeon?",
+    ch: "Bisch sicher, dass Du de Dungeon verlah willsch?",
   },
   fleeDungeon: {
     de: "Du nimmst Deine Beine in die Hand und fliehst so schnell du kannst aus dem Dungeon.\nDie Decke und Wände beginnen zu bröckeln und machen merkwürdige Geräusche.\nMit deinem letzten Atemzug schaffst du es nach draußen, während der Dungeon hinter dir in sich zusammenfällt.",
@@ -940,6 +940,39 @@ const terms = {
     de: "Herzlichen Glückwunsch, Du hast den Boss besiegt und damit den Dungeon beendet.\n Viel Glück auf Deinen weiteren Abenteuern.",
     en: "Congratulations, you have defeated the boss and completed the dungeon.\n Good luck on your future adventures!",
     ch: "Grautulation, Du hesch de Boss bsiigt und de Dungeon gschlosse.\n Viel Glück uf Dini wiiteri Abentüür!",
+  },
+  // #endregion
+
+  // #region Combat
+  chooseCombatOption: {
+    de: "Wähle eine Aktion aus:",
+    en: "Choose an action:",
+    ch: "Wähl en Aktion us:",
+  },
+  attack: {
+    de: "Angreifen",
+    en: "Attack",
+    ch: "Aagriffe",
+  },
+  defend: {
+    de: "Verteidigen",
+    en: "Defend",
+    ch: "Verteidige",
+  },
+  useAbility: {
+    de: "Fähigkeit benutzen",
+    en: "Use Ability",
+    ch: "Fähigkeit bruuche",
+  },
+  useItem: {
+    de: "Item benutzen",
+    en: "Use Item",
+    ch: "Gegenstand bruuche",
+  },
+  runAway: {
+    de: "Weg rennen",
+    en: "Run Away",
+    ch: "Flüechte",
   },
   // #endregion
 
@@ -1592,9 +1625,9 @@ const terms = {
     ch: "Wird glade...",
   },
   mainMenuTitle: {
-    de: "⚔️ D&D Command Line Interface ⚔️",
-    en: "⚔️ D&D Command Line Interface ⚔️",
-    ch: "⚔️ D&D Command Line Interface ⚔️",
+    de: "⚔️ DnD Command Line Interface ⚔️",
+    en: "⚔️ DnD Command Line Interface ⚔️",
+    ch: "⚔️ DnD Command Line Interface ⚔️",
   },
   chooseOption: {
     de: "Wähle eine Option",

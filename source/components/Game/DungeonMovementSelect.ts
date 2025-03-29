@@ -28,6 +28,7 @@ import {
   isRightKey,
   isUpKey,
 } from "@utilities/MenuService.js";
+import { log } from "@utilities/LogService.js";
 
 type DungeonMovementSelectResult =
   | "north"
@@ -258,25 +259,24 @@ const rightHand = leftHand.map((line) =>
 export function holdMyText(text: string) {
   const alignedText = alignText(text, "left").split("\n");
   const textHeight = alignedText.length;
-  const textWidth = removeFormatting(alignedText[0]).text.length;
-  let lHand = leftHand;
-  let rHand = rightHand;
+  // makes a copy so the actual constant doesnt get changed
+  const lHand = [...leftHand];
+  const rHand = [...rightHand];
   const lHandHeight = lHand.length;
 
-  if (textHeight >= lHand.length) {
+  if (textHeight >= lHandHeight) {
     // Add empty lines at the top of the side pieces to compensate for the higher text
     for (let i = 0; i < textHeight - lHandHeight; i++) {
       lHand.unshift(" ".repeat(lHand[0].length));
       rHand.unshift(" ".repeat(lHand[0].length));
     }
-  } else {
-    alignedText.unshift(" ".repeat(textWidth));
   }
 
-  const rHandAndText = alignTextSideBySide(
+  const lHandAndText = alignTextSideBySide(
     lHand.join("\n"),
     alignedText.join("\n")
   );
-  const holdingHands = alignTextSideBySide(rHandAndText, rHand.join("\n"));
+
+  const holdingHands = alignTextSideBySide(lHandAndText, rightHand.join("\n"));
   return holdingHands;
 }

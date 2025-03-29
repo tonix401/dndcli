@@ -56,7 +56,7 @@ const SELECT_SEPARATOR = chalk.dim(" ──────────");
 // #endregion
 
 // #region Standard Settings
-const LOG_LEVELS: LogTypes[] = ["Info ", "Warn ", "Error"];
+const LOG_LEVELS: LogTypes[] = ["Warn ", "Error"];
 
 const STANDARD_THEME: ITheme = {
   name: { de: "Standard", en: "Standard" },
