@@ -1,6 +1,7 @@
 import { Chapter, IGameState } from "@utilities/IGameState.js";
 import { STORY_PACE } from "../GameService.js";
 import { ChatCompletionRequestMessage } from "../../ai/AIService.js";
+import { getTerm } from "@utilities/LanguageService.js";
 
 /**
  * Generate a chapter title based on the arc
@@ -8,17 +9,17 @@ import { ChatCompletionRequestMessage } from "../../ai/AIService.js";
 export function getChapterTitle(arc: string): string {
   switch (arc) {
     case "introduction":
-      return "The Beginning";
+      return getTerm("chapterTitleIntroduction");
     case "rising-action":
-      return "The Challenge Grows";
+      return getTerm("chapterTitleRisingAction");
     case "climax":
-      return "The Moment of Truth";
+      return getTerm("chapterTitleClimax");
     case "falling-action":
-      return "The Aftermath";
+      return getTerm("chapterTitleFallingAction");
     case "resolution":
-      return "The Conclusion";
+      return getTerm("chapterTitleResolution");
     default:
-      return "A New Chapter";
+      return getTerm("chapterTitleDefault");
   }
 }
 
@@ -110,17 +111,17 @@ export function detectNarrativeLoop(gameState: IGameState): boolean {
 export function getArcGuidelines(arc: string): string {
   switch (arc) {
     case "introduction":
-      return "Establish setting, introduce key characters, and present initial conflict";
+      return getTerm("arcGuidelineIntroduction");
     case "rising-action":
-      return "Escalate challenges, introduce complications, deepen character relationships";
+      return getTerm("arcGuidelineRisingAction");
     case "climax":
-      return "Build toward major confrontation, maximize tension, create high stakes";
+      return getTerm("arcGuidelineClimax");
     case "falling-action":
-      return "Show consequences of climax, begin resolving conflicts";
+      return getTerm("arcGuidelineFallingAction");
     case "resolution":
-      return "Provide closure to story arcs, hint at future adventures";
+      return getTerm("arcGuidelineResolution");
     default:
-      return "Continue developing the story with meaningful choices";
+      return getTerm("arcGuidelineDefault");
   }
 }
 
@@ -153,17 +154,17 @@ export function getArcTransitionGuidance(
   newArc: string
 ): string {
   if (previousArc === "introduction" && newArc === "rising-action") {
-    return "Build upon established elements by introducing complications. Increase stakes for the character and deepen NPC relationships. Create roadblocks toward the main objectives.";
+    return getTerm("arcTransitionIntroToRising");
   } else if (previousArc === "rising-action" && newArc === "climax") {
-    return "Bring all major storylines to a head. Force crucial decisions that have significant consequences. Introduce the main antagonist or challenge directly.";
+    return getTerm("arcTransitionRisingToClimax");
   } else if (previousArc === "climax" && newArc === "falling-action") {
-    return "Show immediate consequences of the climactic decisions. Begin resolving secondary conflicts while maintaining tension. Create space for character reflection.";
+    return getTerm("arcTransitionClimaxToFalling");
   } else if (previousArc === "falling-action" && newArc === "resolution") {
-    return "Provide closure to major story threads. Show character growth and the new status quo. Plant subtle seeds for potential future adventures.";
+    return getTerm("arcTransitionFallingToResolution");
   } else if (previousArc === "resolution" && newArc === "introduction") {
-    return "Create a clear narrative break with a new setting or time jump. Introduce new challenges while referencing past adventures. Establish fresh objectives while honoring character history.";
+    return getTerm("arcTransitionResolutionToIntro");
   }
-  return "Smoothly transition the narrative while maintaining story consistency.";
+  return getTerm("arcTransitionDefault");
 }
 
 /**
@@ -466,7 +467,7 @@ export async function ensureNarrativeContinuity(
           const args = JSON.parse(choicesResponse.function_call.arguments);
           if (args.choices && Array.isArray(args.choices)) {
             choicesContent = args.choices
-              .map((choice: string, i: number) => `${i + 1}. {${choice}}`)
+              .map((choice: string, i: number) => `${i + 1}.{${choice}}`)
               .join("\n");
           }
         } catch (error) {

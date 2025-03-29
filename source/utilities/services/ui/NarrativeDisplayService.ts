@@ -11,8 +11,7 @@ import { primaryColor, secondaryColor } from "@utilities/ConsoleService.js";
 import chalk from "chalk";
 import Config from "@utilities/Config.js";
 import path from "path";
-import { IGameState } from "@utilities/IGameState.js";
-import { deduplicateGameState } from "@utilities/SaveLoadService.js";
+import { getTerm } from "@utilities/LanguageService.js";
 
 /**
  * Displays ASCII art from a string or loads it from a file
@@ -286,15 +285,15 @@ export async function displayTextInBookFormat(
     // Add helpful navigation hint if we have ASCII art pages
     if (asciiArtLines.length > 0) {
       if (page === 1 && totalPages > 1) {
-        footerText += " - Press → for story text";
+        footerText += ` - ${getTerm("pressRightForStory")}`;
       } else if (page === 2 && allContentPages[0].isAsciiArt) {
-        footerText += " - Story begins here";
+        footerText += ` - ${getTerm("storyBeginsHere")}`;
       }
     }
 
     // Add a hint when on the last page if not exiting
     if (page === totalPages && !exitOnLastPage) {
-      footerText += " - Press Enter for choices";
+      footerText += ` - ${getTerm("pressEnterForChoices")}`;
     }
 
     const pageInfoLine = bookBottom[1];
@@ -304,13 +303,9 @@ export async function displayTextInBookFormat(
 
     // Navigation instructions
     if (totalPages > 1) {
-      console.log(
-        secondaryColor(
-          "  Use ← and → arrow keys to navigate pages, [Enter] to continue"
-        )
-      );
+      console.log(secondaryColor(getTerm("useArrowKeysNavigation")));
     } else {
-      console.log(secondaryColor("  Press [Enter] to continue"));
+      console.log(secondaryColor(getTerm("pressEnterToContinue")));
     }
   };
 
@@ -366,7 +361,7 @@ export async function displayRecapInBookFormat(
   } = {}
 ): Promise<void> {
   const {
-    title = "Adventure Recap",
+    title = getTerm("adventureRecap"),
     clearConsole = true,
     asciiArt = "",
   } = options;
@@ -408,23 +403,4 @@ export async function getAsciiArtContent(filename: string): Promise<string> {
     );
     return ""; // Return empty on error
   }
-}
-
-/**
- * Displays a recap of the previous narrative.
- * @deprecated Use displayRecapInBookFormat instead
- */
-export async function displayRecap(gameState: IGameState): Promise<void> {
-  const narrativeHistory = gameState.getNarrativeHistory();
-  if (narrativeHistory.length > 0) {
-    const recap = narrativeHistory[narrativeHistory.length - 1];
-    console.log(
-      chalk.bold(primaryColor("\n🔄 Recap of your previous session:"))
-    );
-    console.log(secondaryColor(recap));
-    await pressEnter({
-      message: "Review the recap, then press Enter to continue...",
-    });
-  }
-  deduplicateGameState(gameState);
 }

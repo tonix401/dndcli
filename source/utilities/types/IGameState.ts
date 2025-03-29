@@ -36,7 +36,7 @@ export interface Character {
 export interface CharacterTrait {
   name: string;
   level: number;
-  description: string;
+  description?: string;
 }
 
 /**

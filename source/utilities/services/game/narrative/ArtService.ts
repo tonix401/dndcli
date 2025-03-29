@@ -5,8 +5,12 @@
  * based on game context, character class, story arc, and narrative content.
  */
 
-import { Log, NarrativeDisplay } from "../../../Services.js"; //TODO: Adjust import path
+import { log } from "@core/LogService.js";
+import { getAsciiArtContent } from "@ui/NarrativeDisplayService.js";
 import { IGameState } from "@utilities/IGameState.js";
+import { getTerm } from "@core/LanguageService.js";
+import { getLanguage } from "@core/CacheService.js";
+import { translateText } from "@ai/AIService.js";
 
 /**
  * Gets appropriate ASCII art for a character class intro
@@ -30,9 +34,9 @@ export async function getIntroAsciiArt(
 
     // Get the relevant art file or use a default
     const artFile = artMap[characterClass.toLowerCase()] || "adventure.txt";
-    return await NarrativeDisplay.getAsciiArtContent(artFile);
+    return await getAsciiArtContent(artFile);
   } catch (error) {
-    Log.log(`Error loading intro ASCII art: ${error}`, "Warn ");
+    log(`Error loading intro ASCII art: ${error}`, "Warn ");
     return ""; // Return empty string on error
   }
 }
@@ -100,9 +104,9 @@ export async function getSceneAsciiArt(
       fileName = arcMap[arc] || "book.txt"; // Default to book.txt if arc not found
     }
 
-    return await NarrativeDisplay.getAsciiArtContent(fileName);
+    return await getAsciiArtContent(fileName);
   } catch (error) {
-    Log.log(`Error loading scene ASCII art: ${error}`, "Warn ");
+    log(`Error loading scene ASCII art: ${error}`, "Warn ");
     return ""; // Return empty string on error
   }
 }
@@ -152,7 +156,7 @@ export async function getContextualAsciiArt(
 
   // If we found a match, load that art
   if (bestMatch && maxMatches > 0) {
-    return await NarrativeDisplay.getAsciiArtContent(bestMatch);
+    return await getAsciiArtContent(bestMatch);
   }
 
   return ""; // No matching scene found
@@ -170,6 +174,8 @@ export async function generateGameRecap(
   let recap = "";
 
   try {
+    const currentLanguage = getLanguage();
+
     // Get the narrative history
     const narrativeHistory = gameState.getNarrativeHistory();
     const completedObjectives =
@@ -177,7 +183,7 @@ export async function generateGameRecap(
     const choices = gameState.getChoices().slice(-5);
 
     // Generate a comprehensive recap that includes narrative content
-    recap = `Chapter: ${gameState.getCurrentChapter().title}\n\n`;
+    recap = `${getTerm("chapter")}: ${gameState.getCurrentChapter().title}\n\n`;
 
     // Include the last significant narrative entry (that isn't a player choice)
     const significantNarratives = narrativeHistory
@@ -193,17 +199,21 @@ export async function generateGameRecap(
         narrativeRecap += sentences.slice(0, 3).join(" ") + "\n\n";
       }
 
-      recap += "Previously:\n" + narrativeRecap + "\n";
+      recap += `${getTerm("previously")}:\n${narrativeRecap}\n`;
     }
 
     // Include recent decisions
     if (choices.length > 0) {
-      recap += "Recent decisions:\n• " + choices.slice(-3).join("\n• ");
+      recap += `${getTerm("recentDecisions")}:\n• ${choices
+        .slice(-3)
+        .join("\n• ")}`;
     }
-  } catch (error) {
-    Log.log(`Error generating recap: ${error}`, "Error");
-    recap = "Your adventure continues...";
-  }
 
-  return recap;
+    // Translate the entire recap to the current language if needed
+    // This ensures all narrative content matches the user's language setting
+    return await translateText(recap, currentLanguage);
+  } catch (error) {
+    log(`Error generating recap: ${error}`, "Error");
+    return getTerm("adventureContinues");
+  }
 }

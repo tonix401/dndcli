@@ -10,23 +10,24 @@
 
 import chalk from "chalk";
 import ora from "ora";
+import { getTerm } from "@utilities/LanguageService.js";
 import {
   AI,
-  Log,
-  SaveLoad,
-  Inventory,
-  Cache,
-  Storage,
-  Language,
-  Equipment,
-  Console,
-  Objective,
-  NarrativeDisplay,
-  Choice,
   ArtService,
+  Cache,
+  Choice,
+  Console,
+  Equipment,
   EventHandlerService,
   GameStateService,
+  Inventory,
+  Language,
+  Log,
+  NarrativeDisplay,
   NarrativeService,
+  Objective,
+  SaveLoad,
+  Storage,
 } from "@utilities/Services.js";
 import { IGameState } from "@utilities/IGameState.js";
 import Config, { StoryPaceOptionsKey } from "@utilities/Config.js";
@@ -48,7 +49,7 @@ export const STORY_PACE = Config.STORY_PACE_OPTIONS;
  * generates introductory narrative content, processes player choices, triggers combat,
  * manages chapter progression, and handles shop and dungeon encounters.
  *
- * @param {GameState} gameState - The current game state instance.
+ * @param {IGameState} gameState - The current game state instance.
  * @param {any} characterData - The player character's data.
  * @param {string} introArt - Optional ASCII art to display in introduction
  * @returns {Promise<void>} A promise that resolves when the campaign loop exits.
@@ -102,7 +103,7 @@ export async function campaignLoop(
 
       // Display recap with the ASCII art embedded in the book
       await NarrativeDisplay.displayRecapInBookFormat(recapText, {
-        title: "Your Adventure So Far",
+        title: getTerm("yourAdventureSoFar"),
         clearConsole: true,
         asciiArt: recapArt,
       });
@@ -144,7 +145,7 @@ export async function campaignLoop(
       // Generate introductory narrative via AI service.
       const spinner = ora({
         text: chalk.hex(Cache.getTheme().accentColor)(
-          "Generating introduction..."
+          getTerm("generatingIntroduction")
         ),
         spinner: "dots",
       }).start();
@@ -231,12 +232,12 @@ Starting Instructions:
         );
 
         spinner.succeed(
-          chalk.hex(Cache.getTheme().accentColor)("Introduction ready!")
+          chalk.hex(Cache.getTheme().accentColor)(getTerm("introductionReady"))
         );
       } catch (error) {
         spinner.fail(
           chalk.hex(Cache.getTheme().errorColor)(
-            "Failed to generate introduction"
+            getTerm("failedToGenerateIntro")
           )
         );
         Log.log(`Failed to generate introduction: ${error}`, "Error");
@@ -275,7 +276,7 @@ Starting Instructions:
 
       // Now we include the ASCII art directly in the book display
       await NarrativeDisplay.displayTextInBookFormat(storyText, {
-        title: "Introduction",
+        title: getTerm("introduction"),
         clearConsole: true,
         pageSize: 15,
         asciiArt: combinedArt,
@@ -311,11 +312,7 @@ Starting Instructions:
       }`,
       "Error"
     );
-    console.log(
-      Console.secondaryColor(
-        "An error occurred during campaign setup. Returning to main menu..."
-      )
-    );
+    console.log(Console.secondaryColor(getTerm("campaignLoopError")));
     // Attempt to save game state before returning.
     try {
       await SaveLoad.saveGameState(gameState);
@@ -343,26 +340,47 @@ Starting Instructions:
       GameStateService.updatePlotStageIfNeeded(gameState);
 
       // Create base message for narrative generation
+      // In the main campaign loop, where it creates the base narrative message
+
       const baseScenarioMessage =
         NarrativeService.createBaseNarrativeMessage(gameState);
 
-      // Need to ensure each message has a properly typed role
+      const currentLanguage = Cache.getLanguage();
+      const languageNames: Record<string, string> = {
+        en: "English",
+        de: "German",
+        ch: "Swiss German",
+      };
+      const languageName = languageNames[currentLanguage] || "English";
+
+      let updatedContent = baseScenarioMessage.content;
+      if (typeof updatedContent === "string") {
+        if (updatedContent.includes("STICK TO THIS LANGUAGE")) {
+          updatedContent = updatedContent.replace(
+            /respond in clear, concise .* and STICK TO THIS LANGUAGE/,
+            `respond in clear, concise ${languageName} and STICK TO THIS LANGUAGE`
+          );
+        } else {
+          updatedContent += `\n- IMPORTANT: Please respond in ${languageName} regardless of previous conversation language.`;
+        }
+      }
+      const updatedBaseMessage: ChatCompletionRequestMessage = {
+        role: "system",
+        content: updatedContent,
+      };
+
       const messages: ChatCompletionRequestMessage[] = [
-        {
-          role: "system",
-          content: baseScenarioMessage.content,
-        },
+        updatedBaseMessage,
         ...gameState
           .getConversationHistory()
           .slice(-9)
           .map((msg): ChatCompletionRequestMessage => {
-            // Ensure each role is explicitly one of the allowed values
             const role =
               msg.role === "system" ||
               msg.role === "user" ||
               msg.role === "assistant"
                 ? msg.role
-                : "user"; // Default to user if somehow an invalid role got in
+                : "user";
 
             return {
               role: role,
@@ -373,9 +391,7 @@ Starting Instructions:
 
       // Generate the next scene narrative
       const spinner = ora({
-        text: chalk.hex(Cache.getTheme().accentColor)(
-          "Weaving the next part of your story..."
-        ),
+        text: chalk.hex(Cache.getTheme().accentColor)(getTerm("weavingStory")),
         spinner: "dots",
       }).start();
 
@@ -389,15 +405,11 @@ Starting Instructions:
         narrative = result.narrative;
         specialEvent = result.specialEvent;
         spinner.succeed(
-          chalk.hex(Cache.getTheme().accentColor)(
-            "Next part of your story ready!"
-          )
+          chalk.hex(Cache.getTheme().accentColor)(getTerm("storyReady"))
         );
       } catch (error) {
         spinner.fail(
-          chalk.hex(Cache.getTheme().errorColor)(
-            "Storytelling encountered an issue"
-          )
+          chalk.hex(Cache.getTheme().errorColor)(getTerm("storytellingIssue"))
         );
         throw error;
       }
@@ -405,7 +417,7 @@ Starting Instructions:
       // Ensure narrative continuity (prevent premature endings)
       const continuitySpinner = ora({
         text: chalk.hex(Cache.getTheme().accentColor)(
-          "Ensuring narrative continuity..."
+          getTerm("ensuringNarrativeContinuity")
         ),
         spinner: "dots",
       }).start();
@@ -422,12 +434,14 @@ Starting Instructions:
         finalNarrative = result.narrative;
         finalSpecialEvent = result.specialEvent;
         continuitySpinner.succeed(
-          chalk.hex(Cache.getTheme().accentColor)("Narrative flow secured")
+          chalk.hex(Cache.getTheme().accentColor)(
+            getTerm("narrativeFlowSecured")
+          )
         );
       } catch (error) {
         continuitySpinner.fail(
           chalk.hex(Cache.getTheme().errorColor)(
-            "Issue with narrative continuity"
+            getTerm("narrativeContinuityIssue")
           )
         );
         throw error;
@@ -474,7 +488,8 @@ Starting Instructions:
       await NarrativeDisplay.displayTextInBookFormat(
         storyText.replace(/```ascii[\s\S]+?```/, ""),
         {
-          title: gameState.getCurrentChapter()?.title || "Chapter 1",
+          title:
+            gameState.getCurrentChapter()?.title || getTerm("chapter") + " 1",
           clearConsole: true,
           pageSize: 15,
           asciiArt: asciiArt,
@@ -530,15 +545,11 @@ Starting Instructions:
       await GameStateService.updateAndSaveState(gameState, choice);
     } catch (error: any) {
       Log.log("Campaign loop error: " + error.message, "Error");
-      console.log(
-        Console.secondaryColor("An error occurred in the main game loop.")
-      );
+      console.log(Console.secondaryColor(getTerm("error")));
 
       try {
         await SaveLoad.saveGameState(gameState);
-        console.log(
-          Console.secondaryColor("Game state saved. You can continue later.")
-        );
+        console.log(Console.secondaryColor(getTerm("gameStateSaved")));
       } catch (saveError) {
         Log.log(
           `Failed to save game state: ${

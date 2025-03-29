@@ -101,8 +101,12 @@ function ensureConfig() {
  * @property {number} [topP] - Nucleus sampling parameter (0-1)
  * @property {number} [maxRetries] - Maximum number of retry attempts
  * @property {number} [retryDelay] - Delay between retries in milliseconds
- * @property {Array<Object>} [functions] - Function definitions for structured outputs
- * @property {Object|string} [function_call] - Function call configuration
+ * @property {Array<{
+ *   name: string;
+ *   description?: string;
+ *   parameters: Record<string, unknown>;
+ * }>} [functions] - Function definitions for structured outputs
+ * @property {{ name: string } | "auto" | "none"} [function_call] - Function call configuration
  */
 export interface GenerateTextOptions {
   model?: string;
@@ -868,6 +872,57 @@ export function getEnhancedAIInstructions(gameState: IGameState): string {
   }
 
   return enhancedInstructions;
+}
+
+/**
+ * Translates text to the target language using AI
+ *
+ * @param text Text to translate
+ * @param targetLanguage In theory we can ask it to translate into any language
+ * @returns Translated text
+ */
+export async function translateText(
+  text: string,
+  targetLanguage: string
+): Promise<string> {
+  // Skip translation if text is empty or target language is English (assumed default)
+  if (!text || targetLanguage === "en") {
+    return text;
+  }
+
+  try {
+    const languageNames: Record<string, string> = {
+      en: "English",
+      de: "German",
+      ch: "Swiss German",
+    };
+
+    const fullLanguageName = languageNames[targetLanguage] || "English";
+
+    const response = await generateChatNarrative(
+      [
+        {
+          role: "system",
+          content: `You are a professional translator. Translate the following text into ${fullLanguageName}. 
+            Preserve all formatting including line breaks. Do not add any explanations or notes.
+            Just return the translated text.`,
+        },
+        {
+          role: "user",
+          content: text,
+        },
+      ],
+      {
+        temperature: 0.3,
+        maxTokens: 1500,
+      }
+    );
+
+    return response.content || text;
+  } catch (error) {
+    log(`Translation failed: ${error}`, "Error");
+    return text;
+  }
 }
 
 /**
