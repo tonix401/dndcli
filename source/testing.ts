@@ -1,11 +1,10 @@
-import { totalClear } from "@core/ConsoleService.js";
-import crypto from "crypto";
+import { dungeonMinigame } from "@components/DungeonMinigame.js";
+import { pause } from "@utilities/ConsoleService.js";
 
 async function test() {
   ///////////////////////
-  totalClear();
-  console.log(crypto.createHash("sha256").update("123").digest("hex"));
-
+  await pause(1000);
+  await dungeonMinigame();
   /////////////////////////
 }
 await test();

@@ -1,4 +1,4 @@
-import { StoryPaceKey } from "@game/GameService.js";
+import { StoryPaceKey } from "@utilities/GameService.js";
 
 export interface ConversationMessage {
   role: "system" | "user" | "assistant";

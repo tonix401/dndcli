@@ -1,7 +1,7 @@
 import { Chapter, IGameState } from "@utilities/IGameState.js";
 import { STORY_PACE } from "../GameService.js";
 import { ChatCompletionRequestMessage } from "../../ai/AIService.js";
-import { getTerm } from "@core/LanguageService.js";
+import { getTerm } from "@utilities/LanguageService.js";
 
 /**
  * Generate a chapter title based on the arc
@@ -343,7 +343,7 @@ export async function generateNextSceneNarrative(
   specialEvent: { type: string; details?: string };
 }> {
   const { generateChatNarrative } = await import("../../ai/AIService.js");
-  const { log } = await import("@core/LogService.js");
+  const { log } = await import("@utilities/LogService.js");
 
   try {
     const storyPace = gameState.getStoryPace();
@@ -431,7 +431,7 @@ export async function ensureNarrativeContinuity(
   // Check if narrative contains choices indicator - match both formats with and without space
   if (!narrative.includes("CHOICES:") && !narrative.match(/\d+\.?\s*\{.+\}/)) {
     // If no choices found, try to generate them
-    const { log } = await import("@core/LogService.js");
+    const { log } = await import("@utilities/LogService.js");
 
     try {
       log(

@@ -17,9 +17,9 @@ import { IGameState } from "@utilities/IGameState.js";
 import {
   generateChatNarrative,
   ChatCompletionResponse,
-} from "@ai/AIService.js";
-import { sanitizeJsonString } from "@core/ConsoleService.js";
-import { log } from "@core/LogService.js";
+} from "@utilities/AIService.js";
+import { sanitizeJsonString } from "@utilities/ConsoleService.js";
+import { log } from "@utilities/LogService.js";
 
 /**
  * Structure representing the analyzed components of a player choice

@@ -10,14 +10,14 @@ import {
   ValidationError,
   type Status,
 } from "@inquirer/core";
-import { getTheme } from "@core/CacheService.js";
+import { getTheme } from "@utilities/CacheService.js";
 import {
   alignText,
   boxItUp,
   primaryColor,
   removeFormatting,
   secondaryColor,
-} from "@core/ConsoleService.js";
+} from "@utilities/ConsoleService.js";
 import {
   Choice,
   isDownKey,
@@ -28,7 +28,7 @@ import {
   NormalizedChoice,
   isBackKey,
   isRightKey,
-} from "@ui/MenuService.js";
+} from "@utilities/MenuService.js";
 import ansiEscapes from "ansi-escapes";
 import chalk from "chalk";
 import { getShopVisual } from "@resources/generalScreens/shopBackground.js";

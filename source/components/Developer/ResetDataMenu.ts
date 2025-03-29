@@ -1,19 +1,19 @@
 import { checkbox } from "@inquirer/prompts";
-import { getTerm } from "@core/LanguageService.js";
+import { getTerm, TermKey } from "@utilities/LanguageService.js";
 import {
   resetCachedGameState,
   getTheme,
   setLanguage,
   setTheme,
-} from "@core/CacheService.js";
+} from "@utilities/CacheService.js";
 import Config from "@utilities/Config.js";
-import { clearLogs } from "@core/LogService.js";
+import { clearLogs } from "@utilities/LogService.js";
 import {
   pressEnter,
   primaryColor,
   secondaryColor,
-} from "@core/ConsoleService.js";
-import { saveDataToFile } from "@core/StorageService.js";
+} from "@utilities/ConsoleService.js";
+import { saveDataToFile } from "@utilities/StorageService.js";
 
 /**
  * Menu component that handles resetting different types of data
@@ -66,7 +66,7 @@ export async function resetDataMenu(): Promise<void> {
     `${getTerm("resetDone")}: ${
       choices.length === 0
         ? getTerm("none")
-        : choices.map((choice) => getTerm(choice)).join(", ")
+        : choices.map((choice) => getTerm(choice as TermKey)).join(", ")
     }`
   );
   await pressEnter();

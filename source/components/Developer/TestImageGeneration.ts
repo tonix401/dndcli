@@ -2,8 +2,11 @@ import {
   pressEnter,
   primaryColor,
   secondaryColor,
-} from "@core/ConsoleService.js";
-import { canGenerateImage, generateSceneImage } from "@core/ImageService.js";
+} from "@utilities/ConsoleService.js";
+import {
+  canGenerateImage,
+  generateSceneImage,
+} from "@utilities/ImageService.js";
 import chalk from "chalk";
 import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
 import { themedInput } from "@components/ThemedInput.js";

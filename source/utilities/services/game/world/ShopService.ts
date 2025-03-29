@@ -1,8 +1,8 @@
 import { IItem } from "@utilities/IITem.js";
 import ICharacter from "@utilities/ICharacter.js";
-import { generateRandomItem } from "@game/character/ItemGenerator.js";
-import { addItemToInventory } from "@game/character/InventoryService.js";
-import { saveDataToFile } from "@core/StorageService.js";
+import { generateRandomItem } from "@utilities/character/ItemGenerator.js";
+import { addItemToInventory } from "@utilities/character/InventoryService.js";
+import { saveDataToFile } from "@utilities/StorageService.js";
 import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
 import {
   accentColor,
@@ -10,9 +10,9 @@ import {
   primaryColor,
   secondaryColor,
   totalClear,
-} from "@core/ConsoleService.js";
+} from "@utilities/ConsoleService.js";
 import { shopSelect } from "@components/ShopSelect.js";
-import { getTerm } from "@core/LanguageService.js";
+import { getTerm } from "@utilities/LanguageService.js";
 
 /**
  * Generate items for a shop based on player level and location

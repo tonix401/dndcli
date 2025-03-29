@@ -16,6 +16,7 @@ import {
   Cache,
 } from "../../Services.js";
 import { IGameState } from "../../types/IGameState.js";
+import { accentColor, errorColor } from "@utilities/ConsoleService.js";
 
 /**
  * Updates game state based on player choice and saves it
@@ -56,7 +57,7 @@ export async function updateAndSaveState(
       }`,
       "Error"
     );
-    console.log(chalk.yellow("Warning: Could not save game state."));
+    console.log(errorColor("Warning: Could not save game state."));
   }
 }
 

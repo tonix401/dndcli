@@ -1,7 +1,7 @@
 import crypto from "crypto";
-import { getTerm } from "@core/LanguageService.js";
-import { getPassword, setPassword } from "@core/CacheService.js";
-import { primaryColor, totalClear } from "@core/ConsoleService.js";
+import { getTerm } from "@utilities/LanguageService.js";
+import { getPassword, setPassword } from "@utilities/CacheService.js";
+import { primaryColor, totalClear } from "@utilities/ConsoleService.js";
 import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
 import { themedPasswordInput } from "@components/ThemedPasswordInput.js";
 

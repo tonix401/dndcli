@@ -1,4 +1,4 @@
-import { primaryColor, secondaryColor } from "@core/ConsoleService.js";
+import { primaryColor, secondaryColor } from "@utilities/ConsoleService.js";
 
 export default function getTreasureAscii() {
   const p = (text: string) => primaryColor(text);

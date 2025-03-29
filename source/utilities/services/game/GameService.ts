@@ -10,7 +10,7 @@
 
 import chalk from "chalk";
 import ora from "ora";
-import { getTerm } from "@core/LanguageService.js";
+import { getTerm } from "@utilities/LanguageService.js";
 import {
   AI,
   ArtService,
@@ -28,10 +28,10 @@ import {
   Objective,
   SaveLoad,
   Storage,
-} from "../../Services.js"; //TODO: Adjust import path
-import { IGameState } from "../../types/IGameState.js";
+} from "@utilities/Services.js";
+import { IGameState } from "@utilities/IGameState.js";
 import Config, { StoryPaceOptionsKey } from "@utilities/Config.js";
-import { ChatCompletionRequestMessage } from "../ai/AIService.js";
+import { ChatCompletionRequestMessage } from "@utilities/AIService.js";
 import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
 
 // Re-export StoryPaceKey for external usage

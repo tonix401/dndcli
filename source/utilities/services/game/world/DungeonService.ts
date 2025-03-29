@@ -1,12 +1,12 @@
 import { IEnemy } from "@utilities/IEnemy.js";
-import { getDungeon } from "@core/CacheService.js";
+import { getDungeon } from "@utilities/CacheService.js";
 import {
   alignTextSideBySide,
   primaryColor,
   secondaryColor,
-} from "@core/ConsoleService.js";
-import { getDataFromFile } from "@core/StorageService.js";
-import { getRandomEnemy } from "@game/combat/EnemyService.js";
+} from "@utilities/ConsoleService.js";
+import { getDataFromFile } from "@utilities/StorageService.js";
+import { getRandomEnemy } from "@utilities/combat/EnemyService.js";
 
 export enum RoomTypes {
   START = "START",

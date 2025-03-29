@@ -1,7 +1,7 @@
 import { IGameState } from "@utilities/IGameState.js";
-import { sanitizeJsonString } from "@core/ConsoleService.js";
-import { log } from "@core/LogService.js";
-import { generateChatNarrative } from "@ai/AIService.js";
+import { sanitizeJsonString } from "@utilities/ConsoleService.js";
+import { log } from "@utilities/LogService.js";
+import { generateChatNarrative } from "@utilities/AIService.js";
 import { StoryPaceKey } from "../GameService.js";
 import Config from "@utilities/Config.js";
 

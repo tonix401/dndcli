@@ -3,8 +3,8 @@ import {
   getTextOnBackground,
   primaryColor,
   secondaryColor,
-} from "@core/ConsoleService.js";
-import { getTerm } from "@core/LanguageService.js";
+} from "@utilities/ConsoleService.js";
+import { getTerm } from "@utilities/LanguageService.js";
 
 export function getErrorMessage(errorMessage: string) {
   const background = secondaryColor(

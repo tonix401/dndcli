@@ -3,9 +3,9 @@ import path from "path";
 import crypto from "crypto";
 import { ITheme } from "@utilities/ITheme.js";
 import ICharacter from "@utilities/ICharacter.js";
-import { Language } from "@core/LanguageService.js";
+import { Language } from "@utilities/LanguageService.js";
 import { IAbility } from "@utilities/IAbility.js";
-import { LogTypes } from "@core/LogService.js";
+import { LogTypes } from "@utilities/LogService.js";
 import { EnemyMove } from "@utilities/IEnemy.js";
 import { IGameStateData } from "@utilities/IGameState.js";
 
@@ -79,7 +79,12 @@ const STANDARD_PASSWORD: string = crypto
 /**
  * List of available character classes
  */
-const CHARACTER_CLASSES = ["swordsman", "mage", "archer", "thief"];
+const CHARACTER_CLASSES: ("swordsman" | "mage" | "archer" | "thief")[] = [
+  "swordsman",
+  "mage",
+  "archer",
+  "thief",
+];
 
 /**
  * The default character data

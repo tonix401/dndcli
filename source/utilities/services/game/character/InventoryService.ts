@@ -13,12 +13,16 @@
  */
 
 import chalk from "chalk";
-import inquirer from "inquirer";
 import { IItem } from "@utilities/IITem.js";
 import ICharacter from "@utilities/ICharacter.js";
-import { saveDataToFile, getDataFromFile } from "@core/StorageService.js";
-import { generateRandomItem } from "@game/character/ItemGenerator.js";
-import { getTerm } from "@core/LanguageService.js";
+import { saveDataToFile } from "@utilities/StorageService.js";
+import { generateRandomItem } from "@utilities/character/ItemGenerator.js";
+import { getTerm } from "@utilities/LanguageService.js";
+import {
+  accentColor,
+  primaryColor,
+  removeFormatting,
+} from "@utilities/ConsoleService.js";
 
 /**
  * Constants for inventory management
@@ -529,11 +533,11 @@ export async function inventoryMenu(
     !Array.isArray(character.inventory) ||
     character.inventory.length === 0
   ) {
-    console.log(chalk.redBright("Your inventory is empty."));
+    console.log(accentColor(getTerm("inventoryEmpty")));
     return;
   }
 
-  const { themedSelect } = await import("@ui/MenuService.js");
+  const { themedSelect } = await import("@utilities/MenuService.js");
 
   // Build the list of inventory choices with color coding and stat information
   const inventoryChoices = character.inventory.map(
@@ -604,7 +608,7 @@ export async function inventoryMenu(
 
       if (shouldEquip) {
         const result = equipItem(character, selectedItemIndex);
-        console.log(chalk.greenBright(result.message));
+        console.log(accentColor(result.message));
       }
       return;
     }
@@ -631,9 +635,9 @@ export async function inventoryMenu(
  * @param character - The character whose inventory to display
  */
 export function displayInventory(character: ICharacter): void {
-  console.log(chalk.whiteBright.bold("=== Inventory ==="));
+  console.log(chalk.bold(primaryColor(getTerm("inventoryTitle"))));
   if (!character.inventory || character.inventory.length === 0) {
-    console.log(chalk.gray("(empty)"));
+    console.log(accentColor(getTerm("empty")));
   } else {
     character.inventory.forEach((item: IItem, idx: number) => {
       // Show damage/defense stats for equipment
@@ -661,7 +665,7 @@ export function displayInventory(character: ICharacter): void {
 
   // Display equipped items
   if (character.equippedItems && character.equippedItems.length > 0) {
-    console.log(chalk.whiteBright.bold("\n=== Equipped ==="));
+    console.log(primaryColor(getTerm("equippedTitle")));
     character.equippedItems.forEach((item: IItem) => {
       let statsInfo = "";
       if (item.type === "weapon" && item.damage) {
@@ -683,11 +687,11 @@ export function displayInventory(character: ICharacter): void {
         }
       }
 
-      console.log(chalk.green(`→ ${item.name}${statsInfo}${bonusInfo}`));
+      console.log(accentColor(`→ ${item.name}${statsInfo}${bonusInfo}`));
     });
   }
 
-  console.log(chalk.whiteBright("=================\n"));
+  console.log(primaryColor("=".repeat(removeFormatting(getTerm("equippedTitle")).text.length)));
 }
 
 /**

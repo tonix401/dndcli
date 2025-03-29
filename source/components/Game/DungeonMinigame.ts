@@ -1,12 +1,13 @@
-import { getDungeon, setDungeon } from "@core/CacheService.js";
-import { totalClear } from "@core/ConsoleService.js";
+import { getDungeon, setDungeon } from "@utilities/CacheService.js";
 import {
   Dungeon,
   initiateDungeonMapWithHallways,
   Room,
-} from "@game/world/DungeonService.js";
+} from "@utilities/world/DungeonService.js";
 import { enterRoom } from "./EnterRoom.js";
 import { dungeonMovementSelect } from "./DungeonMovementSelect.js";
+import { totalClear } from "@utilities/ConsoleService.js";
+import { log } from "@utilities/LogService.js";
 
 /**
  * Dungeon minigame.
@@ -26,8 +27,6 @@ export async function dungeonMinigame() {
 
     currentRoom = dungeon.rooms[dungeon.player.y][dungeon.player.x];
     await enterRoom(currentRoom);
-
-    setDungeon(dungeon);
 
     if (wantsToLeave) {
       totalClear();
@@ -68,7 +67,7 @@ async function movePlayerMenu(
       dungeon.player.x += 1;
       break;
     default:
-      console.log("No valid movement selected");
+      log("Dungeon Minigame: Invalid direction selected.");
   }
 
   dungeon.rooms[dungeon.player.y][dungeon.player.x].discovered = true;

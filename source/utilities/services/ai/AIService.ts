@@ -12,10 +12,10 @@ import { OpenAI } from "openai";
 import dotenv from "dotenv";
 import ICharacter from "@utilities/ICharacter.js";
 import { IGameState } from "@utilities/IGameState.js";
-import { detectNarrativeLoop } from "@narrative/NarrativeService.js";
-import { enforceStoryRequirements } from "@narrative/ObjectiveService.js";
-import { sanitizeJsonString } from "@core/ConsoleService.js";
-import { log } from "@core/LogService.js";
+import { detectNarrativeLoop } from "@utilities/NarrativeService.js";
+import { enforceStoryRequirements } from "@utilities/ObjectiveService.js";
+import { sanitizeJsonString } from "@utilities/ConsoleService.js";
+import { log } from "@utilities/LogService.js";
 
 /**
  * Structure for chat completion messages sent to the API
@@ -873,8 +873,6 @@ export function getEnhancedAIInstructions(gameState: IGameState): string {
 
   return enhancedInstructions;
 }
-
-// ...existing code...
 
 /**
  * Translates text to the target language using AI

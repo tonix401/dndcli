@@ -210,7 +210,9 @@ async function handleShopEvent(characterData: any): Promise<void> {
     Console.primaryColor("\nYou've encountered a merchant willing to trade.")
   );
 
-  const { handleShopInteraction } = await import("@game/world/ShopService.js");
+  const { handleShopInteraction } = await import(
+    "@utilities/world/ShopService.js"
+  );
 
   await handleShopInteraction(characterData);
 }

@@ -7,10 +7,10 @@ import {
   primaryColor,
   removeFormatting,
   secondaryColor,
-} from "@core/ConsoleService.js";
+} from "@utilities/ConsoleService.js";
 import ICharacter from "@utilities/ICharacter.js";
 import { IEnemy } from "@utilities/IEnemy.js";
-import { getTerm } from "@core/LanguageService.js";
+import { getTerm } from "@utilities/LanguageService.js";
 import chalk from "chalk";
 
 /**

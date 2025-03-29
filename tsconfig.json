@@ -39,21 +39,23 @@
         "./components/general/*"
       ],
       "@utilities/*": [
-        "./utilities/types/*",
+        "./utilities/services/game/character/*",
+        "./utilities/services/game/narrative/*",
+        "./utilities/services/game/combat/*",
+        "./utilities/services/game/*",
+        "./utilities/services/ui/*",
+        "./utilities/services/ai/*",
+        "./utilities/services/core/*",
+        "./utilities/services/state/*",
+        "./utilities/services/*",
         "./utilities/general/*",
-        "./utilities/game/*"
+        "./utilities/game/*",
+        "./utilities/types/*",
+        "./utilities/*"
       ],
       "@resources/*": ["./resources/*"],
       // this is even more stupid, but it works too
       "@storage/*": ["./source/../storage/*"],
-      "@core/*": ["./utilities/services/core/*"],
-      "@ai/*": ["./utilities/services/ai/*"],
-      "@ui/*": ["./utilities/services/ui/*"],
-      "@game/*": ["./utilities/services/game/*"],
-      "@character/*": ["./utilities/services/game/character/*"],
-      "@narrative/*": ["./utilities/services/game/narrative/*"],
-      "@combat/*": ["./utilities/services/game/combat/*"],
-      "@state/*": ["./utilities/services/state/*"]
     } /* Specify a set of entries that re-map imports to additional lookup locations. */,
     // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */
     // "typeRoots": [],                                  /* Specify multiple folders that act like './node_modules/@types'. */

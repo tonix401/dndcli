@@ -1,5 +1,5 @@
-import { primaryColor } from "@core/ConsoleService.js";
-import { getTerm } from "@core/LanguageService.js";
+import { primaryColor } from "@utilities/ConsoleService.js";
+import { getTerm } from "@utilities/LanguageService.js";
 
 export const getEnlargeWindowAscii = () => {
   return `

@@ -1,11 +1,11 @@
-import { primaryColor, totalClear } from "@core/ConsoleService.js";
-import { getTerm } from "@core/LanguageService.js";
+import { primaryColor, totalClear } from "@utilities/ConsoleService.js";
+import { getTerm } from "@utilities/LanguageService.js";
 import { Separator } from "@inquirer/prompts";
 import config from "@utilities/Config.js";
 import ICharacter from "@utilities/ICharacter.js";
 import Config from "@utilities/Config.js";
-import { getDataFromFile, saveDataToFile } from "@core/StorageService.js";
-import { inputValidators } from "@ui/MenuService.js";
+import { getDataFromFile, saveDataToFile } from "@utilities/StorageService.js";
+import { inputValidators } from "@utilities/MenuService.js";
 import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
 import { themedInput } from "@components/ThemedInput.js";
 

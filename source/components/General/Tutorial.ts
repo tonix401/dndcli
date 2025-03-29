@@ -1,12 +1,12 @@
-import { getTheme } from "@core/CacheService.js";
+import { getTheme } from "@utilities/CacheService.js";
 import {
   boxItUp,
   getTextOnBackground,
   primaryColor,
   totalClear,
-} from "@core/ConsoleService.js";
-import { getTerm } from "@core/LanguageService.js";
-import { themedSingleKeyPrompt } from "@ui/MenuService.js";
+} from "@utilities/ConsoleService.js";
+import { getTerm, TermKey } from "@utilities/LanguageService.js";
+import { themedSingleKeyPrompt } from "@utilities/MenuService.js";
 
 export async function tutorial(isNew: boolean) {
   let explanationsTerms = [
@@ -30,7 +30,7 @@ export async function tutorial(isNew: boolean) {
       getTextOnBackground(
         boxItUp(
           primaryColor(
-            getTerm(explanationsTerms[index]) +
+            getTerm(explanationsTerms[index] as TermKey) +
               `\n(${index + 1}/${explanationsTerms.length})`
           )
         )
