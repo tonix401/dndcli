@@ -232,7 +232,7 @@ const arrowKeysSelect = createPrompt(
 
       if (first === -1) {
         throw new ValidationError(
-          "[select prompt] No selectable choices. All choices are disabled."
+          `[select prompt] ${getTerm("noSelectableChoices")}`
         );
       }
 
@@ -323,10 +323,10 @@ const arrowKeysSelect = createPrompt(
 
       if (items.length > pageSize) {
         helpTipBottom = `\n${theme.style.help(
-          "(Use arrow keys to reveal more choices)"
+          getTerm("useArrowKeysNavigation")
         )}`;
       } else {
-        helpTipTop = theme.style.help("(Use arrow keys)");
+        helpTipTop = theme.style.help(getTerm("useArrowKeys"));
       }
     }
 
@@ -340,7 +340,9 @@ const arrowKeysSelect = createPrompt(
 
         if (item.disabled) {
           const disabledLabel =
-            typeof item.disabled === "string" ? item.disabled : "(disabled)";
+            typeof item.disabled === "string"
+              ? item.disabled
+              : getTerm("disabled");
           return theme.style.disabled(`${item.name} ${disabledLabel}`);
         }
 
@@ -397,34 +399,34 @@ export const themedSingleKeyPrompt = createPrompt(
 
 // Functions that test for certain types of control keys inside selects and other prompts or menus
 /**
- * up
+ * up, w, i
  */
 export function isUpKey(key: any): boolean {
-  return key.name === "up";
+  return key.name === "up" || key.name === "w" || key.name === "i";
 }
 /**
- * down
+ * down, s, k
  */
 export function isDownKey(key: any): boolean {
-  return key.name === "down";
+  return key.name === "down" || key.name === "s" || key.name === "k";
 }
 /**
- * left
+ * left, a, j
  */
 export function isLeftKey(key: any): boolean {
-  return key.name === "left";
+  return key.name === "left" || key.name === "a" || key.name === "j";
 }
 /**
- * right
+ * right, d, l
  */
 export function isRightKey(key: any): boolean {
-  return key.name === "right";
+  return key.name === "right" || key.name === "d" || key.name === "l";
 }
 /**
- * return
+ * return, space, right
  */
 export function isConfirmKey(key: any): boolean {
-  return key.name === "return";
+  return key.name === "return" || key.name === "space";
 }
 /**
  * escape, left

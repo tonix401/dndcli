@@ -18,6 +18,7 @@ import {
 } from "../../Services.js";
 import { runCombat } from "../../../src/combat.js";
 import { IGameState } from "../../types/IGameState.js";
+import { getTerm } from "@utilities/LanguageService.js";
 
 /**
  * Handles special events based on their type and narrative context
@@ -80,7 +81,7 @@ async function handleCombatEvent(
   characterData: any
 ): Promise<void> {
   await Console.pressEnter({
-    message: "Press Enter when you're ready for combat...",
+    message: getTerm("pressEnterForCombat"),
   });
 
   try {
@@ -89,12 +90,14 @@ async function handleCombatEvent(
 
     console.log(
       chalk.hex(Cache.getTheme().accentColor)(
-        `\n⚔️ Combat encounter triggered!`
+        `\n⚔️ ${getTerm("combatEncounterTriggered")}`
       )
     );
 
     console.log(
-      Console.secondaryColor(`A ${enemy.name} appears before you...`)
+      Console.secondaryColor(
+        `${getTerm("enemyAppears").replace("{enemy}", enemy.name)}`
+      )
     );
 
     await Console.pause(1500);
@@ -102,16 +105,16 @@ async function handleCombatEvent(
     const combatResult = await runCombat(characterData, enemy);
 
     if (!combatResult) {
-      console.log(
-        Console.secondaryColor("You have been defeated or fled. Game over.")
-      );
+      console.log(Console.secondaryColor(getTerm("combatDefeat")));
       return;
     } else {
       // Update player XP after victory
       characterData.xp = String(Number(characterData.xp) + enemy.xpReward);
 
       console.log(
-        Console.primaryColor(`Victory! You gained ${enemy.xpReward} XP.`)
+        Console.primaryColor(
+          getTerm("combatVictory").replace("{xp}", enemy.xpReward.toString())
+        )
       );
 
       // Chance to receive a random item after combat
@@ -123,15 +126,13 @@ async function handleCombatEvent(
         if (added) {
           console.log(
             Console.primaryColor(
-              `You found a new item: ${newItem.name} (Rarity: ${newItem.rarity}).`
+              getTerm("foundNewItem")
+                .replace("{name}", newItem.name)
+                .replace("{rarity}", newItem.rarity)
             )
           );
         } else {
-          console.log(
-            Console.secondaryColor(
-              "Your inventory is full. The item was left behind."
-            )
-          );
+          console.log(Console.secondaryColor(getTerm("inventoryFull")));
         }
 
         Storage.saveDataToFile("character", characterData);
@@ -147,7 +148,7 @@ async function handleCombatEvent(
   }
 
   await Console.pressEnter({
-    message: "Press Enter to continue your journey...",
+    message: getTerm("pressContinueJourney"),
   });
 }
 
@@ -167,19 +168,21 @@ async function handleDungeonEvent(characterData: any): Promise<void> {
     const loot = Inventory.generateLootDrop(characterData.level);
 
     if (loot.length > 0) {
-      console.log(Console.primaryColor("\nYou found some items!"));
+      console.log(Console.primaryColor(`\n${getTerm("foundItems")}`));
 
       loot.forEach((item) => {
         const added = Inventory.addItemToInventory(characterData, item);
 
         if (added) {
           console.log(
-            Console.primaryColor(`Found: ${item.name} (${item.rarity})`)
+            Console.primaryColor(
+              getTerm("foundItem")
+                .replace("{name}", item.name)
+                .replace("{rarity}", item.rarity)
+            )
           );
         } else {
-          console.log(
-            Console.secondaryColor("Your inventory is full. Item left behind.")
-          );
+          console.log(Console.secondaryColor(getTerm("inventoryFullItemLeft")));
         }
       });
 
@@ -194,8 +197,7 @@ async function handleDungeonEvent(characterData: any): Promise<void> {
     );
 
     await Console.pressEnter({
-      message:
-        "There was an issue with the dungeon. Press Enter to continue your journey...",
+      message: getTerm("dungeonIssue"),
     });
   }
 }
@@ -206,9 +208,7 @@ async function handleDungeonEvent(characterData: any): Promise<void> {
  * @param characterData Character data
  */
 async function handleShopEvent(characterData: any): Promise<void> {
-  console.log(
-    Console.primaryColor("\nYou've encountered a merchant willing to trade.")
-  );
+  console.log(Console.primaryColor(`\n${getTerm("merchantEncounter")}`));
 
   const { handleShopInteraction } = await import(
     "@utilities/world/ShopService.js"
@@ -223,11 +223,15 @@ async function handleShopEvent(characterData: any): Promise<void> {
  * @returns The result of the dice roll
  */
 async function handleDiceRollEvent(): Promise<number> {
-  console.log(Console.secondaryColor("A dice roll is required..."));
+  console.log(Console.secondaryColor(getTerm("diceRollRequired")));
 
   const [rollResult] = Dice.rollDice(20, 1);
 
-  console.log(Console.secondaryColor(`You rolled: ${rollResult}`));
+  console.log(
+    Console.secondaryColor(
+      getTerm("youRolled").replace("{roll}", rollResult.toString())
+    )
+  );
 
   return rollResult;
 }

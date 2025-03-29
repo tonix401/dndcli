@@ -15,6 +15,7 @@ import fs from "fs";
 import path from "path";
 import { createCanvas, loadImage } from "canvas";
 import crypto from "crypto";
+import { getTerm } from "@utilities/LanguageService.js";
 
 /**
  * In-memory cache to store previously generated ASCII art by prompt
@@ -109,25 +110,21 @@ export async function generateSceneImage(
     // Check cache first to avoid redundant API calls, unless forceNewGeneration is true
     if (!options?.forceNewGeneration && imageCache[sceneDescription]) {
       log(
-        "Using cached image for prompt: " +
-          sceneDescription.substring(0, 30) +
-          "..."
+        getTerm("usingCachedImage") + sceneDescription.substring(0, 30) + "..."
       );
       return imageCache[sceneDescription];
     }
 
     if (options?.forceNewGeneration) {
-      log("Force new generation enabled, bypassing cache...");
+      log(getTerm("forceNewGeneration"));
     }
 
     // Verify we haven't exceeded rate limits
     if (!(await canGenerateImage())) {
-      throw new Error(
-        "Image generation limit reached. Please try again later."
-      );
+      throw new Error(getTerm("imageGenerationLimitReached"));
     }
 
-    log("Generating scene image...");
+    log(getTerm("generatingSceneImage"));
 
     // Create a new OpenAI instance to avoid potential state issues
     const openai = getOpenAI();
@@ -211,12 +208,12 @@ export async function generateSceneImage(
 
     imageCache[cacheKey] = asciiResult;
     imagesGenerated++;
-    log("Scene image generated successfully.");
+    log(getTerm("sceneImageGenerated"));
     return asciiResult;
   } catch (error: any) {
-    log("Failed to generate scene image:", error);
-    console.error("Failed to generate scene image:", error);
-    throw new Error(`Error generating image: ${error.message}`);
+    log(getTerm("failedToGenerateImage"), error);
+    console.error(getTerm("failedToGenerateImage"), error);
+    throw new Error(`${getTerm("errorGeneratingImage")}: ${error.message}`);
   } finally {
     // Clean up resources to prevent memory leaks and ensure next generation works
     try {
