@@ -393,7 +393,12 @@ export const themedSingleKeyPrompt = createPrompt(
         done(config.keybindings[key.name] as any);
       }
     });
-    return theme.prefix + " " + chalk.hex(theme.secondaryColor)(config.message);
+    return (
+      ansiEscapes.cursorHide +
+      theme.prefix +
+      " " +
+      chalk.hex(theme.secondaryColor)(config.message)
+    );
   }
 );
 
