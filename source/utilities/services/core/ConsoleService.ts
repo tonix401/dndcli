@@ -250,6 +250,7 @@ export async function navigationPrompt(config?: {
 
   if (allowEscape) {
     keybindings.escape = "escape";
+    keybindings.q = "q"
   }
 
   process.stdout.write(ansiEscapes.cursorHide);

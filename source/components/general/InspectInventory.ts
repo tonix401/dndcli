@@ -151,15 +151,15 @@ export async function inspectInventory() {
     if (totalPages > 1) {
       const prevPageText =
         currentPage > 0
-          ? accentColor(`[1] ${getTerm("previousPage")}`)
-          : chalk.gray(`[1] ${getTerm("previousPage")}`);
+          ? accentColor(`[${chalk.bold("◄")}] ${getTerm("previousPage")}`)
+          : chalk.gray(`[${chalk.bold("◄")}] ${getTerm("previousPage")}`);
 
       const nextPageText =
         currentPage < totalPages - 1
-          ? accentColor(`[2] ${getTerm("nextPage")}`)
-          : chalk.gray(`[2] ${getTerm("nextPage")}`);
+          ? accentColor(`[${chalk.bold("►")}] ${getTerm("nextPage")}`)
+          : chalk.gray(`[${chalk.bold("►")}] ${getTerm("nextPage")}`);
 
-      const exitText = accentColor(`[0] ${getTerm("exit")}`);
+      const exitText = accentColor(`[q] ${getTerm("exit")}`);
       navigationOptions = `\n\n${prevPageText}  |  ${nextPageText}  |  ${exitText}`;
     }
 
@@ -205,7 +205,8 @@ export async function inspectInventory() {
     } else if (
       userInput === "0" ||
       userInput === "enter" ||
-      userInput === "escape"
+      userInput === "escape" ||
+      userInput === "q"
     ) {
       // Exit inventory view
       break;

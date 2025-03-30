@@ -28,7 +28,6 @@ import {
   isRightKey,
   isUpKey,
 } from "@utilities/MenuService.js";
-import { log } from "@utilities/LogService.js";
 
 type DungeonMovementSelectResult =
   | "north"
