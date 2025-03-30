@@ -47,12 +47,10 @@ export async function createCharacterMenu(): Promise<void> {
     // Ask user if they want default stats or custom allocation
     totalClear();
     const statMethod = await themedSelectInRoom({
-      message: primaryColor(
-        "Do you want the default stat distribution or allocate custom points?"
-      ),
+      message: primaryColor(getTerm("defaultStats")),
       choices: [
-        { name: "Default", value: "default" },
-        { name: "Customize", value: "custom" },
+        { name: getTerm("default"), value: "default" },
+        { name: getTerm("custom"), value: "custom" },
       ],
     });
 
@@ -66,22 +64,20 @@ export async function createCharacterMenu(): Promise<void> {
         Config.START_CHARACTER_STATS[charData.class] || charData.abilities;
     } else if (statMethod === "custom") {
       let pool = 20;
-      console.log(
-        secondaryColor(
-          `You have ${pool} points to distribute among your stats.`
-        )
-      );
-      const stats = [
-        "maxhp",
-        "strength",
-        "mana",
-        "dexterity",
-        "charisma",
-        "luck",
-      ];
+      console.log(secondaryColor(getTerm("pointPool") + ": " + pool));
+      const stats: (
+        | "maxhp"
+        | "strength"
+        | "mana"
+        | "dexterity"
+        | "charisma"
+        | "luck"
+      )[] = ["maxhp", "strength", "mana", "dexterity", "charisma", "luck"];
       for (const stat of stats) {
         const promptMsg = primaryColor(
-          `Allocate points for ${stat} (points left: ${pool}): `
+          `${getTerm("appointPoints")} ${getTerm(stat)} (${getTerm(
+            "pointsLeft"
+          )}: ${pool})`
         );
         let allocationStr = await themedInput({ message: promptMsg });
         let allocation = parseInt(allocationStr);
@@ -218,7 +214,7 @@ export async function validateOrigin(origin: string): Promise<string> {
           return "Valid";
         } else {
           // Return in the same format you had before
-          return `Invalid. This origin story is ${result.reason}`;
+          return `${getTerm("invalid")}: ${result.reason}`;
         }
       } catch (error) {
         log(

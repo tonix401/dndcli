@@ -132,6 +132,11 @@ const terms = {
       `[${arrowRight}] oder [Enter] zum d'Uswahl bestätige,\n` +
       `[${arrowLeft}] zum zrugg gah.`,
   },
+  tutorialEscape: {
+    de: "Solltest Du einmal nicht wissen, wie man zurück geht:\nMeistens funktioniert [esc]",
+    en: "If you're ever unsure how to go back:\n[Esc] usually works.",
+    ch: "Falls du nöd wüsst, wie me zrugg goht:\nMeistens geit's mit [Esc].",
+  },
   tutorialPremise: {
     de:
       "Dieses Spiel ist hauptsächlich ein Open World Role Playing Game.\n" +
@@ -263,6 +268,36 @@ const terms = {
     de: "Es wurde noch kein Charakter gespeichert",
     en: "There is no character saved yet",
     ch: "Es isch no kei Charakter gspicheret worde",
+  },
+  defaultStats: {
+    de: "Möchtest du die Standardwerte oder eigene Punkte verteilen?",
+    en: "Do you want the default stat distribution or allocate custom points?",
+    ch: "Wetsch d'Standardwerte oder wotsch Punkt selber z'teile?",
+  },
+  default: {
+    de: "Standard",
+    en: "Default",
+    ch: "Standard",
+  },
+  custom: {
+    de: "Benutzerdefiniert",
+    en: "Custom",
+    ch: "Eiget",
+  },
+  pointPool: {
+    de: "Du hast noch Punkte zu vergeben",
+    en: "You have points left to distribute",
+    ch: "Du hesch no Punkt zum verteile",
+  },
+  appointPoints: {
+    de: "Verteile Punkte für",
+    en: "Allocate points for",
+    ch: "Verteil Punkt für",
+  },
+  pointsLeft: {
+    de: "verbleibende Punkte",
+    en: "points left",
+    ch: "no verbleibendi Punkt",
   },
 
   // Character Stats
