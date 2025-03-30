@@ -82,7 +82,11 @@ async function handleMenuChoice(choice: string) {
         await exitProgram();
       }
     default:
-      log("Index: Unexpected menu choice", "Error");
+      log(
+        `Dev Menu: Unexpected menu choice: '${choice}', fallback onto default, showing error`,
+        "Error"
+      );
+      throw new TypeError("Unexpected menu choice is not handled correctly");
   }
 }
 
@@ -128,7 +132,7 @@ async function exitProgram() {
 
 main().catch(async (error) => {
   totalClear();
-  log("Index: Error in main function, " + error, "Error");
+  log(error, "Error");
   console.log(getErrorMessage(error));
   process.exit(0);
 });

@@ -58,24 +58,8 @@ export async function secretDevMenu() {
       value: "flip",
     },
     {
-      name: "Test Combat",
-      value: "testCombat",
-    },
-    {
-      name: "Test Shop",
-      value: "testShop",
-    },
-    {
-      name: "Test Dungeon",
-      value: "testDungeon",
-    },
-    {
-      name: "Test Image Generation",
-      value: "testImage",
-    },
-    {
-      name: "Test Animations",
-      value: "testAnimations",
+      name: getTerm("testing"),
+      value: "testing",
     },
     {
       name: getTerm("goBack"),
@@ -119,6 +103,54 @@ export async function secretDevMenu() {
       case "flip":
         await flipATable();
         break;
+      case "testing":
+        await testingMenu();
+        break;
+      case "goBack":
+        return;
+      default:
+        log("Dev Menu: Unexpected menu choice", "Error");
+        console.log(getTerm("invalid"));
+        await pressEnter();
+    }
+  }
+}
+
+async function testingMenu() {
+  while (true) {
+    const choice = await themedSelectInRoom({
+      message: getTerm("experimentalWarning"),
+      choices: [
+        {
+          name: "Test Combat",
+          value: "testCombat",
+        },
+        {
+          name: "Test Shop",
+          value: "testShop",
+        },
+        {
+          name: "Test Dungeon",
+          value: "testDungeon",
+        },
+        {
+          name: "Test Image Generation",
+          value: "testImage",
+        },
+        {
+          name: "Test Animations",
+          value: "testAnimations",
+        },
+        {
+          name: getTerm("goBack"),
+          value: "goBack",
+        },
+      ],
+    });
+
+    switch (choice) {
+      case "goBack":
+        return;
       case "testCombat":
         await testCombat();
         break;
@@ -136,12 +168,12 @@ export async function secretDevMenu() {
       case "testAnimations":
         await testAnimations();
         break;
-      case "goBack":
-        return;
       default:
-        log("Dev Menu: Unexpected menu choice", "Error");
-        console.log(getTerm("invalid"));
-        await pressEnter();
+        log(
+          `Dev Menu: Unexpected menu choice: '${choice}', fallback onto default, showing error`,
+          "Error"
+        );
+        throw new TypeError("Dev Menu: Unexpected menu choice is not handled correctly");
     }
   }
 }
