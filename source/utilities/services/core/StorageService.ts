@@ -2,6 +2,7 @@ import { configDotenv } from "dotenv";
 import Config from "@utilities/Config.js";
 import { log } from "@utilities/LogService.js";
 import fs from "fs-extra";
+import path from "path";
 import { inputValidators } from "@utilities/MenuService.js";
 import { getTerm } from "@utilities/LanguageService.js";
 import { themedInput } from "@components/ThemedInput.js";
@@ -15,6 +16,34 @@ const files = {
 };
 
 type File = keyof typeof files;
+
+/**
+ * Gets the directory where game data files are stored
+ * @returns The path to the data directory
+ */
+export function getDataDirectory(): string {
+  // Use the character file path to determine the directory
+  return path.dirname(Config.CHARACTER_FILE);
+}
+
+/**
+ * Deletes a data file
+ * @param file The file to delete
+ * @returns True if successful, false otherwise
+ */
+export function deleteDataFile(file: File): boolean {
+  const filePath = files[file];
+  try {
+    fs.unlinkSync(filePath);
+    log(`Successfully deleted file: ${filePath}`, "Info ");
+    return true;
+  } catch (error) {
+    if (error instanceof Error) {
+      log(`Error deleting file ${filePath}: ${error.message}`, "Error");
+    }
+    return false;
+  }
+}
 
 export function getDataFromFile(file: File): any {
   const sourceFile = files[file];

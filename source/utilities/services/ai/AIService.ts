@@ -943,3 +943,44 @@ export function getOpenAI(): OpenAI {
   ensureConfig();
   return openai;
 }
+
+/**
+ * Checks internet connectivity by attempting to reach OpenAI's API endpoints
+ *
+ * This function makes a lightweight request to verify if OpenAI's services
+ * are reachable, which is required for the AI storytelling features.
+ *
+ * @returns {Promise<boolean>} True if internet connection is available, false otherwise
+ */
+export async function checkInternetConnectivity(): Promise<boolean> {
+  try {
+    // First ensure the API key is configured
+    ensureConfig();
+
+    // Create a minimal request with timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+    // Try to fetch OpenAI's models endpoint - this is a lightweight call
+    const response = await fetch("https://api.openai.com/v1/models", {
+      method: "HEAD",
+      headers: {
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      },
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    // 200 OK or 401 Unauthorized both indicate the server is reachable
+    return response.status === 200 || response.status === 401;
+  } catch (error) {
+    log(
+      `Internet connectivity check failed: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+      "Info "
+    );
+    return false;
+  }
+}

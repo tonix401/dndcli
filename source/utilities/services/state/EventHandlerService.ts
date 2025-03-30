@@ -16,9 +16,16 @@ import {
   Storage,
   Cache,
 } from "../../Services.js";
-import { runCombat } from "../../../src/combat.js";
+import { runCombat, CombatResult } from "../../../src/combat.js";
 import { IGameState } from "../../types/IGameState.js";
 import { getTerm } from "@utilities/LanguageService.js";
+
+/**
+ * Event result interface
+ */
+interface EventResult {
+  combatResult: CombatResult;
+}
 
 /**
  * Handles special events based on their type and narrative context
@@ -27,20 +34,21 @@ import { getTerm } from "@utilities/LanguageService.js";
  * @param narrative The current narrative text
  * @param characterData Character data
  * @param gameState Current game state
- * @returns Promise that resolves when the event has been handled
+ * @returns Promise that resolves with the event result
  */
 export async function handleSpecialEvent(
   specialEvent: { type: string; details: string },
   narrative: string,
   characterData: any,
   gameState: IGameState
-): Promise<void> {
+): Promise<EventResult | void> {
   // Check if this is a combat event
   if (
     narrative.toLowerCase().includes("combat encounter:") ||
     specialEvent.type === "combat"
   ) {
-    await handleCombatEvent(narrative, characterData);
+    const combatResult = await handleCombatEvent(narrative, characterData);
+    return { combatResult };
   }
   // Check if this is a dungeon event
   else if (
@@ -71,15 +79,48 @@ export async function handleSpecialEvent(
 }
 
 /**
+ * Handles permanent character defeat by deleting saved game files
+ */
+export async function handleCharacterDefeat(): Promise<void> {
+  try {
+    console.log(Console.errorColor("\n💀 " + getTerm("characterDefeated")));
+    await Console.pause(2000);
+
+    console.log(Console.errorColor(getTerm("permadeathMessage")));
+    await Console.pause(1500);
+
+    // Delete save files using Storage service
+    const characterDeleted = Storage.deleteDataFile("character");
+    if (characterDeleted) {
+      console.log(Console.secondaryColor("Character file deleted."));
+    }
+
+    const gameStateDeleted = Storage.deleteDataFile("gameState");
+    if (gameStateDeleted) {
+      console.log(Console.secondaryColor("Game state file deleted."));
+    }
+
+    console.log(Console.accentColor(getTerm("startNewAdventure")));
+    await Console.pressEnter({
+      message: getTerm("pressEnterToReturnToMenu"),
+    });
+  } catch (error) {
+    Log.log(`Failed to handle character defeat: ${error}`, "Error");
+    console.log(Console.errorColor(getTerm("errorDeletingSaves")));
+  }
+}
+
+/**
  * Handles a combat encounter
  *
  * @param narrative The narrative containing combat context
  * @param characterData Character data
+ * @returns Combat result indicating success or failure
  */
 async function handleCombatEvent(
   narrative: string,
   characterData: any
-): Promise<void> {
+): Promise<CombatResult> {
   await Console.pressEnter({
     message: getTerm("pressEnterForCombat"),
   });
@@ -104,11 +145,19 @@ async function handleCombatEvent(
 
     const combatResult = await runCombat(characterData, enemy);
 
-    if (!combatResult) {
+    if (!combatResult || (!combatResult.success && !combatResult.fled)) {
+      // Character was defeated in combat
       console.log(Console.secondaryColor(getTerm("combatDefeat")));
-      return;
+      await handleCharacterDefeat();
+      return { success: false, fled: false };
+    } else if (combatResult.fled) {
+      // Player fled from combat
+      console.log(Console.secondaryColor(getTerm("escapedCombat")));
+      console.log(Console.secondaryColor(getTerm("noRewards")));
+      await Console.pause(1500);
+      return { success: false, fled: true };
     } else {
-      // Update player XP after victory
+      // Combat victory - update player XP after victory
       characterData.xp = String(Number(characterData.xp) + enemy.xpReward);
 
       console.log(
@@ -137,6 +186,8 @@ async function handleCombatEvent(
 
         Storage.saveDataToFile("character", characterData);
       }
+
+      return { success: true, fled: false };
     }
   } catch (error) {
     Log.log(
@@ -145,11 +196,12 @@ async function handleCombatEvent(
       }`,
       "Error"
     );
+    return { success: false, fled: true };
+  } finally {
+    await Console.pressEnter({
+      message: getTerm("pressContinueJourney"),
+    });
   }
-
-  await Console.pressEnter({
-    message: getTerm("pressContinueJourney"),
-  });
 }
 
 /**
@@ -162,31 +214,52 @@ async function handleDungeonEvent(characterData: any): Promise<void> {
     // Import and use the dungeon minigame component
     const { dungeonMinigame } = await import("@components/DungeonMinigame.js");
 
-    await dungeonMinigame();
+    // Capture the dungeon result
+    const dungeonResult = await dungeonMinigame();
 
-    // After a dungeon, add loot drops
-    const loot = Inventory.generateLootDrop(characterData.level);
+    // If player died in the dungeon, handle permadeath
+    if (dungeonResult === "died") {
+      console.log(Console.secondaryColor(getTerm("dungeonDefeat")));
+      await handleCharacterDefeat();
+      return; // Exit early - no loot for the dead
+    }
 
-    if (loot.length > 0) {
-      console.log(Console.primaryColor(`\n${getTerm("foundItems")}`));
+    // If player fled, they get no rewards
+    if (dungeonResult === "fled") {
+      console.log(Console.secondaryColor(getTerm("dungeonFled")));
+      console.log(Console.secondaryColor(getTerm("noRewards")));
+      await Console.pause(1500);
+      return; // Exit early - no loot for cowards
+    }
 
-      loot.forEach((item) => {
-        const added = Inventory.addItemToInventory(characterData, item);
+    // Only award loot if the dungeon was completed successfully
+    if (dungeonResult === "completed") {
+      // After a successful dungeon run, add loot drops
+      const loot = Inventory.generateLootDrop(characterData.level);
 
-        if (added) {
-          console.log(
-            Console.primaryColor(
-              getTerm("foundItem")
-                .replace("{name}", item.name)
-                .replace("{rarity}", item.rarity)
-            )
-          );
-        } else {
-          console.log(Console.secondaryColor(getTerm("inventoryFullItemLeft")));
-        }
-      });
+      if (loot.length > 0) {
+        console.log(Console.primaryColor(`\n${getTerm("foundItems")}`));
 
-      Storage.saveDataToFile("character", characterData);
+        loot.forEach((item) => {
+          const added = Inventory.addItemToInventory(characterData, item);
+
+          if (added) {
+            console.log(
+              Console.primaryColor(
+                getTerm("foundItem")
+                  .replace("{name}", item.name)
+                  .replace("{rarity}", item.rarity)
+              )
+            );
+          } else {
+            console.log(
+              Console.secondaryColor(getTerm("inventoryFullItemLeft"))
+            );
+          }
+        });
+
+        Storage.saveDataToFile("character", characterData);
+      }
     }
   } catch (error) {
     Log.log(

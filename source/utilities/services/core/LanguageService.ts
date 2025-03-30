@@ -76,6 +76,11 @@ const terms = {
     en: "Check the logs for more information",
     ch: "Überprüef d'Logs für meh Informatione",
   },
+  noInternetConnection: {
+    de: "Keine Internetverbindung verfügbar. Der KI-Geschichtenerzähler benötigt Internet, um zu funktionieren.",
+    en: "No internet connection available. The AI storyteller requires internet to function.",
+    ch: "Kei Internetverbindig verfüegbar. De KI-Gschichteverzeller brucht Internet zum funktioniere.",
+  },
   // #endregion
 
   // #region Setup + Tutorial
@@ -941,6 +946,21 @@ const terms = {
     en: "Congratulations, you have defeated the boss and completed the dungeon.\n Good luck on your future adventures!",
     ch: "Grautulation, Du hesch de Boss bsiigt und de Dungeon gschlosse.\n Viel Glück uf Dini wiiteri Abentüür!",
   },
+  dungeonDefeat: {
+    de: "Du wurdest im Dungeon besiegt!",
+    en: "You have been defeated in the dungeon!",
+    ch: "Du bisch im Dungeon besiegt worde!",
+  },
+  dungeonFled: {
+    de: "Du bist aus dem Dungeon geflohen.",
+    en: "You fled from the dungeon.",
+    ch: "Du bisch us em Dungeon gflüchtet.",
+  },
+  dungeonCompleted: {
+    de: "Du hast den Dungeon erfolgreich abgeschlossen!",
+    en: "You successfully completed the dungeon!",
+    ch: "Du hesch de Dungeon erfolgrich abgschlosse!",
+  },
   // #endregion
 
   // #region Combat
@@ -977,6 +997,38 @@ const terms = {
   // #endregion
 
   // #region Campaign
+
+  storyPaceFast: {
+    de: "Schnell",
+    en: "Fast",
+    ch: "Schnäll",
+  },
+  storyPaceMedium: {
+    de: "Mittel",
+    en: "Medium",
+    ch: "Mittel",
+  },
+  storyPaceSlow: {
+    de: "Detailliert",
+    en: "Detailed",
+    ch: "Detailliert",
+  },
+  storyPaceFastDescription: {
+    de: "Schnelle Geschichtsfortschritte mit wenigen Interaktionen",
+    en: "Rapid story progress with minimal exchanges",
+    ch: "Schnelli Gschicht mit wenig Interaktione",
+  },
+  storyPaceMediumDescription: {
+    de: "Ausgewogenes Erzähltempo",
+    en: "Balanced narrative pacing",
+    ch: "Usgliiched Erzähltempo",
+  },
+  storyPaceSlowDescription: {
+    de: "Detailreiche Geschichtsentwicklung",
+    en: "Thorough story development with details",
+    ch: "Detailriichi Gschichtsentwicklig",
+  },
+
   exploreFurther: {
     de: "Erkunde die Umgebung weiter",
     en: "Explore the area further",
@@ -1488,6 +1540,53 @@ const terms = {
     en: "You rolled a {roll}!",
     ch: "Du hesch e {roll} gwürflet!",
   },
+
+  characterDefeated: {
+    de: "Du wurdest besiegt!",
+    en: "You have been defeated!",
+    ch: "Du bisch besiegt worde!",
+  },
+  permadeathMessage: {
+    de: "In dieser Welt ist der Tod endgültig. Dein Abenteuer endet hier.",
+    en: "In this world, death is permanent. Your adventure comes to an end.",
+    ch: "I dere Wält isch de Tod endgültig. Dis Abentüür ändet hie.",
+  },
+  startNewAdventure: {
+    de: "Du musst einen neuen Charakter erstellen und ein neues Abenteuer beginnen.",
+    en: "You will need to create a new character and start a new adventure.",
+    ch: "Du muesch en neue Charakter erstelle und es neus Abentüür afange.",
+  },
+  errorDeletingSaves: {
+    de: "Es gab einen Fehler beim Löschen der Speicherdateien, aber dein Abenteuer ist trotzdem zu Ende.",
+    en: "There was an error deleting save files, but your adventure is still over.",
+    ch: "Es het en Fehler bim Lösche vo de Speicherdateie geh, aber dis Abentüür isch trotzdem verbi.",
+  },
+  escapedCombat: {
+    de: "Du konntest mit deinem Leben entkommen.",
+    en: "You managed to escape with your life.",
+    ch: "Du hesch es gschafft mit dim Läbe z'flüchte.",
+  },
+  noRewards: {
+    de: "Allerdings erhältst du keine Erfahrung oder Gegenstände aus der Begegnung.",
+    en: "However, you gain no experience or items from the encounter.",
+    ch: "Allerdings überchunsch kei Erfahrig oder Gegeständ us dere Begegnig.",
+  },
+  deletingSaveFiles: {
+    de: "Speicherdateien werden gelöscht...",
+    en: "Deleting save files...",
+    ch: "Speicherdateie wärde glöscht...",
+  },
+  enterNewAdventure: {
+    de: "Ein neues Abenteuer erwartet dich...",
+    en: "A new adventure awaits you...",
+    ch: "Es neus Abentüür wartet uf dich...",
+  },
+  deathQuote: {
+    de: "Tod ist nur der Anfang einer neuen Geschichte.",
+    en: "Death is only the beginning of a new story.",
+    ch: "De Tod isch nur de Afang vunere neue Gschicht.",
+  },
+
   // #endregion
 
   // #region EquipmentService

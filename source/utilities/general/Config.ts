@@ -8,6 +8,7 @@ import { IAbility } from "@utilities/IAbility.js";
 import { LogTypes } from "@utilities/LogService.js";
 import { EnemyMove } from "@utilities/IEnemy.js";
 import { IGameStateData } from "@utilities/IGameState.js";
+import { getTerm } from "@utilities/services/core/LanguageService.js";
 
 // #region Paths
 // Base directory (assumes process.cwd() is the project root)
@@ -39,6 +40,9 @@ const CONTEXT_FILE = path.join(STORAGE_DIR, "context.json");
 
 // Game state file path
 const GAME_STATE_FILE = path.join(STORAGE_DIR, "gamestate.json");
+
+// Backup file path
+const BACKUP_FILE = GAME_STATE_FILE + ".bak";
 
 // Dungeon data file path
 const DUNGEON_FILE = path.join(STORAGE_DIR, "dungeon.json");
@@ -725,21 +729,32 @@ const STORY_PACE = {
  */
 const STORY_PACE_OPTIONS = {
   FAST: {
-    name: "Fast",
+    // Use language service to get translated terms
+    get name() {
+      return getTerm("storyPaceFast");
+    },
     multiplier: 0.5,
-    description: "Rapid story progression with fewer exchanges required",
+    get description() {
+      return getTerm("storyPaceFastDescription");
+    },
   },
   MEDIUM: {
-    // Changed from NORMAL to MEDIUM
-    name: "Medium",
+    get name() {
+      return getTerm("storyPaceMedium");
+    },
     multiplier: 1.0,
-    description: "Standard pacing with balanced narrative development",
+    get description() {
+      return getTerm("storyPaceMediumDescription");
+    },
   },
   SLOW: {
-    // Changed from DETAILED to SLOW
-    name: "Detailed",
+    get name() {
+      return getTerm("storyPaceSlow");
+    },
     multiplier: 1.5,
-    description: "Extended pacing with more thorough story development",
+    get description() {
+      return getTerm("storyPaceSlowDescription");
+    },
   },
 };
 
@@ -930,6 +945,7 @@ export default {
   CHARACTER_FILE,
   CONTEXT_FILE,
   GAME_STATE_FILE,
+  BACKUP_FILE,
   ATTACK_FRAMES_FILE,
   SOURCE_DIR,
   RESOURCES_DIR,
