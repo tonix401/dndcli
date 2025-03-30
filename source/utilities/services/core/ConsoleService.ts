@@ -752,10 +752,6 @@ export async function playAnimation(
     );
   }
 
-  parsed.frames = parsed.frames.map((frame: string[]) =>
-    frame.map((line: string) => line.replaceAll(".", " "))
-  );
-
   for (let index = 0; index < loops; index++) {
     for (const frameIndex in parsed.frames) {
       totalClear();

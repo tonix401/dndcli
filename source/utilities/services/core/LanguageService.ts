@@ -649,6 +649,16 @@ const terms = {
     en: "Save state data",
     ch: "Spilstanddate",
   },
+  testing: {
+    de: "Tests",
+    en: "Tests",
+    ch: "Tests",
+  },
+  experimentalWarning: {
+    de: "Tests: (inklusive experimenteller Features)",
+    en: "Tests: (including experimental features)",
+    ch: "Tests: (inklusive experimentelle Features)",
+  },
   animations: {
     de: "Animationen",
     en: "Animations",
