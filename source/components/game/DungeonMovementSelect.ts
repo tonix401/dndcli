@@ -277,6 +277,6 @@ export function holdMyText(text: string) {
     alignedText.join("\n")
   );
 
-  const holdingHands = alignTextSideBySide(lHandAndText, rightHand.join("\n"));
+  const holdingHands = alignTextSideBySide(lHandAndText, rHand.join("\n"));
   return holdingHands;
 }
