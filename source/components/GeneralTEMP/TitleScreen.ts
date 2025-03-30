@@ -7,7 +7,7 @@ import {
   totalClear,
 } from "@utilities/ConsoleService.js";
 import { log } from "@utilities/LogService.js";
-import { tutorial } from "@components/Tutorial.js";
+import { tutorial } from "components/GeneralTEMP/Tutorial.js";
 import {
   ensureSetupAndCheckIsNew,
   saveDataToFile,

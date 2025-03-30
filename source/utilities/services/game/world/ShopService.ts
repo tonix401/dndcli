@@ -3,7 +3,7 @@ import ICharacter from "@utilities/ICharacter.js";
 import { generateRandomItem } from "@utilities/character/ItemGenerator.js";
 import { addItemToInventory } from "@utilities/character/InventoryService.js";
 import { saveDataToFile } from "@utilities/StorageService.js";
-import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
+import { themedSelectInRoom } from "components/GeneralTEMP/ThemedSelectInRoom.js";
 import {
   accentColor,
   pressEnter,

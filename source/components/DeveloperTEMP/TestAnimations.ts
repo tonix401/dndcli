@@ -1,7 +1,7 @@
 import Config from "@utilities/Config.js";
 import path from "path";
 import fs from "fs";
-import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
+import { themedSelectInRoom } from "components/GeneralTEMP/ThemedSelectInRoom.js";
 import { getTerm } from "@utilities/LanguageService.js";
 import {
   playAnimation,

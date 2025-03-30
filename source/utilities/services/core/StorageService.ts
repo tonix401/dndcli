@@ -5,7 +5,7 @@ import fs from "fs-extra";
 import path from "path";
 import { inputValidators } from "@utilities/MenuService.js";
 import { getTerm } from "@utilities/LanguageService.js";
-import { themedInput } from "@components/ThemedInput.js";
+import { themedInput } from "components/GeneralTEMP/ThemedInput.js";
 
 const getFiles = (): Record<string, string> => {
   return {
@@ -17,7 +17,12 @@ const getFiles = (): Record<string, string> => {
   };
 };
 
-type FileOptions = "character" | "context" | "settings" | "gameState" | "dungeon"
+type FileOptions =
+  | "character"
+  | "context"
+  | "settings"
+  | "gameState"
+  | "dungeon";
 
 /**
  * Gets the directory where game data files are stored
