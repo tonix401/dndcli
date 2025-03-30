@@ -584,6 +584,14 @@ Starting Instructions:
  */
 export async function startCampaign(): Promise<void> {
   try {
+    // Check internet connectivity first
+    const isConnected = await AI.checkInternetConnectivity();
+    if (!isConnected) {
+      Log.log(getTerm("noInternetConnection"), "Error");
+      console.log(Console.errorColor(getTerm("noInternetConnection")));
+      console.log(Console.secondaryColor(getTerm("returningToMainMenu")));
+      return;
+    }
     // Retrieve character data from persistent storage.
     const characterData = Storage.getDataFromFile("character");
     if (!characterData) {

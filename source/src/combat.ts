@@ -19,7 +19,7 @@ import { combatStatusSelect } from "@components/CombatStatusSelect.js";
 import { getEquippedStatBonuses } from "@utilities/character/EquipmentService.js";
 import { getTerm } from "@utilities/LanguageService.js";
 
-interface CombatResult {
+export interface CombatResult {
   success: boolean;
   fled: boolean;
 }
