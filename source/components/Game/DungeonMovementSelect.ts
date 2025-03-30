@@ -114,7 +114,7 @@ export const dungeonMovementSelect = createPrompt(
             }
             break;
           // isBackKey(key) also checks for key.name === "left", but because we already check for the case isLeftKey(key) above, we dont need to worry about it
-          case isBackKey(key) && canGoBack:
+          case (key.name === "q" || isBackKey(key)) && canGoBack:
             setStatus("done");
             done("goBack");
             break;
