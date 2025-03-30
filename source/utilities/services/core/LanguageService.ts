@@ -212,6 +212,11 @@ const terms = {
       "Das isch alles, was du wüsse muesch zum starte.\n" +
       "Viel Spass bim Spiele!",
   },
+  apiKeyInvalid: {
+    de: "Dein API-Schlüssel ist ungültig. Bitte gib einen gültigen OpenAI API-Schlüssel ein.",
+    en: "Your API key is invalid. Please enter a valid OpenAI API key.",
+    ch: "Din API-Schlüssel isch ungültig. Bitte gib en gültige OpenAI API-Schlüssel i.",
+  },
 
   //#endregion
 
@@ -1039,6 +1044,41 @@ const terms = {
     en: "Run Away",
     ch: "Flüechte",
   },
+  yourTurn: {
+    de: "Du bist dran!",
+    en: "Your turn!",
+    ch: "Du bisch dra!",
+  },
+  enemyDefenseReducesDamage: {
+    de: "Die Verteidigung des Gegners reduziert den Schaden!",
+    en: "The enemy's defense reduces the damage!",
+    ch: "D'Verteidigung vom Gegner reduziert de Schade!",
+  },
+  youAttackForDamage: {
+    de: "Du greifst {enemy} an und verursachst {damage} Schaden! (Würfelwurf: {roll})",
+    en: "You attack {enemy} and deal {damage} damage! (Roll: {roll})",
+    ch: "Du greifsch {enemy} a und machsch {damage} Schade! (Würfelwurf: {roll})",
+  },
+  braceForAttack: {
+    de: "Du nimmst eine defensive Haltung ein und bereitest dich auf den nächsten Angriff vor.",
+    en: "You assume a defensive stance and brace for the next attack.",
+    ch: "Du nimmsch e defensivi Haltig ii und bereitisch dich uf de nöchscht Aagriff vor.",
+  },
+  noSpecialAbilities: {
+    de: "Du hast keine speziellen Fähigkeiten.",
+    en: "You have no special abilities.",
+    ch: "Du hesch kei spezielle Fähigkeite.",
+  },
+  chooseAbility: {
+    de: "Wähle eine Fähigkeit",
+    en: "Choose an ability",
+    ch: "Wähl e Fähigkeit",
+  },
+  notEnoughMana: {
+    de: "Du hast nicht genug Mana, um diese Fähigkeit zu benutzen.",
+    en: "You don't have enough mana to use this ability.",
+    ch: "Du hesch nöd gnueg Mana zum die Fähigkeit bruuche.",
+  },
   // #endregion
 
   // #region Campaign
@@ -1501,6 +1541,11 @@ const terms = {
     de: "Zurück zum Hauptmenü...",
     en: "Returning to main menu...",
     ch: "Zrugg zum Hauptmenü...",
+  },
+  resumingDungeon: {
+    de: "Du kehrst zum Dungeon zurück...",
+    en: "Returning to the dungeon...",
+    ch: "Du kehrsch zum Dungeon zrugg...",
   },
   loadedSavedCampaignState: {
     de: "✅ Gespeicherter Kampagnen-Status geladen.",

@@ -22,6 +22,7 @@ import { getTerm } from "@utilities/LanguageService.js";
 export interface CombatResult {
   success: boolean;
   fled: boolean;
+  gameOver?: boolean;
 }
 
 function getStrengthBonus(character: ICharacter): number {
@@ -53,16 +54,18 @@ async function enemyTurn(enemy: IEnemy, character: ICharacter): Promise<void> {
 
   if (move.type === "attack") {
     const [enemyRoll] = rollDice(6, 1);
+
+    // Fix the damage calculation to ensure minimum damage
     let damage = Math.max(
-      enemy.attack + enemyRoll - character.abilities.strength,
+      enemy.attack + enemyRoll - Math.floor(character.abilities.strength / 5),
       1
     );
     damage = Math.floor(damage * (move.multiplier || 1));
 
-    // Apply damage reduction if character is defending
+    // Ensure minimum damage of 1 even when defending
     if (character.isDefending) {
-      damage = Math.floor(damage * 0.5);
-      character.isDefending = false; // Reset defending status
+      damage = Math.max(Math.floor(damage * 0.5), 1); // Ensure at least 1 damage
+      character.isDefending = false;
       console.log(accentColor("Your defensive stance reduces the damage!"));
     }
 
@@ -72,6 +75,7 @@ async function enemyTurn(enemy: IEnemy, character: ICharacter): Promise<void> {
         `\n${enemy.name}'s ${move.name} deals ${damage} damage to you!`
       )
     );
+    saveDataToFile("character", character);
   } else if (move.type === "defend") {
     enemy.isDefending = true;
     console.log(accentColor(`\n${enemy.name} ${move.description}`));
@@ -148,10 +152,11 @@ export async function runCombat(
       }
       await pause(1000);
       round++;
+      saveDataToFile("character", character);
       continue;
     }
 
-    console.log(accentColor("\nYour turn!"));
+    console.log(accentColor("\n" + getTerm("yourTurn")));
     await pause(800);
     totalClear();
     const combatAction = await combatStatusSelect({
@@ -266,14 +271,18 @@ async function doAttack(character: ICharacter, enemy: IEnemy): Promise<void> {
   // Check if enemy is defending
   if (enemy.isDefending) {
     damage = Math.floor(damage * 0.5);
-    console.log(accentColor("The enemy's defense reduces your damage!"));
+    console.log(accentColor(getTerm("enemyDefenseReducesDamage")));
     enemy.isDefending = false;
   }
 
   enemy.hp = Math.max(enemy.hp - damage, 0);
   console.log(
     accentColor(
-      `\nYou attack ${enemy.name} for ${damage} damage! (Attack roll: ${attackRoll})`
+      "\n" +
+        getTerm("youAttackForDamage", false)
+          .replace("{enemy}", enemy.name)
+          .replace("{damage}", damage.toString())
+          .replace("{roll}", attackRoll.toString())
     )
   );
   await pressEnter();
@@ -285,10 +294,9 @@ async function doAttack(character: ICharacter, enemy: IEnemy): Promise<void> {
  */
 async function doDefend(character: ICharacter): Promise<void> {
   await playAnimation("defend.json");
-  console.log(
-    accentColor("\nYou brace for the enemy's attack, reducing damage.")
-  );
+  console.log(accentColor("\n" + getTerm("braceForAttack")));
   character.isDefending = true;
+  saveDataToFile("character", character);
 }
 
 /**
@@ -296,7 +304,7 @@ async function doDefend(character: ICharacter): Promise<void> {
  */
 async function useAbility(character: ICharacter, enemy: IEnemy): Promise<void> {
   if (!character.abilitiesList || character.abilitiesList.length === 0) {
-    console.log(accentColor("\nYou don't have any special abilities yet."));
+    console.log(accentColor("\n" + getTerm("noSpecialAbilities")));
     await pressEnter();
     return;
   }
@@ -309,7 +317,7 @@ async function useAbility(character: ICharacter, enemy: IEnemy): Promise<void> {
   });
 
   const selectedAbility = await themedSelect<IAbility>({
-    message: "Choose an ability to use:",
+    message: getTerm("chooseAbility"),
     choices: abilities,
   });
 
@@ -321,9 +329,8 @@ async function useAbility(character: ICharacter, enemy: IEnemy): Promise<void> {
     selectedAbility.manaCost > 0 &&
     character.abilities.mana < selectedAbility.manaCost
   ) {
-    console.log(
-      accentColor("\nYou don't have enough mana to use that ability.")
-    );
+    console.log(accentColor("\n" + getTerm("notEnoughMana")));
+    saveDataToFile("character", character);
     await pressEnter();
     return;
   }

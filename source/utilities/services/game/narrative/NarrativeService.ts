@@ -77,6 +77,18 @@ export function validateChapterProgression(gameState: IGameState): {
     );
   }
 
+  const currentArc = currentChapter.arc;
+  const hasCombat = gameState
+    .getNarrativeHistory()
+    .some((n) => n.toLowerCase().includes("combat encounter:"));
+
+  if (
+    (currentArc === "rising-action" || currentArc === "climax") &&
+    !hasCombat
+  ) {
+    reasons.push("Combat encounter required in this story arc");
+  }
+
   return {
     canProgress: reasons.length === 0,
     reasons,
@@ -326,7 +338,11 @@ RESPONSE INSTRUCTIONS:
   1. {First choice description}
   2. {Second choice description}
   3. {Third choice description}
-- For special encounters, use appropriate format markers (COMBAT ENCOUNTER: or START DUNGEON:)
+- For special encounters, use ONLY these exact formats:
+  - Combat: "COMBAT ENCOUNTER: [description]"
+  - Dungeon: "START DUNGEON: [description]"
+  - Shop: "SHOP ENCOUNTER: [description]" 
+  - Dice roll: "DICE ROLL: [description]"
 - Maintain consistency with previous narrative
     `,
   };
@@ -522,7 +538,6 @@ export async function ensureNarrativeContinuity(
     }
   }
 
-  // No changes needed
   return { narrative, specialEvent };
 }
 
