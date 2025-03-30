@@ -120,6 +120,7 @@ async function testingMenu() {
   while (true) {
     const choice = await themedSelectInRoom({
       message: getTerm("experimentalWarning"),
+      canGoBack: true,
       choices: [
         {
           name: "Test Combat",
@@ -173,7 +174,9 @@ async function testingMenu() {
           `Dev Menu: Unexpected menu choice: '${choice}', fallback onto default, showing error`,
           "Error"
         );
-        throw new TypeError("Dev Menu: Unexpected menu choice is not handled correctly");
+        throw new TypeError(
+          "Dev Menu: Unexpected menu choice is not handled correctly"
+        );
     }
   }
 }

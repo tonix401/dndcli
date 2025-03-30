@@ -2,6 +2,7 @@ import {
   pressEnter,
   primaryColor,
   secondaryColor,
+  totalClear,
 } from "@utilities/ConsoleService.js";
 import {
   canGenerateImage,
@@ -139,6 +140,7 @@ export async function testImageGeneration() {
     options.forceNewGeneration = forceFresh as boolean;
 
     const asciiArt = await generateSceneImage(prompt, options);
+    totalClear();
     console.log(asciiArt);
   } catch (error: unknown) {
   } finally {

@@ -7,15 +7,17 @@ import { inputValidators } from "@utilities/MenuService.js";
 import { getTerm } from "@utilities/LanguageService.js";
 import { themedInput } from "@components/ThemedInput.js";
 
-const files = {
-  character: Config.CHARACTER_FILE,
-  context: Config.CONTEXT_FILE,
-  settings: Config.SETTINGS_FILE,
-  gameState: Config.GAME_STATE_FILE,
-  dungeon: Config.DUNGEON_FILE,
+const getFiles = (): Record<string, string> => {
+  return {
+    character: Config.CHARACTER_FILE,
+    context: Config.CONTEXT_FILE,
+    settings: Config.SETTINGS_FILE,
+    gameState: Config.GAME_STATE_FILE,
+    dungeon: Config.DUNGEON_FILE,
+  };
 };
 
-type File = keyof typeof files;
+type FileOptions = "character" | "context" | "settings" | "gameState" | "dungeon"
 
 /**
  * Gets the directory where game data files are stored
@@ -31,8 +33,8 @@ export function getDataDirectory(): string {
  * @param file The file to delete
  * @returns True if successful, false otherwise
  */
-export function deleteDataFile(file: File): boolean {
-  const filePath = files[file];
+export function deleteDataFile(file: FileOptions): boolean {
+  const filePath = getFiles()[file];
   try {
     fs.unlinkSync(filePath);
     log(`Successfully deleted file: ${filePath}`, "Info ");
@@ -45,8 +47,8 @@ export function deleteDataFile(file: File): boolean {
   }
 }
 
-export function getDataFromFile(file: File): any {
-  const sourceFile = files[file];
+export function getDataFromFile(file: FileOptions): any {
+  const sourceFile = getFiles()[file];
   try {
     const data = fs.readFileSync(sourceFile, "utf-8");
     return JSON.parse(data);
@@ -61,8 +63,8 @@ export function getDataFromFile(file: File): any {
   }
 }
 
-export function saveDataToFile(file: File, data: string | object): void {
-  const destinationFile = files[file];
+export function saveDataToFile(file: FileOptions, data: string | object): void {
+  const destinationFile = getFiles()[file];
   try {
     fs.writeFileSync(destinationFile, JSON.stringify(data, null, 2));
   } catch (error) {

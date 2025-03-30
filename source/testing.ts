@@ -1,10 +1,13 @@
-import { dungeonMinigame } from "@components/DungeonMinigame.js";
-import { pause } from "@utilities/ConsoleService.js";
+import { holdMyText } from "@components/DungeonMovementSelect.js";
+import Config from "@utilities/Config.js"
 
 async function test() {
   ///////////////////////
-  await pause(1000);
-  await dungeonMinigame();
+  const text = ["wefuhpnaiowugnpaods", "wAOIFONDSAFDSKJVGNM", "WEFUIOhffwe"];
+  for (let i = 0; i < 20; i++) {
+    text.push("wiflonbiaubngvpiudsc")
+    console.log(holdMyText(text.join("\n")));
+  }
   /////////////////////////
 }
 await test();

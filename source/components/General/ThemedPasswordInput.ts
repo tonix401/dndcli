@@ -57,15 +57,18 @@ export const themedPasswordInput = createPrompt<string, PasswordConfig>(
       formattedRunes = "..." + runes.slice(outputLength - 50);
     }
 
-    return secondaryColor(
-      getTextOnBackground(
-        boxItUp(
-          ansiEscapes.cursorHide +
-            secondaryColor(
-              [prefix, message, chalk.white(formattedRunes)].join(" ")
-            )
-        ),
-        getPasswordBackground()
+    return (
+      ansiEscapes.clearTerminal +
+      secondaryColor(
+        getTextOnBackground(
+          boxItUp(
+            ansiEscapes.cursorHide +
+              secondaryColor(
+                [prefix, message, chalk.white(formattedRunes)].join(" ")
+              )
+          ),
+          getPasswordBackground()
+        )
       )
     );
   }

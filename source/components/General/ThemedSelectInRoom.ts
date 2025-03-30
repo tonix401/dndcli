@@ -161,20 +161,23 @@ export const themedSelectInRoom = createPrompt(
       return "";
     }
 
-    return getTextOnBackground(
-      boxItUp(
-        alignText(
-          `${message}\n${page}${ansiEscapes.cursorHide}`,
-          "left",
-          "",
-          maxItemLength
-        ),
-        {
-          top: 0,
-          bottom: 0,
-          left: 1,
-          right: 2,
-        }
+    return (
+      ansiEscapes.clearTerminal +
+      getTextOnBackground(
+        boxItUp(
+          alignText(
+            `${message}\n${page}${ansiEscapes.cursorHide}`,
+            "left",
+            "",
+            maxItemLength
+          ),
+          {
+            top: 0,
+            bottom: 0,
+            left: 1,
+            right: 2,
+          }
+        )
       )
     );
   }
