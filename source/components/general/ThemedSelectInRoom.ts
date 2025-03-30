@@ -161,24 +161,25 @@ export const themedSelectInRoom = createPrompt(
       return "";
     }
 
-    return (
-      ansiEscapes.clearTerminal +
-      getTextOnBackground(
-        boxItUp(
-          alignText(
-            `${message}\n${page}${ansiEscapes.cursorHide}`,
-            "left",
-            "",
-            maxItemLength
-          ),
-          {
-            top: 0,
-            bottom: 0,
-            left: 1,
-            right: 2,
-          }
-        )
-      )
+    const roomWidth = getTextOnBackground("").split("\n")[0].length;
+    const box = boxItUp(
+      alignText(
+        `${message}\n${page}${ansiEscapes.cursorHide}`,
+        "left",
+        "",
+        maxItemLength
+      ),
+      {
+        top: 0,
+        bottom: 0,
+        left: 1,
+        right: 2,
+      }
     );
+
+    if (box.split("\n")[0].length > roomWidth) {
+      return ansiEscapes.clearTerminal + box;
+    }
+    return ansiEscapes.clearTerminal + getTextOnBackground(box);
   }
 );
