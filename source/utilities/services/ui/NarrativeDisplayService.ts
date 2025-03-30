@@ -120,6 +120,23 @@ export async function displayTextInBookFormat(
   } else if (formatTextFn) {
     displayText = formatTextFn(text);
   }
+  displayText = displayText
+    .split("\n")
+    .filter((line) => !line.trim().match(/^\d+\s*\.\s*\{.+\}$/))
+    .join("\n");
+  displayText = displayText.replace(/CHOICES:[\s\n]*$/, "");
+
+  const hasContent = displayText.trim().length > 0;
+
+  // If no content and no ASCII art, skip displaying empty book
+  if (!hasContent && !asciiArt) {
+    return; // Exit immediately to avoid showing empty book
+  }
+
+  // If we only have whitespace content, add a placeholder message
+  if (!hasContent && asciiArt) {
+    displayText = "Continue to see your choices...";
+  }
 
   if (clearConsole) {
     totalClear();

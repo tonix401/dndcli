@@ -146,7 +146,10 @@ export function generateProgressBar(current: number, max: number): string {
  * Displays the current objective progress to the player
  *
  * @param gameState Current game state
+ *
+ * Disabled for now
  */
+/*
 export function showObjectiveProgress(gameState: IGameState): void {
   const completedCount =
     gameState.getCurrentChapter().completedObjectives.length;
@@ -164,6 +167,7 @@ export function showObjectiveProgress(gameState: IGameState): void {
     );
   }
 }
+*/
 
 /**
  * Updates plot stage when certain conditions are met

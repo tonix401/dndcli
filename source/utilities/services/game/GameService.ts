@@ -507,8 +507,10 @@ Starting Instructions:
         gameState
       );
 
-      // Display objective progress
+      /* Display objective progress
+      Disabled for now
       GameStateService.showObjectiveProgress(gameState);
+      */
 
       // Prompt for player choice
       let choice;
