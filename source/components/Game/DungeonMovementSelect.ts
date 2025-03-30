@@ -264,7 +264,7 @@ export function holdMyText(text: string) {
   const rHand = [...rightHand];
   const lHandHeight = lHand.length;
 
-  if (textHeight >= lHandHeight) {
+  if (textHeight > lHandHeight) {
     // Add empty lines at the top of the side pieces to compensate for the higher text
     for (let i = 0; i < textHeight - lHandHeight; i++) {
       lHand.unshift(" ".repeat(lHand[0].length));

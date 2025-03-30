@@ -18,12 +18,7 @@ import {
 } from "@utilities/IGameState.js";
 
 // #region Initiate
-let settings = null;
-try {
-  settings = getDataFromFile("settings");
-} catch (error) {
-  log("Cache Service: " + error);
-}
+let settings = getDataFromFile("settings");
 
 // Don't try to load game state directly here - defer to SaveLoadService instead
 // This prevents conflicts between different loading mechanisms

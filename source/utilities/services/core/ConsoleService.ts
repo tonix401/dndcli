@@ -173,8 +173,6 @@ export async function pressEnter(config?: {
     return: true,
     right: true,
     space: true,
-    l: true,
-    d: true,
   };
 
   // Add left keybindings if allowed
@@ -184,8 +182,6 @@ export async function pressEnter(config?: {
       left: true,
       q: true,
       escape: true,
-      a: true,
-      j: true,
     };
   }
 

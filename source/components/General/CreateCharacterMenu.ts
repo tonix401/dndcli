@@ -56,9 +56,9 @@ export async function createCharacterMenu(): Promise<void> {
       ],
     });
 
-    charData.abilitiesList = Config.START_CHARACTER_ABILITIES[
-      charData.class
-    ] || ["default"];
+    charData.abilitiesList =
+      Config.START_CHARACTER_ABILITIES[charData.class] ||
+      Config.START_CHARACTER_ABILITIES["default"];
 
     if (statMethod === "default") {
       // Map class to default stats if available
@@ -99,6 +99,10 @@ export async function createCharacterMenu(): Promise<void> {
       if (pool > 0) {
         (charData.abilities as any).maxhp += pool;
       }
+    }
+
+    if (charData.hp > charData.abilities.maxhp) {
+      charData.hp = charData.abilities.maxhp;
     }
 
     // Get character origin
