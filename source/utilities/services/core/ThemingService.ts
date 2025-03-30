@@ -17,7 +17,6 @@ const getThemes = (): Record<string, IThemeOverride> => {
       secondaryColor: "#FF0000",
       cursor: "🦜",
       accentColor: "#FFD700",
-      backgroundColor: "#000000",
       errorColor: "#8B0000",
     },
     frog: {
@@ -36,9 +35,7 @@ const getThemes = (): Record<string, IThemeOverride> => {
       secondaryColor: "#444444",
       cursor: chalk.whiteBright("0"),
       prefix: chalk.bold(chalk.hex("#00FF00")("System \\")),
-      accentColor: "#FF00FF",
-      backgroundColor: "#000000",
-      errorColor: "#FF5555",
+      accentColor: "#ff007c",
     },
     fire: {
       name: { de: "Feuer", en: "Fire", ch: "Feuer" },
@@ -53,7 +50,6 @@ const getThemes = (): Record<string, IThemeOverride> => {
       secondaryColor: "#00FF00",
       cursor: "(⌐■_■)",
       accentColor: "#00FFFF",
-      backgroundColor: "#222222",
       errorColor: "#FF1493",
     },
     unicorn: {
@@ -68,18 +64,17 @@ const getThemes = (): Record<string, IThemeOverride> => {
     },
     galaxy: {
       name: { de: "Galaxie", en: "Galaxy", ch: "Galaxie" },
-      primaryColor: "#4B0082",
+      primaryColor: "#8324b8",
       secondaryColor: "#8A2BE2",
       prefix: "🌒",
       cursor: "☆",
     },
     noir: {
-      name: { de: "Noir", en: "Noir" },
+      name: { de: "Noir", en: "Noir", ch: "Noir" },
       primaryColor: "#444444",
       secondaryColor: "#444444",
       cursor: chalk.hex("#444444")("•"),
       accentColor: "#888888",
-      backgroundColor: "#000000",
       errorColor: "#FF0000",
     },
     random: {

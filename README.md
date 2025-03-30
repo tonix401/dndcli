@@ -1,27 +1,42 @@
 
-# DnD-CLI
+# **DnD-CLI**
 
-### Authors
+### **Authors**
 
 - [@tonix401](https://github.com/tonix401) (Tom W.)
 - [@akoSiThaesler](https://github.com/akoSiThaesler) (Julian T.)
 
-### Description
-A fantasy text adventure game, with following cool features
+### **MUST HAVES**
+**Character Creation and Management**: 
+Character creation with customizable attributes (e.g., origin, class, name).
 
-- Character creation and management
-- Combat system with turn-based mechanics
-- Inventory and equipment management
-- Dungeon exploration
-- AI-generated narrative content with OpenAI integration
-- Story progression with chapter-based objectives
-- Game state persistence across sessions
-- Multiple language support (English, German, Swiss German)
-- Customizable themes and visual elements
-- Developer tools for testing game components
-- Implementations of ascii art
+**Campaign Mode**: Provide a campaign mode where the user, with the character they created, experiences an AI-generated narrative simulating a D&D-style adventure. Allow for random encounters (dungeons and combat) and dynamic story developments during gameplay 
 
-### Setup and Execution
+**Admin Mode**: Encrypted password protection. Provide a menu to view and manage stored game data, logs, and settings through a dedicated developer menu. Feature to reset options.
+
+**Local JSON-File Storage**: Implement JSON-based storage for characters, game state, and settings
+
+**Logging and Debugging**: Gracefully manage unexpected inputs. Proper logging and constantly save data changes to the persistent storage
+
+**AI Implementation**: Integrate AI components to assist in content generation and dynamic storytelling during gameplay. (In Campaign mode)
+
+**Theme and Language Settings**: Offer multiple CLI themes featuring different color schemes to enhance the visual experience. Enable dynamic switching between themes from within the settings menu for personalized interface customization.
+
+### **NICE TO HAVES**
+
+**Turn-Based Combat System**: Provide players with actionable combat choices (attack, defend, or use an item) that are clear and intuitive
+
+**Procedural Dungeon**: Generate random dungeons using a set of predefined room types (such as entrance, trap, treasure, enemy, and boss rooms).
+
+**Adaptive visuals**: Self made backgrounds and text manipulation for cool visuals in the menus and game
+
+**Dynamic NPC Interaction & Storytelling**: Generate adaptive NPC dialogues and story events that evolve based on player actions. Adjust NPC responses dynamically in accordance with the player’s choices and game context for a richer narrative.
+
+**Tests**: Offer tests for the dungeon, combat, shop, animations and the experimental image generation feature
+
+**Animations**: Animations for combat actions
+
+### **Setup and Execution**
 
 After cloning, install dependencies and Compile TS to JS
 

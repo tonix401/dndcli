@@ -12,6 +12,7 @@ export async function tutorial(isNew: boolean) {
   let explanationsTerms = [
     "helloNewPlayer",
     "tutorialMenu",
+    "tutorialEscape",
     "tutorialPremise",
     "tutorialCharacter",
     "tutorialSettings",

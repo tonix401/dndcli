@@ -152,33 +152,6 @@ export function generateProgressBar(current: number, max: number): string {
 }
 
 /**
- * Displays the current objective progress to the player
- *
- * @param gameState Current game state
- *
- * Disabled for now
- */
-/*
-export function showObjectiveProgress(gameState: IGameState): void {
-  const completedCount =
-    gameState.getCurrentChapter().completedObjectives.length;
-  const totalCount =
-    completedCount + gameState.getCurrentChapter().pendingObjectives.length;
-
-  if (totalCount > 0) {
-    console.log(
-      chalk.hex(Cache.getTheme().accentColor)(
-        `Chapter progress: ${completedCount}/${totalCount} ${generateProgressBar(
-          completedCount,
-          totalCount
-        )}`
-      )
-    );
-  }
-}
-*/
-
-/**
  * Updates plot stage when certain conditions are met
  *
  * @param gameState Current game state
