@@ -3,6 +3,8 @@
  *
  * This service provides functions to select and load appropriate ASCII art
  * based on game context, character class, story arc, and narrative content.
+ * NOTICE: A lot of this is not in use since we currently do not have
+ * the ascii art files. This is a placeholder for future development. :D
  */
 
 import { log } from "@utilities/LogService.js";
@@ -121,6 +123,8 @@ export async function getContextualAsciiArt(
   narrative: string
 ): Promise<string> {
   // List of scene keywords to look for and corresponding ASCII art files
+  // Ascii art wont be implemented in this version for now since cant find
+  // good art work T_T
   const sceneKeywords: Record<string, string[]> = {
     "battle.txt": ["battle", "fight", "combat", "attack", "defend"],
     "tavern.txt": ["tavern", "inn", "drink", "ale", "beer", "meal"],
@@ -183,7 +187,7 @@ export async function generateGameRecap(
     const choices = gameState.getChoices().slice(-5);
 
     // Generate a comprehensive recap that includes narrative content
-    recap = `${getTerm("chapter")}: ${gameState.getCurrentChapter().title}\n\n`;
+    recap = `${gameState.getCurrentChapter().title}\n\n`;
 
     // Include the last significant narrative entry (that isn't a player choice)
     const significantNarratives = narrativeHistory

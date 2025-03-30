@@ -16,8 +16,8 @@ import {
   Cache,
 } from "../../Services.js";
 import { IGameState } from "../../types/IGameState.js";
-import { accentColor, errorColor } from "@utilities/ConsoleService.js";
-import { getTerm } from "@utilities/LanguageService.js";
+import { errorColor } from "@utilities/ConsoleService.js";
+import { getTerm, TermKey } from "@utilities/LanguageService.js";
 
 /**
  * Updates game state based on player choice and saves it
@@ -91,11 +91,13 @@ export async function checkAndHandleChapterProgression(
         nextArc
       );
 
+      const chapterTitleKey = `chapterTitle${
+        nextArc.charAt(0).toUpperCase() + nextArc.slice(1)
+      }` as TermKey;
+
       // Begin the new chapter
       gameState.beginNewChapter(
-        `${getTerm("chapter")} ${chapterNumber}: ${Narrative.getChapterTitle(
-          nextArc
-        )}`,
+        `${getTerm("chapter")} ${chapterNumber}: ${getTerm(chapterTitleKey)}`,
         transitionGuidance,
         nextArc
       );

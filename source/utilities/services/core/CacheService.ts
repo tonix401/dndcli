@@ -279,11 +279,7 @@ export function beginNewChapter(
 export function getCurrentChapter(): Chapter {
   // Initialize a default chapter if none exists
   if (!cachedGameState.currentChapter) {
-    beginNewChapter(
-      "Chapter 1: The Beginning",
-      "Your adventure begins",
-      "introduction"
-    );
+    beginNewChapter("", "Your adventure begins", "introduction");
   }
 
   return cachedGameState.currentChapter;
@@ -422,7 +418,7 @@ export function createNewGameState(): IGameState {
     plotStage: defaultState.plotStage || 1,
     plotSummary: defaultState.plotSummary || "",
     currentChapter: {
-      title: "Chapter 1: The Beginning",
+      title: "",
       summary: "Your adventure begins",
       arc: "introduction",
       completedObjectives: [],
@@ -679,7 +675,6 @@ async function save() {
       cachedGameState.plotStage <= 1;
 
     if (isEmpty) {
-      log("Cache Service: Prevented saving empty game state", "Warn ");
       return;
     }
 
@@ -703,18 +698,39 @@ export async function resetCachedGameState(
     return;
   }
 
+  // Create a new game state
   cachedGameState = createNewGameState();
+
+  // Initialize customState to empty object
+  cachedGameState.customState = {};
+
   log("Cache Service: Game state reset to defaults (confirmed)", "Info ");
 
   try {
-    const { saveGameState } = await import("./SaveLoadService.js");
-    await saveGameState(cachedGameState);
+    // Directly save to the file system using fs-extra instead of going through SaveLoadService
+    // This bypasses the isEmpty check in the save() function
+    const gameStateFilePath = Config.GAME_STATE_FILE;
+
+    // Add savedAt timestamp to the state
+    const stateToSave = {
+      version: 1,
+      savedAt: new Date().toISOString(),
+      state: cachedGameState,
+    };
+
+    // Force write directly to file
+    await fs.outputJSON(gameStateFilePath, stateToSave, { spaces: 2 });
+    log("Cache Service: Game state file forcefully reset", "Info ");
 
     // Delete backup file if it exists
     if (await fs.pathExists(Config.BACKUP_FILE)) {
       await fs.remove(Config.BACKUP_FILE);
       log("Cache Service: Backup file deleted successfully", "Info ");
     }
+
+    // Now reload from SaveLoadService to ensure everything is in sync
+    const { saveGameState } = await import("./SaveLoadService.js");
+    await saveGameState(cachedGameState);
   } catch (error) {
     log(
       `Failed to save reset game state or delete backup: ${

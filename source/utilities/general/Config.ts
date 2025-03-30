@@ -682,7 +682,7 @@ const DEFAULT_GAME_STATE: IGameStateData = {
   plotStage: 1,
   plotSummary: "",
   currentChapter: {
-    title: "Chapter 1: The Beginning",
+    title: "",
     summary: "Your adventure begins",
     arc: "introduction",
     completedObjectives: [],

@@ -59,7 +59,7 @@ export async function resetDataMenu(): Promise<void> {
     clearLogs();
   }
   if (choices.includes("saveStateData")) {
-    await resetCachedGameState();
+    await resetCachedGameState(true);
   }
 
   console.log(

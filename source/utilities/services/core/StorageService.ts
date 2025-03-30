@@ -1,4 +1,4 @@
-import { configDotenv } from "dotenv";
+import dotenv, { configDotenv } from "dotenv";
 import Config from "@utilities/Config.js";
 import { log } from "@utilities/LogService.js";
 import fs from "fs-extra";
@@ -86,6 +86,7 @@ export function saveDataToFile(file: FileOptions, data: string | object): void {
  * Ensures that the environment is set up and checks if the player is new
  * @returns Whether the player is new
  */
+
 export async function ensureSetupAndCheckIsNew() {
   configDotenv();
 
@@ -104,17 +105,76 @@ export async function ensureSetupAndCheckIsNew() {
     }
   });
 
-  if (!process.env.OPENAI_API_KEY) {
-    fs.writeFileSync(
-      filePathsToCheck.env,
-      "OPENAI_API_KEY=" +
-        (await themedInput({
-          message: getTerm("enterApiKey"),
-          validate: inputValidators.apiKey,
-        }))
-    );
-    return true;
+  let apiKeyValid = false;
+  let firstAttempt = true;
+
+  while (!apiKeyValid) {
+    // Clear console on subsequent attempts (not on first run)
+    if (!firstAttempt) {
+      console.clear();
+      console.log(getTerm("apiKeyInvalid"));
+    } else {
+      firstAttempt = false;
+    }
+
+    // Check if API key exists and validate it
+    if (!process.env.OPENAI_API_KEY) {
+      log("No API key found, prompting user for input...", "Info ");
+
+      const newApiKey = await themedInput({
+        message: getTerm("enterApiKey"),
+        validate: inputValidators.apiKey,
+      });
+
+      // Write the API key to the .env file
+      fs.writeFileSync(filePathsToCheck.env, `OPENAI_API_KEY=${newApiKey}`);
+
+      // Update the environment variable in the current process
+      process.env.OPENAI_API_KEY = newApiKey;
+
+      // Reload environment variables
+      dotenv.config();
+    }
+
+    // Validate the API key
+    log("Validating OpenAI API key...", "Info ");
+    try {
+      // Force the OpenAI client to reinitialize with the new key
+      // We need to modify the AIService.ts to add a resetConfig function
+      const { validateApiKey, resetOpenAIClient } = await import(
+        "@utilities/AIService.js"
+      );
+      resetOpenAIClient(); // Reset the OpenAI client configuration before validating
+
+      const validationResult = await validateApiKey();
+
+      if (validationResult.isValid) {
+        apiKeyValid = true;
+        log("API key validation successful", "Info ");
+      } else {
+        log(`API key validation failed: ${validationResult.error}`, "Error");
+        // Clear the invalid key so we prompt for a new one
+        process.env.OPENAI_API_KEY = "";
+        fs.writeFileSync(filePathsToCheck.env, `OPENAI_API_KEY=`);
+
+        // Wait briefly before retrying to avoid too rapid prompts
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+      }
+    } catch (error) {
+      log(
+        `API key validation error: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+        "Error"
+      );
+      // Clear the invalid key
+      process.env.OPENAI_API_KEY = "";
+      fs.writeFileSync(filePathsToCheck.env, `OPENAI_API_KEY=`);
+
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+    }
   }
+
   if (getDataFromFile("character") === null) {
     saveDataToFile("character", Config.START_CHARACTER);
     return true;
