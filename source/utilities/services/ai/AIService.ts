@@ -18,6 +18,118 @@ import { sanitizeJsonString } from "@utilities/ConsoleService.js";
 import { log } from "@utilities/LogService.js";
 
 /**
+ * Validates if the OpenAI API key is correctly formatted and authenticates successfully
+ *
+ * This performs a lightweight API call to verify the key is valid without consuming
+ * significant quota. It distinguishes between different types of failures:
+ * - Malformed key (wrong format)
+ * - Authentication failure (correctly formatted but invalid key)
+ * - Network issues (can't reach OpenAI servers)
+ *
+ * @returns {Promise<{isValid: boolean, error?: string}>} Result object with validation status and optional error message
+ */
+export async function validateApiKey(): Promise<{
+  isValid: boolean;
+  error?: string;
+}> {
+  try {
+    // First check if API key exists and has correct format
+    if (!process.env.OPENAI_API_KEY) {
+      return {
+        isValid: false,
+        error: "Missing API key in environment variables",
+      };
+    }
+
+    // Basic format check (starts with "sk-" and has reasonable length)
+    if (
+      !process.env.OPENAI_API_KEY.startsWith("sk-") ||
+      process.env.OPENAI_API_KEY.length < 30
+    ) {
+      return { isValid: false, error: "API key is incorrectly formatted" };
+    }
+
+    log("Making test API call to validate key...", "Info ");
+
+    // Make a lightweight API call to validate authentication
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+    }, 15000); // Increased timeout to 15 seconds for reliability
+
+    try {
+      // Initialize OpenAI client with current key
+      ensureConfig();
+
+      // Use a simple models list request to test authentication
+      log("Calling OpenAI models list API...", "Info ");
+      const modelsList = await openai.models.list();
+
+      clearTimeout(timeoutId);
+      log(`Successfully retrieved ${modelsList.data.length} models`, "Info ");
+      return { isValid: true };
+    } catch (apiError: any) {
+      clearTimeout(timeoutId);
+
+      // Handle common API errors with specific error messages
+      if (apiError.status === 401) {
+        return {
+          isValid: false,
+          error: "Invalid API key - authentication failed",
+        };
+      } else if (apiError.status === 429) {
+        return {
+          isValid: false,
+          error: "Rate limit exceeded - please try again later",
+        };
+      } else if (apiError.status === 500 || apiError.status === 503) {
+        return {
+          isValid: false,
+          error:
+            "OpenAI service is currently unavailable - please try again later",
+        };
+      } else if (apiError.message && apiError.message.includes("network")) {
+        return {
+          isValid: false,
+          error: "Network error - please check your internet connection",
+        };
+      } else if (apiError.message && apiError.message.includes("timeout")) {
+        return {
+          isValid: false,
+          error: "Request timed out - please try again",
+        };
+      } else {
+        return {
+          isValid: false,
+          error: `API error: ${apiError.message || "Unknown error"}`,
+        };
+      }
+    }
+  } catch (error) {
+    // Handle unexpected errors
+    log(`Unexpected error during API key validation: ${error}`, "Error");
+    return {
+      isValid: false,
+      error: `Connection error: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    };
+  }
+}
+
+/**
+ * Resets the OpenAI client configuration
+ *
+ * This function forces the client to be re-initialized on the next API call,
+ * which is useful when the API key has been updated.
+ */
+export function resetOpenAIClient(): void {
+  isItConfigured = false;
+  openai = undefined as any;
+  log("OpenAI client configuration reset", "Info ");
+}
+
+/**
  * Structure for chat completion messages sent to the API
  *
  * @interface ChatCompletionRequestMessage
@@ -886,7 +998,7 @@ export async function translateText(
   targetLanguage: string
 ): Promise<string> {
   // Skip translation if text is empty or target language is English (assumed default)
-  if (!text || targetLanguage === "en") {
+  if (!text) {
     return text;
   }
 

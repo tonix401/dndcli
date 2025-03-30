@@ -287,6 +287,17 @@ Starting Instructions:
         characterData,
         gameState
       );
+      gameState.addNarrative(introNarrative);
+
+      gameState.addConversation({
+        role: "user",
+        content: `Player choice: ${initialChoice}`,
+      });
+
+      await Objective.extractInitialObjectives(introNarrative, gameState);
+
+      // Save the game state before potential return
+      await SaveLoad.saveGameState(gameState);
       if (
         initialChoice.toLowerCase().includes("return to main menu") ||
         initialChoice.toLowerCase() === "exit"
@@ -294,16 +305,6 @@ Starting Instructions:
         console.log(Console.secondaryColor(getTerm("returningToMainMenu")));
         return;
       }
-      gameState.addNarrative(introNarrative);
-      gameState.addConversation({
-        role: "user",
-        content: `Player choice: ${initialChoice}`,
-      });
-
-      // Extract potential objectives from the introductory narrative.
-      await Objective.extractInitialObjectives(introNarrative, gameState);
-
-      await SaveLoad.saveGameState(gameState);
     }
   } catch (error) {
     Log.log(
@@ -497,7 +498,7 @@ Starting Instructions:
       );
 
       // Handle special events (combat, dungeon, shop, etc.)
-      await EventHandlerService.handleSpecialEvent(
+      const eventResult = await EventHandlerService.handleSpecialEvent(
         {
           type: finalSpecialEvent.type,
           details: finalSpecialEvent.details || "",
@@ -507,10 +508,40 @@ Starting Instructions:
         gameState
       );
 
-      /* Display objective progress
-      Disabled for now
-      GameStateService.showObjectiveProgress(gameState);
-      */
+      // Check for game over conditions and exit the loop if needed
+      if (eventResult && eventResult.gameOver === true) {
+        // Character is defeated, exit campaign loop
+        return; // This exits the campaign loop function completely
+      }
+
+      // Also check combat result directly
+      if (
+        eventResult &&
+        eventResult.combatResult &&
+        eventResult.combatResult.gameOver
+      ) {
+        // Character is defeated in combat, exit campaign loop
+        return;
+      }
+
+      // If player fled from dungeon, save game state and return to main menu
+      if (
+        eventResult &&
+        "dungeonFled" in eventResult &&
+        eventResult.dungeonFled
+      ) {
+        console.log(Console.secondaryColor(getTerm("returningToMainMenu")));
+        await Console.pause(1000);
+
+        // Save game state before returning to menu
+        try {
+          await SaveLoad.saveGameState(gameState);
+        } catch (saveError) {
+          console.error("Error saving game state:", saveError);
+        }
+
+        return;
+      }
 
       // Prompt for player choice
       let choice;
@@ -601,6 +632,11 @@ export async function startCampaign(): Promise<void> {
         "No character data found. Please create a character first.",
         "Error"
       );
+
+      console.log(Console.errorColor(getTerm("noCharacterDataFound")));
+      await Console.pressEnter({
+        message: getTerm("pressEnterToReturnToMenu"),
+      });
       return;
     }
 

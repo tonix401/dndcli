@@ -24,7 +24,9 @@ import { getTerm } from "@utilities/LanguageService.js";
  * Event result interface
  */
 interface EventResult {
-  combatResult: CombatResult;
+  combatResult?: CombatResult;
+  dungeonFled?: boolean;
+  gameOver?: boolean;
 }
 
 /**
@@ -48,6 +50,18 @@ export async function handleSpecialEvent(
     specialEvent.type === "combat"
   ) {
     const combatResult = await handleCombatEvent(narrative, characterData);
+    if (combatResult.fled) {
+      gameState.addConversation({
+        role: "user",
+        content: `I fled from the combat. The character is running away to safety. Abandoning the fight.`,
+      });
+    }
+
+    // Pass through the gameOver flag if set
+    if (combatResult.gameOver) {
+      return { combatResult, gameOver: true };
+    }
+
     return { combatResult };
   }
   // Check if this is a dungeon event
@@ -55,19 +69,27 @@ export async function handleSpecialEvent(
     narrative.toLowerCase().includes("start dungeon:") ||
     specialEvent.type === "dungeon"
   ) {
-    await handleDungeonEvent(characterData);
+    // If player fled from dungeon, we should return to menu
+    const dungeonResult = await handleDungeonEvent(characterData, gameState);
+    if (dungeonResult && dungeonResult.fled) {
+      return { dungeonFled: true };
+    }
+    // If player died in dungeon, we should exit game
+    if (dungeonResult && dungeonResult.gameOver) {
+      return { gameOver: true };
+    }
   }
   // Check if this is a shop event
   else if (
-    narrative.toLowerCase().includes("shop") ||
-    narrative.toLowerCase().includes("store") ||
+    // Quick fix for shop detection in narrative
+    narrative.toLowerCase().includes("shop encounter:") ||
     specialEvent.type === "shop"
   ) {
     await handleShopEvent(characterData);
   }
   // Check if this is a dice roll event
   else if (
-    narrative.toLowerCase().includes("roll a d20") ||
+    narrative.toLowerCase().includes("dice roll:") ||
     specialEvent.type === "dice_roll"
   ) {
     const rollResult = await handleDiceRollEvent();
@@ -81,7 +103,7 @@ export async function handleSpecialEvent(
 /**
  * Handles permanent character defeat by deleting saved game files
  */
-export async function handleCharacterDefeat(): Promise<void> {
+export async function handleCharacterDefeat(): Promise<boolean> {
   try {
     console.log(Console.errorColor("\n💀 " + getTerm("characterDefeated")));
     await Console.pause(2000);
@@ -104,9 +126,12 @@ export async function handleCharacterDefeat(): Promise<void> {
     await Console.pressEnter({
       message: getTerm("pressEnterToReturnToMenu"),
     });
+
+    return true; // Return true to indicate character was defeated and files deleted
   } catch (error) {
     Log.log(`Failed to handle character defeat: ${error}`, "Error");
     console.log(Console.errorColor(getTerm("errorDeletingSaves")));
+    return true; // Still return true to exit the game loop
   }
 }
 
@@ -148,8 +173,8 @@ async function handleCombatEvent(
     if (!combatResult || (!combatResult.success && !combatResult.fled)) {
       // Character was defeated in combat
       console.log(Console.secondaryColor(getTerm("combatDefeat")));
-      await handleCharacterDefeat();
-      return { success: false, fled: false };
+      const defeated = await handleCharacterDefeat();
+      return { success: false, fled: false, gameOver: defeated };
     } else if (combatResult.fled) {
       // Player fled from combat
       console.log(Console.secondaryColor(getTerm("escapedCombat")));
@@ -204,12 +229,10 @@ async function handleCombatEvent(
   }
 }
 
-/**
- * Handles dungeon exploration
- *
- * @param characterData Character data
- */
-async function handleDungeonEvent(characterData: any): Promise<void> {
+async function handleDungeonEvent(
+  characterData: any,
+  gameState: IGameState
+): Promise<{ fled: boolean; gameOver?: boolean } | void> {
   try {
     // Import and use the dungeon minigame component
     const { dungeonMinigame } = await import("@components/DungeonMinigame.js");
@@ -220,16 +243,28 @@ async function handleDungeonEvent(characterData: any): Promise<void> {
     // If player died in the dungeon, handle permadeath
     if (dungeonResult === "died") {
       console.log(Console.secondaryColor(getTerm("dungeonDefeat")));
-      await handleCharacterDefeat();
-      return; // Exit early - no loot for the dead
+      const defeated = await handleCharacterDefeat();
+      return { fled: false, gameOver: defeated }; // Signal game over
     }
 
-    // If player fled, they get no rewards
+    // If player fled, they get no rewards and return to main menu
     if (dungeonResult === "fled") {
       console.log(Console.secondaryColor(getTerm("dungeonFled")));
       console.log(Console.secondaryColor(getTerm("noRewards")));
       await Console.pause(1500);
-      return; // Exit early - no loot for cowards
+
+      // Inform the player they're returning to main menu
+      console.log(Console.secondaryColor(getTerm("returningToMainMenu")));
+      await Console.pause(1000);
+
+      // Add context to the narrative about fleeing
+      gameState.addConversation({
+        role: "user",
+        content: `I fled from the dungeon. The character is leaving this dangerous place to safety.`,
+      });
+
+      // Return fled status directly instead of using customState
+      return { fled: true };
     }
 
     // Only award loot if the dungeon was completed successfully
@@ -260,6 +295,9 @@ async function handleDungeonEvent(characterData: any): Promise<void> {
 
         Storage.saveDataToFile("character", characterData);
       }
+
+      // Return success status
+      return { fled: false };
     }
   } catch (error) {
     Log.log(
