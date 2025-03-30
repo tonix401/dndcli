@@ -945,10 +945,10 @@ export function getOpenAI(): OpenAI {
 }
 
 /**
- * Checks internet connectivity by attempting to reach OpenAI's API endpoints
+ * Checks internet connectivity with improved reliability
  *
- * This function makes a lightweight request to verify if OpenAI's services
- * are reachable, which is required for the AI storytelling features.
+ * This function makes multiple attempts to verify connectivity using both
+ * OpenAI's API endpoint and a fallback public endpoint.
  *
  * @returns {Promise<boolean>} True if internet connection is available, false otherwise
  */
@@ -957,29 +957,53 @@ export async function checkInternetConnectivity(): Promise<boolean> {
     // First ensure the API key is configured
     ensureConfig();
 
-    // Create a minimal request with timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-    // Try to fetch OpenAI's models endpoint - this is a lightweight call
-    const response = await fetch("https://api.openai.com/v1/models", {
+      const response = await fetch("https://api.openai.com/v1/models", {
+        method: "HEAD",
+        headers: {
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        },
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      // 200 OK or 401 Unauthorized both indicate the server is reachable
+      if (response.status === 200 || response.status === 401) {
+        return true;
+      }
+    } catch (openaiError) {
+      log(
+        `OpenAI connectivity check failed, trying fallback: ${
+          openaiError instanceof Error
+            ? openaiError.message
+            : String(openaiError)
+        }`,
+        "Info "
+      );
+      // Continue to fallback method
+    }
+
+    // Fallback to a public endpoint for additional verification
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+    const response = await fetch("https://www.google.com", {
       method: "HEAD",
-      headers: {
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-      },
       signal: controller.signal,
     });
 
     clearTimeout(timeoutId);
-
-    // 200 OK or 401 Unauthorized both indicate the server is reachable
-    return response.status === 200 || response.status === 401;
+    return response.ok;
   } catch (error) {
     log(
-      `Internet connectivity check failed: ${
+      `All internet connectivity checks failed: ${
         error instanceof Error ? error.message : String(error)
       }`,
-      "Info "
+      "Warn "
     );
     return false;
   }
