@@ -17,6 +17,7 @@ import {
 } from "../../Services.js";
 import { IGameState } from "../../types/IGameState.js";
 import { accentColor, errorColor } from "@utilities/ConsoleService.js";
+import { getTerm } from "@utilities/LanguageService.js";
 
 /**
  * Updates game state based on player choice and saves it
@@ -30,7 +31,7 @@ export async function updateAndSaveState(
   choice: string
 ): Promise<void> {
   try {
-    console.log(Console.secondaryColor(`You chose: ${choice}`));
+    console.log(Console.secondaryColor(`${getTerm("youChose")}: ${choice}`));
 
     // Analyze the player's choice for narrative insights
     await CharacterAnalysis.analyzePlayerChoice(choice, gameState);
@@ -92,7 +93,9 @@ export async function checkAndHandleChapterProgression(
 
       // Begin the new chapter
       gameState.beginNewChapter(
-        `Chapter ${chapterNumber}: ${Narrative.getChapterTitle(nextArc)}`,
+        `${getTerm("chapter")} ${chapterNumber}: ${Narrative.getChapterTitle(
+          nextArc
+        )}`,
         transitionGuidance,
         nextArc
       );
@@ -100,18 +103,22 @@ export async function checkAndHandleChapterProgression(
       console.log(
         chalk
           .hex(Cache.getTheme().accentColor)
-          .bold(`\n📖 Beginning ${gameState.getCurrentChapter().title}...`)
+          .bold(
+            `\n${getTerm("beginning")} ${
+              gameState.getCurrentChapter().title
+            }...`
+          )
       );
 
       await Console.pressEnter({
-        message: "Press Enter to start the new chapter...",
+        message: getTerm("startNewChapter"),
       });
     } else {
       console.log(
         chalk
           .hex(Cache.getTheme().accentColor)
           .bold(
-            `\n⚠️ Not ready to advance to next chapter yet:\n${validation.reasons.join(
+            `\n${getTerm("notReadyForNewChapter")}:\n${validation.reasons.join(
               "\n"
             )}`
           )

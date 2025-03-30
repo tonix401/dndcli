@@ -143,7 +143,7 @@ export async function displayTextInBookFormat(
   }
 
   // Fix potential "Chapter Chapter" duplication in title
-  const cleanTitle = title.replace(/^Chapter\s+Chapter/, "Chapter");
+  const cleanTitle = title.replace(/^Chapter*{1-4}Chapter/, getTerm("chapter"));
 
   // Process ASCII art if provided to determine dimensions
   let asciiArtLines: string[] = [];
@@ -297,7 +297,7 @@ export async function displayTextInBookFormat(
     }
 
     // Display book bottom with page number and information
-    let footerText = `Page ${page}/${totalPages}`;
+    let footerText = `${getTerm("page")} ${page}/${totalPages}`;
 
     // Add helpful navigation hint if we have ASCII art pages
     if (asciiArtLines.length > 0) {

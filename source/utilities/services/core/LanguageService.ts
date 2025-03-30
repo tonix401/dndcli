@@ -1038,7 +1038,6 @@ const terms = {
     en: "Thorough story development with details",
     ch: "Detailriichi Gschichtsentwicklig",
   },
-
   exploreFurther: {
     de: "Erkunde die Umgebung weiter",
     en: "Explore the area further",
@@ -1050,19 +1049,19 @@ const terms = {
     ch: "Frag öpper nach meh Informatione",
   },
   openInventory: {
-    de: "📦Öffne dein Inventar",
-    en: "📦Open your inventory",
-    ch: "📦Öpfne dis Inventar",
+    de: "📦 Öffne dein Inventar",
+    en: "📦 Open your inventory",
+    ch: "📦 Öpfne dis Inventar",
   },
   reviewScene: {
-    de: "📚Aktuelle Szene nochmal ansehen",
-    en: "📚Review current scene",
-    ch: "📚Aktuelli Szenerie nochma aaluege",
+    de: "📚 Aktuelle Szene nochmal ansehen",
+    en: "📚 Review current scene",
+    ch: "📚 Aktuelli Szenerie nochma aaluege",
   },
   returnToMenu: {
-    de: "🏠Zurück zum Hauptmenü",
-    en: "🏠Back to main menu",
-    ch: "🏠Zrugg zum Hauptmenü",
+    de: "🏠 Zurück zum Hauptmenü",
+    en: "🏠 Back to main menu",
+    ch: "🏠 Zrugg zum Hauptmenü",
   },
   whatNext: {
     de: "✧ Was möchtest Du als nächstes tun? ✧",
@@ -1374,7 +1373,26 @@ const terms = {
     en: "Failed to start campaign. Returning to main menu...",
     ch: "Kampagne het nöd chönne gstartet werde. Kehr zum Hauptmenü zrugg...",
   },
-
+  beginning: {
+    de: "📖 Anfang",
+    en: "📖 Beginning",
+    ch: "📖 Aafang",
+  },
+  startNewChapter: {
+    de: `Drücke ${arrowRight} oder [Enter], um das neue Kapitel zu starten...`,
+    en: `Press ${arrowRight} or [Enter] to start the new chapter...`,
+    ch: `Drück ${arrowRight} oder [Enter], um s'neui Kapitel z'starte...`,
+  },
+  notReadyForNewChapter: {
+    de: "⚠️ Noch nicht bereit, um zum nächsten Kapitel fortzuschreiten",
+    en: "⚠️ Not ready to advance to next chapter yet",
+    ch: "⚠️ No hüt nöd parat, zum zum nächste Kapitel überzgo...",
+  },
+  youChose: {
+    de: "Du hast gewählt",
+    en: "You chose",
+    ch: "Du hesch g'wählt",
+  },
   // #endregion
 
   // #region Arc Guidelines
