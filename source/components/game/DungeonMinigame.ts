@@ -16,7 +16,7 @@ import {
   totalClear,
 } from "@utilities/ConsoleService.js";
 import { log } from "@utilities/LogService.js";
-import { themedSelectInRoom } from "components/GeneralTEMP/ThemedSelectInRoom.js";
+import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
 import { getYesNo } from "@utilities/MenuService.js";
 import { getTerm } from "@utilities/LanguageService.js";
 

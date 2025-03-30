@@ -2,7 +2,7 @@ import { IItem } from "@utilities/IITem.js";
 import ICharacter from "@utilities/ICharacter.js";
 import { saveDataToFile } from "@utilities/StorageService.js";
 import { primaryColor, secondaryColor } from "@utilities/ConsoleService.js";
-import { themedSelectInRoom } from "components/GeneralTEMP/ThemedSelectInRoom.js";
+import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
 import { pressEnter } from "@utilities/ConsoleService.js";
 import { getTerm } from "@utilities/LanguageService.js";
 

@@ -5,7 +5,7 @@ import fs from "fs-extra";
 import path from "path";
 import { inputValidators } from "@utilities/MenuService.js";
 import { getTerm } from "@utilities/LanguageService.js";
-import { themedInput } from "components/GeneralTEMP/ThemedInput.js";
+import { themedInput } from "@components/ThemedInput.js";
 
 const getFiles = (): Record<string, string> => {
   return {

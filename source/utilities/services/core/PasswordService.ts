@@ -2,8 +2,8 @@ import crypto from "crypto";
 import { getTerm } from "@utilities/LanguageService.js";
 import { getPassword, setPassword } from "@utilities/CacheService.js";
 import { primaryColor, totalClear } from "@utilities/ConsoleService.js";
-import { themedSelectInRoom } from "components/GeneralTEMP/ThemedSelectInRoom.js";
-import { themedPasswordInput } from "components/GeneralTEMP/ThemedPasswordInput.js";
+import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
+import { themedPasswordInput } from "@components/ThemedPasswordInput.js";
 
 /**
  * A Screen to check for a password

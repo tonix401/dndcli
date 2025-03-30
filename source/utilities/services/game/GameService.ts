@@ -32,7 +32,7 @@ import {
 import { IGameState } from "@utilities/IGameState.js";
 import Config, { StoryPaceOptionsKey } from "@utilities/Config.js";
 import { ChatCompletionRequestMessage } from "@utilities/AIService.js";
-import { themedSelectInRoom } from "components/GeneralTEMP/ThemedSelectInRoom.js";
+import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
 
 // Re-export StoryPaceKey for external usage
 export type StoryPaceKey = StoryPaceOptionsKey;

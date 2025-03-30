@@ -11,7 +11,7 @@ import {
 } from "@utilities/PasswordService.js";
 import { handleShopInteraction } from "@utilities/world/ShopService.js";
 import Config from "@utilities/Config.js";
-import { themedSelectInRoom } from "components/GeneralTEMP/ThemedSelectInRoom.js";
+import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
 import { showSettingsData } from "./ShowSettingsData.js";
 import { showCharacterData } from "./ShowCharacterData.js";
 import { showLogsMenu } from "./ShowLogsMenu.js";

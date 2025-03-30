@@ -9,8 +9,8 @@ import {
   generateSceneImage,
 } from "@utilities/ImageService.js";
 import chalk from "chalk";
-import { themedSelectInRoom } from "components/GeneralTEMP/ThemedSelectInRoom.js";
-import { themedInput } from "components/GeneralTEMP/ThemedInput.js";
+import { themedSelectInRoom } from "@components/ThemedSelectInRoom.js";
+import { themedInput } from "@components/ThemedInput.js";
 
 export async function testImageGeneration() {
   console.log(primaryColor("Testing image generation..."));
