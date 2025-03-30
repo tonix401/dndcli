@@ -2,6 +2,7 @@ import { getTerm, Language } from "@utilities/LanguageService.js";
 import { ITheme } from "@utilities/ITheme.js";
 import { IThemeOverride } from "@utilities/IThemeOveride.js";
 import Config, { StoryPaceKey } from "@utilities/Config.js";
+import fs from "fs-extra";
 import {
   Dungeon,
   initiateDungeonMapWithHallways,
@@ -713,9 +714,15 @@ export async function resetCachedGameState(
   try {
     const { saveGameState } = await import("./SaveLoadService.js");
     await saveGameState(cachedGameState);
+
+    // Delete backup file if it exists
+    if (await fs.pathExists(Config.BACKUP_FILE)) {
+      await fs.remove(Config.BACKUP_FILE);
+      log("Cache Service: Backup file deleted successfully", "Info ");
+    }
   } catch (error) {
     log(
-      `Failed to save reset game state: ${
+      `Failed to save reset game state or delete backup: ${
         error instanceof Error ? error.message : String(error)
       }`,
       "Error"
