@@ -1079,6 +1079,114 @@ const terms = {
     en: "You don't have enough mana to use this ability.",
     ch: "Du hesch nöd gnueg Mana zum die Fähigkeit bruuche.",
   },
+
+  // Enemy turn related
+  enemyUsesMove: {
+    de: "{enemy} benutzt {move}...",
+    en: "{enemy} uses {move}...",
+    ch: "{enemy} bruucht {move}...",
+  },
+  defensiveStanceReducesDamage: {
+    de: "Deine defensive Haltung reduziert den Schaden!",
+    en: "Your defensive stance reduces the damage!",
+    ch: "Dini defensivi Haltig reduziert de Schade!",
+  },
+  enemyMoveDealsDamage: {
+    de: "\n{enemy}s {move} verursacht {damage} Schaden bei dir!",
+    en: "\n{enemy}'s {move} deals {damage} damage to you!",
+    ch: "\n{enemy}s {move} macht {damage} Schade a dir!",
+  },
+  enemyDescription: {
+    de: "\n{enemy} {description}",
+    en: "\n{enemy} {description}",
+    ch: "\n{enemy} {description}",
+  },
+  enemyMoveTerrifies: {
+    de: "\n{enemy}s {move} versetzt dich in Schrecken! Du verlierst deinen nächsten Zug.",
+    en: "\n{enemy}'s {move} terrifies you! You'll lose your next turn.",
+    ch: "\n{enemy}s {move} versetzt dich i Schrecke! Du verlürsch din nöchschte Zug.",
+  },
+  enemyMoveResisted: {
+    de: "\n{enemy} versucht dich mit {move} zu erschrecken, aber du widerstehst!",
+    en: "\n{enemy} tries to scare you with {move}, but you resist!",
+    ch: "\n{enemy} versuecht dich mit {move} z'erschrecke, aber du widerstahsch!",
+  },
+  enemyHeals: {
+    de: "\n{enemy} heilt sich um {amount} HP!",
+    en: "\n{enemy} heals for {amount} HP!",
+    ch: "\n{enemy} heilt sich um {amount} HP!",
+  },
+  enemyAppears: {
+    de: "\n⚔️ Ein wilder {enemy} erscheint mit {hp} HP!",
+    en: "\n⚔️ A wild {enemy} appears with {hp} HP!",
+    ch: "\n⚔️ En wilde {enemy} erschint mit {hp} HP!",
+  },
+  tooFrightenedToAct: {
+    de: "\nDu bist zu verängstigt, um in diesem Zug zu handeln!",
+    en: "\nYou are too frightened to act this turn!",
+    ch: "\nDu bisch z'verschreckt zum in dem Zug z'handle!",
+  },
+  youHaveBeenDefeated: {
+    de: "\n💀 Du wurdest besiegt!",
+    en: "\n💀 You have been defeated!",
+    ch: "\n💀 Du bisch besiegt worde!",
+  },
+  youDefeatedEnemy: {
+    de: "\n🎉 Du hast {enemy} besiegt!",
+    en: "\n🎉 You have defeated {enemy}!",
+    ch: "\n🎉 Du hesch {enemy} bsiegt!",
+  },
+  victoryGainedXp: {
+    de: "Sieg! Du erhältst {xp} XP.",
+    en: "Victory! You gained {xp} XP.",
+    ch: "Sieg! Du überchunsch {xp} XP.",
+  },
+  foundItemLoot: {
+    de: "\n💰 Du hast gefunden: {item}!",
+    en: "\n💰 You found: {item}!",
+    ch: "\n💰 Du hesch gfunde: {item}!",
+  },
+  foundItemInventoryFull: {
+    de: "\n💰 Du hast {item} gefunden, aber dein Inventar ist voll!",
+    en: "\n💰 You found {item}, but your inventory is full!",
+    ch: "\n💰 Du hesch {item} gfunde, aber dis Inventar isch voll!",
+  },
+  levelUp: {
+    de: "\n✨ Level Up! Du bist jetzt Level {level}! Deine Werte wurden erhöht.",
+    en: "\n✨ Level Up! You are now level {level}! Your stats have increased.",
+    ch: "\n✨ Level Up! Du bisch jetzt Level {level}! Dini Wert sind gstiege.",
+  },
+  useAbilityForDamage: {
+    de: "\nDu benutzt {ability} auf {enemy} und verursachst {damage} Schaden!",
+    en: "\nYou use {ability} on {enemy} for {damage} damage!",
+    ch: "\nDu bruuchsch {ability} uf {enemy} und machsch {damage} Schade!",
+  },
+  useAbilityForHealing: {
+    de: "\nDu benutzt {ability} und heilst dich um {amount} HP.",
+    en: "\nYou use {ability} and heal for {amount} HP.",
+    ch: "\nDu bruuchsch {ability} und heilsch dich um {amount} HP.",
+  },
+  useAbilityForBuff: {
+    de: "\nDu benutzt {ability} und erhältst +{amount} Stärke für diesen Kampf.",
+    en: "\nYou use {ability} and gain +{amount} strength for this battle.",
+    ch: "\nDu bruuchsch {ability} und überchunsch +{amount} Stärchi für dä Kampf.",
+  },
+  tryToEscape: {
+    de: "\nDu versuchst zu fliehen...",
+    en: "\nYou try to escape...",
+    ch: "\nDu versuechsch z'flüechte...",
+  },
+  escapeSuccessful: {
+    de: "\nDu konntest erfolgreich fliehen!",
+    en: "\nYou managed to escape!",
+    ch: "\nDu hesch es gschafft z'flüechte!",
+  },
+  escapeFailed: {
+    de: "\nDu konntest nicht fliehen!",
+    en: "\nYou failed to escape!",
+    ch: "\nDu hesch es nöd gschafft z'flüechte!",
+  },
+
   // #endregion
 
   // #region Campaign
@@ -1592,11 +1700,6 @@ const terms = {
     de: "Kampfbegegnung ausgelöst!",
     en: "Combat encounter triggered!",
     ch: "Kampfbegegnig usglöst!",
-  },
-  enemyAppears: {
-    de: "{enemy} erscheint vor dir!",
-    en: "{enemy} appears before you!",
-    ch: "{enemy} erschiint vor dir!",
   },
   combatDefeat: {
     de: "Du wurdest besiegt...",
