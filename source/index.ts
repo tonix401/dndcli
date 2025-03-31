@@ -81,6 +81,7 @@ async function handleMenuChoice(choice: string) {
       if (isSure === "yes") {
         await exitProgram();
       }
+      break;
     default:
       log(
         `Dev Menu: Unexpected menu choice: '${choice}', fallback onto default, showing error`,
