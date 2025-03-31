@@ -295,9 +295,9 @@ const terms = {
     ch: "Du hesch no Punkt zum verteile",
   },
   appointPoints: {
-    de: "Verteile Punkte für",
-    en: "Allocate points for",
-    ch: "Verteil Punkt für",
+    de: "Punkte für",
+    en: "Points for",
+    ch: "Punkt für",
   },
   pointsLeft: {
     de: "verbleibende Punkte",
